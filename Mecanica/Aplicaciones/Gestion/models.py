@@ -5,6 +5,9 @@ class Taller(models.Model):
     nombre_tall = models.CharField(max_length=255)
     descripcion_tall = models.TextField()
     logo_tall = models.FileField(upload_to="Taller",null=True,blank=True)
+    direccion_tall = models.CharField(max_length=100)
+    email_tall = models.EmailField()
+    telefono_tall = models.CharField(max_length=11)
 
 class Direccion(models.Model):
     id_dir = models.AutoField(primary_key=True)
@@ -58,7 +61,6 @@ class Vehiculo(models.Model):
     modelo_veh = models.CharField(max_length=255)
     placa_veh = models.CharField(max_length=20,unique=True)
     anio_veh = models.IntegerField()
-    km_veh = models.IntegerField()
     chasis_veh = models.CharField(max_length=255)
     color_veh = models.CharField(max_length=255)
     cli_id = models.ForeignKey(Cliente, on_delete=models.PROTECT)
@@ -71,8 +73,40 @@ class Servicio(models.Model):
 
 class Inspeccion(models.Model):
     id_ins = models.AutoField(primary_key=True)
-    nombre_ins = models.CharField(max_length=255)
-    valor_ins = models.IntegerField()
+    km = models.PositiveIntegerField()
+    nivel_gasolina = models.CharField(max_length=50)
+    plumas = models.BooleanField(default=False)
+    antena = models.BooleanField(default=False)
+    radio = models.BooleanField(default=False)
+    encendedor = models.BooleanField(default=False)
+    espejos = models.BooleanField(default=False)
+    gata = models.BooleanField(default=False)
+    llave_de_ruedas = models.BooleanField(default=False)
+    llanta_emergencia = models.BooleanField(default=False)
+    parlantes = models.BooleanField(default=False)
+    direccionales = models.BooleanField(default=False)
+    manubrios = models.BooleanField(default=False)
+    parabrisas = models.BooleanField(default=False)
+    t_seguridad = models.BooleanField(default=False)
+    tapa_radiador = models.BooleanField(default=False)
+    mandos_funcionales = models.BooleanField(default=False)
+    cenicero = models.BooleanField(default=False)
+    palanca = models.BooleanField(default=False)
+    herramientas = models.BooleanField(default=False)
+    botiquin = models.BooleanField(default=False)
+    tapa_gasolina = models.BooleanField(default=False)
+    lunas = models.BooleanField(default=False)
+    faros = models.BooleanField(default=False)
+    extintor = models.BooleanField(default=False)
+    tapa_cubas = models.BooleanField(default=False)
+    triangulos = models.BooleanField(default=False)
+    emblemas = models.BooleanField(default=False)
+    placas = models.BooleanField(default=False)
+    moquetas = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Inspección: {self.id} - KM: {self.km}"
+    
 
 class Danio(models.Model):
     id_dan = models.AutoField(primary_key=True)
@@ -81,9 +115,10 @@ class Danio(models.Model):
 class Orden(models.Model):
     id_ord=models.AutoField(primary_key=True)
     fecha_ord = models.DateField()
+    fecha_fin_ord = models.DateField()
     numero_ord = models.IntegerField()
     observaciones_ord = models.TextField()
-    estado_ord = models.IntegerField()
+    estado_ord = models.CharField(max_length=30)
     usuario_id = models.ForeignKey(Usuario,on_delete=models.PROTECT)
     vehiculo_id = models.ForeignKey(Vehiculo, on_delete=models.PROTECT)
     inspeccion_id = models.ForeignKey(Inspeccion, on_delete=models.PROTECT)
