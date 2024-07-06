@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Marcar Daños en Vehículo</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .marker {
+        position: absolute;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        cursor: pointer;
+        z-index: 10;
+      }
+      .comment-box {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 10px;
+        width: 250px;
+        display: none;
+        z-index: 1000;
+      }
+      #carImageContainer {
+        position: relative;
+        display: inline-block;
+        margin: 0;
+        padding: 0;
+      }
+      #markerContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none; /* Permitir clics a través del contenedor */
+      }
+      #markerContainer .marker,
+      #markerContainer .comment-box {
+        pointer-events: auto; /* Permitir clics en los marcadores y cajas de comentarios */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Marcar Daños en Vehículo</h1>
+    <div id="carImageContainer">
+      <img
+        id="carImage"
+        src="https://st1.uvnimg.com/dims4/default/0102b2f/2147483647/resize/1093x820%3E/quality/75/?url=http%3A%2F%2Fuvn-brightspot.s3.amazonaws.com%2Fd4%2F4a%2F006304a74db4902c0b4d8d8026c8%2Fchevrolet-corvette-c8-stingray-2020-1280-08.jpg"
+        alt="Diagrama del Vehículo"
+        style="width: 800px"
+      />
+      <!-- Contenedor para los marcadores y las cajas de comentarios -->
+      <div id="markerContainer"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      let markerCount = 0;
+      const carImage = document.getElementById("carImage");
+      const markerContainer = document.getElementById("markerContainer");
+      const danioId = 1; // Reemplaza con el ID del daño correspondiente
+
+      carImage.addEventListener("click", (e) => {
+        const rect = carImage.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        addMarker(x, y);
+      });
+
+      function addMarker(x, y) {
+        markerCount++;
+        const marker = document.createElement("div");
+        marker.className = "marker";
+        marker.innerText = markerCount;
+        marker.style.left = `${x - 10}px`;
+        marker.style.top = `${y - 10}px`;
+        marker.id = `marker-${Date.now()}`;
+        marker.addEventListener("click", (event) => {
+          event.stopPropagation(); // Prevenir que el click en el marcador dispare el click en la imagen
+          showCommentBox(marker, x, y);
+        });
+        markerContainer.appendChild(marker);
+      }
+
+      function showCommentBox(marker, x, y) {
+        // Si ya hay una caja de comentarios abierta, ciérrala
+        const existingCommentBoxes = document.querySelectorAll(".comment-box");
+        existingCommentBoxes.forEach((box) => (box.style.display = "none"));
+
+        let commentBox = marker.nextElementSibling;
+        if (!commentBox || !commentBox.classList.contains("comment-box")) {
+          commentBox = document.createElement("div");
+          commentBox.className = "comment-box p-2";
+          commentBox.style.left = `${x + 15}px`;
+          commentBox.style.top = `${y}px`;
+          commentBox.innerHTML = `
+                    <textarea class="form-control mb-2" placeholder="Describa el daño"></textarea>
+                    <button class="btn btn-success btn-sm mr-2" onclick="saveComment(this)">Guardar</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteMarker('${marker.id}', this)">Eliminar</button>
+                `;
+          markerContainer.appendChild(commentBox);
+        }
+        commentBox.style.display = "block";
+      }
+
+      function saveComment(button) {
+        const commentBox = button.parentElement;
+        const textarea = commentBox.querySelector("textarea");
+        alert(`Comentario guardado: ${textarea.value}`);
+        commentBox.style.display = "none";
+      }
+
+      function deleteMarker(markerId, button) {
+        const commentBox = button.parentElement;
+        const marker = document.getElementById(markerId);
+        marker.remove();
+        commentBox.remove();
+      }
+    </script>
+  </body>
+</html>

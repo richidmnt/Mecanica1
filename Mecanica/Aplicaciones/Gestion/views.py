@@ -1,13 +1,13 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import *
-
+# Gestion de usuarios
 def index(request):
     usuarios = Usuario.objects.all()
     return render(request, 'listaUsuarios.html', {'usuarios': usuarios})
 
 def guardarUsuario(request):
-    return render(request, 'guardarUsuario.html')
+    return render(request, 'registrarDanios.html')
 
 def registrarUsuario(request):
     if request.method == 'POST':
@@ -55,6 +55,9 @@ def eliminarUsuario(request, id):
         messages.error(request, 'El usuario no existe')
     
     return redirect('index')
+
+
+# Gestion de Clientes
 
 def listaClientes(request):
     clientes = Cliente.objects.all()
@@ -104,14 +107,12 @@ def actualizarCliente(request):
     if request.method == 'POST':
         id_cli = request.POST["id_cli"]
         cliente = Cliente.objects.get(id_cli=id_cli)
-        # Actualizar la dirección
         cliente.dir_id.ciudad_dir = request.POST['ciudad_dir']
         cliente.dir_id.barrio_dir = request.POST['barrio_dir']
         cliente.dir_id.calle_dir = request.POST['calle_dir']
         cliente.dir_id.numero_dir = request.POST['numero_dir']
         cliente.dir_id.save()
-
-        # Actualizar el cliente
+        
         cliente.nombre_cli = request.POST['nombre_cli']
         cliente.apellido_cli = request.POST['apellido_cli']
         cliente.ci_cli = request.POST['ci_cli']
@@ -120,6 +121,8 @@ def actualizarCliente(request):
         cliente.save()
         messages.success(request, 'Cliente actualizado correctamente')
         return redirect('listaClientes') 
+    
+# Gestion de servicios
 
 def listaServicios(request):
     servicios = Servicio.objects.all()
@@ -161,7 +164,7 @@ def actualizarServicio(request):
         messages.success(request, 'Servicio actualizado correctamente')
         return redirect('listaServicios')  # Redirige a la lista de servicios después de actualizar
 
-
+# Gestion de  Ordenes de trabajo
 def listaVehiculos(request):
     vehiculos =Vehiculo.objects.all()
     

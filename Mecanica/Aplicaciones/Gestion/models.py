@@ -125,6 +125,11 @@ class Orden(models.Model):
     inspeccion_id = models.ForeignKey(Inspeccion, on_delete=models.PROTECT)
     danios_id = models.ForeignKey(Danio, on_delete=models.PROTECT)
 
+    def calcular_total(self):
+        total_servicios = sum(item.subtotal for item in self.servicios.all())
+        total_repuestos = sum(item.subtotal_rep for item in self.repuestos.all())
+        return total_servicios + total_repuestos
+
 class OrdenServicio(models.Model):
     id_ord_ser = models.AutoField(primary_key=True)
     orden_id = models.ForeignKey(Orden, on_delete=models.CASCADE)
