@@ -1,0 +1,131 @@
+{% extends "./index.html" %} {% block body %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">Lista de Vehículos</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="card-body table-responsive p-0">
+                <table
+                  id="tbl_vehiculos"
+                  class="table table-head-fixed text-nowrap"
+                >
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Marca</th>
+                      <th>Modelo</th>
+                      <th>Placa</th>
+                      <th>Año</th>
+                      <th>Chasis</th>
+                      <th>Color</th>
+                      <th>Cliente</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for vehiculo in vehiculos %}
+                    <tr class="align-middle">
+                      <td>{{ vehiculo.id_veh }}</td>
+                      <td>{{ vehiculo.marca_veh }}</td>
+                      <td>{{ vehiculo.modelo_veh }}</td>
+                      <td>{{ vehiculo.placa_veh }}</td>
+                      <td>{{ vehiculo.anio_veh }}</td>
+                      <td>{{ vehiculo.chasis_veh }}</td>
+                      <td>{{ vehiculo.color_veh }}</td>
+                      <td>
+                        {{ vehiculo.cli_id.nombre_cli }}
+                        {{vehiculo.cli_id.apellido_cli }}
+                      </td>
+                      <td>
+                        <a
+                          href="/obtenerVehiculo/{{ vehiculo.id_veh }}/"
+                          class="btn btn-outline-warning"
+                          >Editar</a
+                        >
+                        <a
+                          href="/detallesVehiculo/{{ vehiculo.id_veh }}/"
+                          class="btn btn-outline-primary"
+                          >Detalles</a
+                        >
+                        <a
+                          href="#"
+                          onclick="eliminar('/eliminarVehiculo/{{ vehiculo.id_veh }}/')"
+                          class="btn btn-danger"
+                          ><i class="bi bi-trash"></i>Eliminar</a
+                        >
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="{% url 'guardarVehiculo' %}" class="btn btn-success"
+              ><i class="fa fa-plus nav-icon"></i> Nuevo Vehículo</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  function eliminar(url) {
+    iziToast.question({
+      timeout: 15000,
+      close: true,
+      overlay: true,
+      displayMode: "once",
+      id: "question",
+      zindex: 999,
+      title: "Confirmación",
+      message: "¿Está seguro de eliminar el vehículo seleccionado?",
+      position: "center",
+      buttons: [
+        [
+          "<button><b>SI</b></button>",
+          function (instance, toast) {
+            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+            window.location.href = url;
+          },
+          true,
+        ],
+        [
+          "<button>NO</button>",
+          function (instance, toast) {
+            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+          },
+        ],
+      ],
+      onClosing: function (instance, toast, closedBy) {
+        console.info("Closing | closedBy: " + closedBy);
+      },
+      onClosed: function (instance, toast, closedBy) {
+        console.info("Closed | closedBy: " + closedBy);
+      },
+    });
+  }
+</script>
+{% endblock %} {% block extra_scripts %}
+<script>
+  $(document).ready(function () {
+    $("#tbl_vehiculos")
+      .DataTable({
+        responsive: true,
+        lengthChange: false,
+        autoWidth: false,
+        buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
+      })
+      .buttons()
+      .container()
+      .appendTo("#tbl_vehiculos_wrapper .col-md-6:eq(0)");
+  });
+</script>
+{% endblock %}

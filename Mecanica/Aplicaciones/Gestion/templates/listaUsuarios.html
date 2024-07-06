@@ -1,0 +1,191 @@
+{% extends "./index.html" %} {% load static %} {% block body %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <!-- Default box -->
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">Lista de Usuarios</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="card-body table-responsive p-0">
+                <table
+                  id="tbl_equipos"
+                  class="table table-head-fixed text-nowrap"
+                >
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Usuario</th>
+                      <th>Nombre</th>
+                      <th>Apellido</th>
+                      <th>Telefono</th>
+                      <th>Email</th>
+                      <th>Rol</th>
+                      <th>Estado</th>
+                      <th>ACCIONES</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for usuario in usuarios %}
+                    <tr class="align-middle">
+                      <td>{{usuario.id_usr}}</td>
+                      <td>{{usuario.username}}</td>
+                      <td>{{usuario.nombre}}</td>
+                      <th>{{usuario.apellido}}</th>
+                      <th>{{usuario.telefono}}</th>
+                      <th>{{usuario.email}}</th>
+                      <th>{{usuario.rol}}</th>
+                      <th>
+                        {% if usuario.is_active %}
+                        <span class="badge bg-success">Activo</span>
+                        {% else %}
+                        <span class="badge bg-warning text-dark">Inactivo</span>
+                        {% endif %}
+                      </th>
+
+                      <td>
+                        <a
+                          href="/obtenerUsuario/{{usuario.id_usr}}/"
+                          class="btn btn-outline-warning"
+                          >Editar</a
+                        >
+                        <a
+                          href="#"
+                          onclick="eliminar('/eliminarUsuario/{{ usuario.id_usr}}')"
+                          class="btn btn-danger"
+                          ><i class="bi bi-trash"></i>Eliminar</a
+                        >
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- /.card-body -->
+          <div class="card-footer">
+            <a href="{% url 'guardarUsuario' %}" class="btn btn-success"
+              ><i class="fa fa-plus nav-icon"></i> Nuevo Usuario</a
+            >
+          </div>
+          <!-- /.card-footer-->
+        </div>
+        <!-- /.card -->
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  function eliminar(url) {
+    iziToast.question({
+      timeout: 15000,
+      close: true,
+      overlay: true,
+      displayMode: "once",
+      id: "question",
+      zindex: 999,
+      title: "Confirmación",
+      message: "¿Está seguro de eliminar el equipo seleccionado?",
+      position: "center",
+      buttons: [
+        [
+          "<button><b>SI</b></button>",
+          function (instance, toast) {
+            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+            window.location.href = url;
+          },
+          true,
+        ],
+        [
+          "<button>NO</button>",
+          function (instance, toast) {
+            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+          },
+        ],
+      ],
+      onClosing: function (instance, toast, closedBy) {
+        console.info("Closing | closedBy: " + closedBy);
+      },
+      onClosed: function (instance, toast, closedBy) {
+        console.info("Closed | closedBy: " + closedBy);
+      },
+    });
+  }
+  function mostrarMensaje() {
+    iziToast.success({
+      title: "OK",
+      message: "Successfully inserted record!",
+      position: "topRight",
+    });
+  }
+</script>
+<!--/ Bordered Table -->
+<script type="text/javascript">
+  $(document).ready(function () {
+    $("#tbl_proveedor").DataTable({
+      dom: "Bfrtip",
+      language: {
+        sProcessing: "Procesando...",
+        sLengthMenu: "Mostrar _MENU_ registros",
+        sZeroRecords: "No se encontraron resultados",
+        sEmptyTable: "Ningún dato disponible en esta tabla",
+        sInfo:
+          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+        sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+        sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+        sInfoPostFix: "",
+        sSearch: "Buscar:",
+        sUrl: "",
+        sInfoThousands: ",",
+        sLoadingRecords: "Cargando...",
+        oPaginate: {
+          sFirst: "Primero",
+          sLast: "Último",
+          sNext: "Siguiente",
+          sPrevious: "Anterior",
+        },
+        oAria: {
+          sSortAscending:
+            ": Activar para ordenar la columna de manera ascendente",
+          sSortDescending:
+            ": Activar para ordenar la columna de manera descendente",
+        },
+      },
+      buttons: [
+        {
+          extend: "pdfHtml5",
+          messageTop: "PDF creado por PDFMake con botones para DataTables.",
+          className: "btn btn-success", // Agregar clase de estilo de Bootstrap
+        },
+        {
+          extend: "print",
+          className: "btn btn-success", // Agregar clase de estilo de Bootstrap
+        },
+        {
+          extend: "csv",
+          className: "btn btn-success", // Agregar clase de estilo de Bootstrap
+        },
+      ],
+    });
+  });
+</script>
+{% endblock %} {% block extra_scripts %}
+<script>
+  $(document).ready(function () {
+    $("#tbl_equipos")
+      .DataTable({
+        responsive: true,
+        lengthChange: false,
+        autoWidth: false,
+        buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
+      })
+      .buttons()
+      .container()
+      .appendTo("#tbl_equipos_wrapper .col-md-6:eq(0)");
+  });
+</script>
+{% endblock %}

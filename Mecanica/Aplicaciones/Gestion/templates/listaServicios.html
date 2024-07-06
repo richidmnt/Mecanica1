@@ -1,0 +1,120 @@
+{% extends "./index.html" %} {% block body %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">Lista de Servicios</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="card-body table-responsive p-0">
+                <table
+                  id="tbl_servicios"
+                  class="table table-head-fixed text-nowrap"
+                >
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Nombre</th>
+                      <th>Descripción</th>
+                      <th>Precio</th>
+                      <th>ACCIONES</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for servicio in servicios %}
+                    <tr class="align-middle">
+                      <td>{{ servicio.id_ser }}</td>
+                      <td>{{ servicio.nombre_ser }}</td>
+                      <td>{{ servicio.descripcion_ser }}</td>
+                      <td>{{ servicio.precio_ser }}</td>
+                      <td>
+                        <a
+                          href="/obtenerServicio/{{ servicio.id_ser }}/"
+                          class="btn btn-outline-warning"
+                          >Editar</a
+                        >
+                        <a
+                          href="/detallesServicio/{{ servicio.id_ser }}/"
+                          class="btn btn-outline-primary"
+                          >Detalles</a
+                        >
+                        <a
+                          href="#"
+                          onclick="eliminar('/eliminarServicio/{{ servicio.id_ser }}/')"
+                          class="btn btn-danger"
+                          ><i class="bi bi-trash"></i>Eliminar</a
+                        >
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <a href="{% url 'guardarServicio' %}" class="btn btn-success"
+              ><i class="fa fa-plus nav-icon"></i> Nuevo Servicio</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  function eliminar(url) {
+    iziToast.question({
+      timeout: 15000,
+      close: true,
+      overlay: true,
+      displayMode: "once",
+      id: "question",
+      zindex: 999,
+      title: "Confirmación",
+      message: "¿Está seguro de eliminar el servicio seleccionado?",
+      position: "center",
+      buttons: [
+        [
+          "<button><b>SI</b></button>",
+          function (instance, toast) {
+            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+            window.location.href = url;
+          },
+          true,
+        ],
+        [
+          "<button>NO</button>",
+          function (instance, toast) {
+            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+          },
+        ],
+      ],
+      onClosing: function (instance, toast, closedBy) {
+        console.info("Closing | closedBy: " + closedBy);
+      },
+      onClosed: function (instance, toast, closedBy) {
+        console.info("Closed | closedBy: " + closedBy);
+      },
+    });
+  }
+</script>
+{% endblock %} {% block extra_scripts %}
+<script>
+  $(document).ready(function () {
+    $("#tbl_servicios")
+      .DataTable({
+        responsive: true,
+        lengthChange: false,
+        autoWidth: false,
+        buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
+      })
+      .buttons()
+      .container()
+      .appendTo("#tbl_servicios_wrapper .col-md-6:eq(0)");
+  });
+</script>
+{% endblock %}

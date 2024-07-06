@@ -59,7 +59,7 @@ class Vehiculo(models.Model):
     id_veh = models.AutoField(primary_key=True)
     marca_veh = models.CharField(max_length=255)
     modelo_veh = models.CharField(max_length=255)
-    placa_veh = models.CharField(max_length=20,unique=True)
+    placa_veh = models.CharField(max_length=20, unique=True)
     anio_veh = models.IntegerField()
     chasis_veh = models.CharField(max_length=255)
     color_veh = models.CharField(max_length=255)
@@ -111,11 +111,12 @@ class Inspeccion(models.Model):
 class Danio(models.Model):
     id_dan = models.AutoField(primary_key=True)
     imagen_dan = models.FileField(upload_to="danio",null=True,blank=True)
+    descripciom_dan = models.TextField()
 
 class Orden(models.Model):
     id_ord=models.AutoField(primary_key=True)
-    fecha_ord = models.DateField()
-    fecha_fin_ord = models.DateField()
+    fecha_ord = models.DateTimeField()
+    fecha_fin_ord = models.DateTimeField()
     numero_ord = models.IntegerField()
     observaciones_ord = models.TextField()
     estado_ord = models.CharField(max_length=30)

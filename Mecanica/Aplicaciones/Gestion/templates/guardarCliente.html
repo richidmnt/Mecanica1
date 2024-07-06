@@ -1,0 +1,237 @@
+{% extends "./index.html" %} {% block body %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">Registrar Cliente</h3>
+          </div>
+          <div class="card-body">
+            <div class="row justify-content-center">
+              <div class="col-lg-12">
+                <div class="card card-success">
+                  <div class="card-header">
+                    <h2 class="card-title text-center">Registrar Cliente</h2>
+                  </div>
+                  <div class="card-body">
+                    <form
+                      id="clienteForm"
+                      method="post"
+                      action="/registrarCliente/"
+                    >
+                      {% csrf_token %}
+                      <div class="row">
+                        <div class="col-md-8">
+                          <div class="row">
+                            <div class="col-6">
+                              <div class="form-group">
+                                <label for="id_nombre_cli" class="form-label"
+                                  >Nombre:</label
+                                >
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  id="id_nombre_cli"
+                                  name="nombre_cli"
+                                  required
+                                />
+                              </div>
+                            </div>
+                            <div class="col-6">
+                              <div class="form-group">
+                                <label for="id_apellido_cli" class="form-label"
+                                  >Apellido:</label
+                                >
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  id="id_apellido_cli"
+                                  name="apellido_cli"
+                                  required
+                                />
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="id_ci_cli" class="form-label"
+                              >Cédula de Identidad:</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              id="id_ci_cli"
+                              name="ci_cli"
+                            />
+                          </div>
+                          <div class="form-group">
+                            <label for="id_telefono_cli" class="form-label"
+                              >Teléfono:</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              id="id_telefono_cli"
+                              name="telefono_cli"
+                            />
+                          </div>
+                          <div class="form-group">
+                            <label for="id_email_cli" class="form-label"
+                              >Correo Electrónico:</label
+                            >
+                            <input
+                              type="email"
+                              class="form-control"
+                              id="id_email_cli"
+                              name="email_cli"
+                              required
+                            />
+                          </div>
+                        </div>
+                        <div
+                          class="col-md-4 p-3"
+                          style="border-left: 1px solid black"
+                        >
+                          <h2>Dirección</h2>
+                          <div class="form-group">
+                            <label for="ciudad_dir" class="form-label"
+                              >Ciudad:</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              id="ciudad_dir"
+                              name="ciudad_dir"
+                              required
+                            />
+                          </div>
+                          <div class="form-group">
+                            <label for="barrio_dir" class="form-label"
+                              >Barrio:</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              id="barrio_dir"
+                              name="barrio_dir"
+                              required
+                            />
+                          </div>
+                          <div class="form-group">
+                            <label for="calle_dir" class="form-label"
+                              >Calle:</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              id="calle_dir"
+                              name="calle_dir"
+                              required
+                            />
+                          </div>
+                          <div class="form-group">
+                            <label for="numero_dir" class="form-label"
+                              >Número:</label
+                            >
+                            <input
+                              type="text"
+                              class="form-control"
+                              id="numero_dir"
+                              name="numero_dir"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-primary">
+                          Registrar Cliente
+                        </button>
+                        <a
+                          href="{% url 'listaClientes' %}"
+                          class="btn btn-secondary"
+                          >Cancelar</a
+                        >
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %} {% block extra_scripts %}
+<script>
+  // Validación del formulario utilizando jQuery Validation
+  $("#clienteForm").validate({
+    rules: {
+      nombre_cli: {
+        required: true,
+        minlength: 3,
+      },
+      apellido_cli: {
+        required: true,
+        minlength: 3,
+      },
+      ci_cli: {
+        minlength: 7,
+        maxlength: 15,
+      },
+      telefono_cli: {
+        digits: true,
+        minlength: 7,
+        maxlength: 15,
+      },
+      email_cli: {
+        required: true,
+        email: true,
+      },
+      dir_id: {
+        minlength: 5,
+      },
+    },
+    messages: {
+      nombre_cli: {
+        required: "Por favor, ingresa el nombre del cliente",
+        minlength: "El nombre debe tener al menos 3 caracteres",
+      },
+      apellido_cli: {
+        required: "Por favor, ingresa el apellido del cliente",
+        minlength: "El apellido debe tener al menos 3 caracteres",
+      },
+      ci_cli: {
+        minlength: "La cédula debe tener al menos 7 caracteres",
+        maxlength: "La cédula no puede tener más de 15 caracteres",
+      },
+      telefono_cli: {
+        digits: "Por favor, ingresa solo números",
+        minlength: "El teléfono debe tener al menos 7 dígitos",
+        maxlength: "El teléfono no puede tener más de 15 dígitos",
+      },
+      email_cli: {
+        required: "Por favor, ingresa el correo electrónico del cliente",
+        email: "Por favor, ingresa un correo electrónico válido",
+      },
+      dir_id: {
+        minlength: "La dirección debe tener al menos 5 caracteres",
+      },
+    },
+    errorElement: "span",
+    errorPlacement: function (error, element) {
+      error.addClass("invalid-feedback");
+      element.closest(".form-group").append(error);
+    },
+    highlight: function (element, errorClass, validClass) {
+      $(element).addClass("is-invalid");
+    },
+    unhighlight: function (element, errorClass, validClass) {
+      $(element).removeClass("is-invalid");
+    },
+  });
+</script>
+{% endblock %}
