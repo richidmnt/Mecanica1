@@ -1,0 +1,183 @@
+{% extends "./index.html" %} {% load static %} {% block body %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <!-- Default box -->
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">Lista de Órdenes No Finalizadas</h3>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="card-body table-responsive p-0">
+                <table
+                  id="tbl_ordenes"
+                  class="table table-head-fixed text-nowrap"
+                >
+                  <thead>
+                    <tr>
+                      <th>Número de Orden</th>
+                      <th>Fecha de Inicio</th>
+                      <th>Cliente</th>
+                      <th>Auto</th>
+                      <th>Estado</th>
+                      <th>ACCIONES</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for orden in ordenes %}
+                    <tr class="align-middle">
+                      <td>{{ orden.numero_ord }}</td>
+                      <td>{{ orden.fecha_ord|date:"d/m/Y H:i" }}</td>
+                      <td>
+                        {{ orden.vehiculo_id.cli_id.nombre_cli }}
+                        {{orden.vehiculo_id.cli_id.apellido_cli }}
+                      </td>
+                      <td>
+                        {{ orden.vehiculo_id.marca_veh}}
+                        {{orden.vehiculo_id.modelo_veh }}
+                      </td>
+                      <td>{{ orden.get_estado_ord_display }}</td>
+                      <td>
+                        <a
+                          href="/detalleOrden/{{ orden.id_ord }}/"
+                          class="btn btn-outline-primary"
+                          >Detalles</a
+                        >
+                        <a
+                          href="/editarOrden/{{ orden.id_ord }}/"
+                          class="btn btn-outline-warning"
+                          >Editar</a
+                        >
+                        <a
+                          href="#"
+                          onclick="eliminar('/eliminarOrden/{{ orden.id_ord }}/')"
+                          class="btn btn-danger"
+                        >
+                          <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <!-- /.card-body -->
+          <div class="card-footer">
+            <a href="" class="btn btn-success">
+              <i class="fa fa-plus nav-icon"></i> Nueva Orden
+            </a>
+          </div>
+          <!-- /.card-footer-->
+        </div>
+        <!-- /.card -->
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  function eliminar(url) {
+    iziToast.question({
+      timeout: 15000,
+      close: true,
+      overlay: true,
+      displayMode: "once",
+      id: "question",
+      zindex: 999,
+      title: "Confirmación",
+      message: "¿Está seguro de eliminar la orden seleccionada?",
+      position: "center",
+      buttons: [
+        [
+          "<button><b>SI</b></button>",
+          function (instance, toast) {
+            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+            window.location.href = url;
+          },
+          true,
+        ],
+        [
+          "<button>NO</button>",
+          function (instance, toast) {
+            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+          },
+        ],
+      ],
+      onClosing: function (instance, toast, closedBy) {
+        console.info("Closing | closedBy: " + closedBy);
+      },
+      onClosed: function (instance, toast, closedBy) {
+        console.info("Closed | closedBy: " + closedBy);
+      },
+    });
+  }
+</script>
+<!--/ Bordered Table -->
+<script type="text/javascript">
+  $(document).ready(function () {
+    $("#tbl_ordenes").DataTable({
+      dom: "Bfrtip",
+      language: {
+        sProcessing: "Procesando...",
+        sLengthMenu: "Mostrar _MENU_ registros",
+        sZeroRecords: "No se encontraron resultados",
+        sEmptyTable: "Ningún dato disponible en esta tabla",
+        sInfo:
+          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+        sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+        sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+        sInfoPostFix: "",
+        sSearch: "Buscar:",
+        sUrl: "",
+        sInfoThousands: ",",
+        sLoadingRecords: "Cargando...",
+        oPaginate: {
+          sFirst: "Primero",
+          sLast: "Último",
+          sNext: "Siguiente",
+          sPrevious: "Anterior",
+        },
+        oAria: {
+          sSortAscending:
+            ": Activar para ordenar la columna de manera ascendente",
+          sSortDescending:
+            ": Activar para ordenar la columna de manera descendente",
+        },
+      },
+      buttons: [
+        {
+          extend: "pdfHtml5",
+          messageTop: "PDF creado por PDFMake con botones para DataTables.",
+          className: "btn btn-success",
+        },
+        {
+          extend: "print",
+          className: "btn btn-success",
+        },
+        {
+          extend: "csv",
+          className: "btn btn-success",
+        },
+      ],
+    });
+  });
+</script>
+{% endblock %} {% block extra_scripts %}
+<script>
+  $(document).ready(function () {
+    $("#tbl_ordenes")
+      .DataTable({
+        responsive: true,
+        lengthChange: false,
+        autoWidth: false,
+        buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
+      })
+      .buttons()
+      .container()
+      .appendTo("#tbl_ordenes_wrapper .col-md-6:eq(0)");
+  });
+</script>
+{% endblock %}

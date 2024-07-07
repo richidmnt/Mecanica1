@@ -9,12 +9,7 @@ class Taller(models.Model):
     email_tall = models.EmailField()
     telefono_tall = models.CharField(max_length=11)
 
-class Direccion(models.Model):
-    id_dir = models.AutoField(primary_key=True)
-    ciudad_dir = models.CharField(max_length=255)
-    barrio_dir = models.CharField(max_length=255)
-    calle_dir = models.CharField(max_length=255)
-    numero_dir = models.CharField(max_length=10)
+
 
 class Usuario(models.Model):
     id_usr = models.AutoField(primary_key=True)
@@ -45,6 +40,12 @@ class Usuario(models.Model):
         return f"{self.nombre} {self.apellido} ({self.username})"
 
 
+class Direccion(models.Model):
+    id_dir = models.AutoField(primary_key=True)
+    ciudad_dir = models.CharField(max_length=255)
+    barrio_dir = models.CharField(max_length=255)
+    calle_dir = models.CharField(max_length=255)
+    numero_dir = models.CharField(max_length=10)
 
 class Cliente(models.Model):
     id_cli = models.AutoField(primary_key=True)
@@ -108,27 +109,38 @@ class Inspeccion(models.Model):
         return f"Inspección: {self.id} - KM: {self.km}"
     
 
-class Danio(models.Model):
-    id_dan = models.AutoField(primary_key=True)
-    imagen_dan = models.FileField(upload_to="danio",null=True,blank=True)
-    descripciom_dan = models.TextField()
-
 class Orden(models.Model):
-    id_ord=models.AutoField(primary_key=True)
+    ESTADOS = [
+        ('PENDIENTE', 'Pendiente'),
+        ('EN_PROGRESO', 'En Progreso'),
+        ('ESPERANDO_REPUESTOS', 'Esperando Repuestos'),
+        ('COMPLETADA', 'Completada'),
+        ('FINALIZADA', 'Finalizada'),
+    ]
+    id_ord = models.AutoField(primary_key=True)
     fecha_ord = models.DateTimeField()
-    fecha_fin_ord = models.DateTimeField()
+    fecha_fin_ord = models.DateTimeField(null=True, blank=True)
     numero_ord = models.IntegerField()
     observaciones_ord = models.TextField()
-    estado_ord = models.CharField(max_length=30)
-    usuario_id = models.ForeignKey(Usuario,on_delete=models.PROTECT)
-    vehiculo_id = models.ForeignKey(Vehiculo, on_delete=models.PROTECT)
-    inspeccion_id = models.ForeignKey(Inspeccion, on_delete=models.PROTECT)
-    danios_id = models.ForeignKey(Danio, on_delete=models.PROTECT)
+    estado_ord = models.CharField(max_length=20, choices=ESTADOS, default='PENDIENTE')
+    usuario_id = models.ForeignKey('Usuario', on_delete=models.PROTECT, related_name='ordenes')
+    vehiculo_id = models.ForeignKey('Vehiculo', on_delete=models.PROTECT, related_name='ordenes')
+    inspeccion_id = models.ForeignKey('Inspeccion', on_delete=models.PROTECT, related_name='ordenes')
+    def __str__(self):
+        return f"Orden: {self.numero_ord} - Estado: {self.get_estado_ord_display()}"
 
     def calcular_total(self):
         total_servicios = sum(item.subtotal for item in self.servicios.all())
         total_repuestos = sum(item.subtotal_rep for item in self.repuestos.all())
         return total_servicios + total_repuestos
+    def save(self, *args, **kwargs):
+        if self.numero_ord is None:
+            max_numero_ord = Orden.objects.aggregate(models.Max('numero_ord'))['numero_ord__max']
+            if max_numero_ord is None:
+                self.numero_ord = 1
+            else:
+                self.numero_ord = max_numero_ord + 1
+        super().save(*args, **kwargs)
 
 class OrdenServicio(models.Model):
     id_ord_ser = models.AutoField(primary_key=True)
@@ -136,7 +148,17 @@ class OrdenServicio(models.Model):
     servicio_id = models.ForeignKey(Servicio, on_delete=models.CASCADE)
     subtotal = models.DecimalField(max_digits=10,decimal_places=2)
 
-    
+
+class Danio(models.Model):
+    id_dan = models.AutoField(primary_key=True)
+    x_pos = models.FloatField()
+    y_pos = models.FloatField()
+    descripcion_dan = models.TextField()
+    orden = models.ForeignKey('Orden', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"Daño en Orden: {self.orden} - {self.descripcion_dan}"
+
 class OrdenRepuesto(models.Model):
     id_rep = models.AutoField(primary_key=True)
     orden_id = models.ForeignKey(Orden, on_delete=models.CASCADE)

@@ -23,5 +23,13 @@ urlpatterns = [
     path('registrarVehiculo/',views.registrarVehiculo),
     path('eliminarVehiculo/<id>/',views.eliminarVehiculo),
     path('obtenerVehiculo/<id>/',views.obtenerVehiculo),
-    path('actualizarVehiculo/',views.actualizarVehiculo)
+    path('actualizarVehiculo/',views.actualizarVehiculo),
+    path('guardarOrden/',views.guardarOrden,name="ordenCliente"),
+    path('registrarOrden/',views.registrarOrden),
+    path('listarOrdenesF/',views.listarOrdenesNoFinalizadas,name="listarOrdenes"),
+    path('registrarDanios/',views.registrarDanios,name="registrarDanios"),
+    path('guardarDanios/',views.guardarDanios),
+    path('listarDanios/',views.listarDanios,name="listarDanios"),
+    path('editarDanio/<id_ord>/',views.obtenerDanios)
+    
 ]

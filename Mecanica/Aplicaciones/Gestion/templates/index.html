@@ -329,18 +329,6 @@
                       <p>Lista Usuarios</p>
                     </a>
                   </li>
-                  <li class="nav-item">
-                    <a href="" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Equipos</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Jugadores</p>
-                    </a>
-                  </li>
                 </ul>
               </li>
               <li class="nav-item">
@@ -402,6 +390,41 @@
                     <a href="{% url 'listaVehiculos' %}" class="nav-link">
                       <i class="far fa-circle nav-icon"></i>
                       <p>Lista Vehículos</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="" class="nav-link">
+                  <i class="nav-icon fas fa-tachometer-alt"></i>
+                  <p>
+                    Ordenes de trabajo
+                    <i class="right fas fa-angle-left"></i>
+                  </p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{% url 'ordenCliente' %}" class="nav-link">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Nueva Orden</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'listarOrdenes' %}" class="nav-link">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Lista de Ordenes</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'registrarDanios' %}" class="nav-link">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>RegistrarDanios</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{% url 'listarDanios' %}" class="nav-link">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Listar Danios</p>
                     </a>
                   </li>
                 </ul>

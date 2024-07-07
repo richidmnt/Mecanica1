@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Marcar Daños en Vehículo</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .marker {
+        position: absolute;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 12px;
+        cursor: pointer;
+        z-index: 10;
+      }
+      .comment-box {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 10px;
+        width: 250px;
+        display: none;
+        z-index: 1000;
+      }
+      #carImageContainer {
+        position: relative;
+        display: inline-block;
+        margin: 0;
+        padding: 0;
+      }
+      #markerContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      #markerContainer .marker,
+      #markerContainer .comment-box {
+        pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Marcar Daños en Vehículo</h1>
+    <form id="daniosForm" method="post" action="/guardarDanios/">
+      {% csrf_token %}
+      <div class="form-group">
+        <select name="" id=""></select>
+      </div>
+      <div id="carImageContainer">
+        <img
+          id="carImage"
+          src="https://st1.uvnimg.com/dims4/default/0102b2f/2147483647/resize/1093x820%3E/quality/75/?url=http%3A%2F%2Fuvn-brightspot.s3.amazonaws.com%2Fd4%2F4a%2F006304a74db4902c0b4d8d8026c8%2Fchevrolet-corvette-c8-stingray-2020-1280-08.jpg"
+          alt="Diagrama del Vehículo"
+          style="width: 800px"
+        />
+        <div id="markerContainer"></div>
+      </div>
+      <button type="submit" class="btn btn-primary mt-3">Guardar Daños</button>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      let markerCount = 0;
+      const carImage = document.getElementById("carImage");
+      const markerContainer = document.getElementById("markerContainer");
+
+      // Cargar los daños existentes
+      document.addEventListener("DOMContentLoaded", function () {
+        const danios = {{ danios|safe }};
+        danios.forEach(danio => {
+          addMarker(danio.x_pos, danio.y_pos, danio.descripcion_dan);
+        });
+      });
+
+      carImage.addEventListener("click", (e) => {
+        const rect = carImage.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        addMarker(x, y);
+      });
+
+      function addMarker(x, y, description = '') {
+        markerCount++;
+        const marker = document.createElement("div");
+        marker.className = "marker";
+        marker.innerText = markerCount;
+        marker.style.left = `${x - 10}px`;
+        marker.style.top = `${y - 10}px`;
+        marker.id = `marker-${Date.now()}`;
+        marker.addEventListener("click", (event) => {
+          event.stopPropagation();
+          showCommentBox(marker, x, y, description);
+        });
+        markerContainer.appendChild(marker);
+
+        // Añadir la caja de comentarios si hay una descripción
+        if (description) {
+          showCommentBox(marker, x, y, description);
+        }
+      }
+
+      function showCommentBox(marker, x, y, description = '') {
+        const existingCommentBoxes = document.querySelectorAll(".comment-box");
+        existingCommentBoxes.forEach((box) => (box.style.display = "none"));
+
+        let commentBox = marker.nextElementSibling;
+        if (!commentBox || !commentBox.classList.contains("comment-box")) {
+          commentBox = document.createElement("div");
+          commentBox.className = "comment-box p-2";
+          commentBox.style.left = `${x + 15}px`;
+          commentBox.style.top = `${y}px`;
+          commentBox.innerHTML = `
+            <textarea class="form-control mb-2" placeholder="Describa el daño">${description}</textarea>
+            <button class="btn btn-success btn-sm mr-2" onclick="saveComment(event, this, ${x}, ${y})">Guardar</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteMarker('${marker.id}', this)">Eliminar</button>
+          `;
+          markerContainer.appendChild(commentBox);
+        }
+        commentBox.style.display = "block";
+      }
+
+      function saveComment(event, button, x, y) {
+        event.preventDefault();
+        const commentBox = button.parentElement;
+        const textarea = commentBox.querySelector("textarea");
+        const description = textarea.value;
+
+        const form = document.getElementById("daniosForm");
+        const inputX = document.createElement("input");
+        inputX.type = "hidden";
+        inputX.name = "x_pos[]";
+        inputX.value = x;
+
+        const inputY = document.createElement("input");
+        inputY.type = "hidden";
+        inputY.name = "y_pos[]";
+        inputY.value = y;
+
+        const inputDescription = document.createElement("input");
+        inputDescription.type = "hidden";
+        inputDescription.name = "descripcion_dan[]";
+        inputDescription.value = description;
+
+        form.appendChild(inputX);
+        form.appendChild(inputY);
+        form.appendChild(inputDescription);
+
+        alert(`Comentario guardado: ${description}`);
+        commentBox.style.display = "none";
+      }
+
+      function deleteMarker(markerId, button) {
+        const commentBox = button.parentElement;
+        const marker = document.getElementById(markerId);
+        marker.remove();
+        commentBox.remove();
+      }
+    </script>
+  </body>
+</html>
