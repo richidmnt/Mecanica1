@@ -239,7 +239,7 @@ def guardarOrden(request):
             'ESTADOS': Orden.ESTADOS,
         }
     return render(request,'generarorden.html',context)
-
+"""
 def registrarOrden(request):
     if request.method == 'POST':
         # Crear dirección
@@ -333,7 +333,120 @@ def registrarOrden(request):
             )
         messages.success(request, 'orden creado correctamente')
         return redirect('/') 
+"""
+def registrarOrden(request):
+    if request.method == 'POST':
+        print("Datos POST recibidos:", request.POST)  # Añadir esta línea
+        try:
+            # Crear dirección
+            direccion = Direccion.objects.create(
+                ciudad_dir=request.POST['ciudad_dir'],
+                barrio_dir=request.POST['barrio_dir'],
+                calle_dir=request.POST['calle_dir'],
+                numero_dir=request.POST['numero_dir']
+            )
 
+            # Crear cliente
+            cliente = Cliente.objects.create(
+                nombre_cli=request.POST['nombre_cli'],
+                apellido_cli=request.POST['apellido_cli'],
+                ci_cli=request.POST['ci_cli'],
+                telefono_cli=request.POST['telefono_cli'],
+                email_cli=request.POST['email_cli'],
+                dir_id=direccion
+            )
+
+            # Crear vehículo
+            vehiculo = Vehiculo.objects.create(
+                marca_veh=request.POST['marca_veh'],
+                modelo_veh=request.POST['modelo_veh'],
+                placa_veh=request.POST['placa_veh'],
+                anio_veh=request.POST['anio_veh'],
+                chasis_veh=request.POST['chasis_veh'],
+                color_veh=request.POST['color_veh'],
+                cli_id=cliente
+            )
+
+            # Crear inspección
+            inspeccion = Inspeccion.objects.create(
+                km=request.POST['km'],
+                nivel_gasolina=request.POST['nivel_gasolina'],
+                plumas='plumas' in request.POST,
+                antena='antena' in request.POST,
+                radio='radio' in request.POST,
+                encendedor='encendedor' in request.POST,
+                espejos='espejos' in request.POST,
+                gata='gata' in request.POST,
+                llave_de_ruedas='llave_de_ruedas' in request.POST,
+                llanta_emergencia='llanta_emergencia' in request.POST,
+                parlantes='parlantes' in request.POST,
+                direccionales='direccionales' in request.POST,
+                manubrios='manubrios' in request.POST,
+                parabrisas='parabrisas' in request.POST,
+                t_seguridad='t_seguridad' in request.POST,
+                tapa_radiador='tapa_radiador' in request.POST,
+                mandos_funcionales='mandos_funcionales' in request.POST,
+                cenicero='cenicero' in request.POST,
+                palanca='palanca' in request.POST,
+                herramientas='herramientas' in request.POST,
+                botiquin='botiquin' in request.POST,
+                tapa_gasolina='tapa_gasolina' in request.POST,
+                lunas='lunas' in request.POST,
+                faros='faros' in request.POST,
+                extintor='extintor' in request.POST,
+                tapa_cubas='tapa_cubas' in request.POST,
+                triangulos='triangulos' in request.POST,
+                emblemas='emblemas' in request.POST,
+                placas='placas' in request.POST,
+                moquetas='moquetas' in request.POST
+            )
+
+            # Generar el próximo número de orden
+            ultimo_numero_ord = Orden.objects.all().order_by('numero_ord').last()
+            next_numero_ord = ultimo_numero_ord.numero_ord + 1 if ultimo_numero_ord else 1
+
+            # Crear la orden
+            orden = Orden.objects.create(
+                fecha_ord=timezone.now(),
+                numero_ord=next_numero_ord,
+                observaciones_ord=request.POST['observaciones_ord'],
+                estado_ord=request.POST['estado_ord'],
+                usuario_id=Usuario.objects.get(id_usr=request.POST['usuario_id']),
+                vehiculo_id=vehiculo,
+                inspeccion_id=inspeccion
+            )
+
+            # Crear servicios de la orden
+            servicios_ids = request.POST.getlist('servicio_id[]')
+            subtotales = request.POST.getlist('subtotal[]')
+
+            print("Servicios IDs:", servicios_ids)  # Añadir esta línea
+            print("Subtotales:", subtotales)  # Añadir esta línea
+
+            for servicio_id, subtotal in zip(servicios_ids, subtotales):
+                if servicio_id and subtotal:
+                    subtotal = subtotal.replace(',', '.')
+                    OrdenServicio.objects.create(
+                        orden_id=orden,
+                        servicio_id=Servicio.objects.get(id_ser=servicio_id),
+                        subtotal=subtotal
+                    )
+
+            messages.success(request, 'Orden creada correctamente')
+            return redirect('listarOrdenes')
+
+        except Exception as e:
+            messages.error(request, f'Error al crear la orden: {e}')
+            return redirect('listarOrdenes')
+
+    
+
+  
+   
+
+
+
+    
 def listarOrdenesNoFinalizadas(request):
     ordenes_no_finalizadas = Orden.objects.exclude(estado_ord='FINALIZADA')
     context = {
@@ -341,6 +454,10 @@ def listarOrdenesNoFinalizadas(request):
     }
     return render(request, 'listarOrdenesF.html', context)
 
+
+
+
+#Registrar Danios
 def registrarDanios(request):
     ordenes = Orden.objects.all()
     return render(request,'registrarDanios2.html',{'ordenes':ordenes})
@@ -362,17 +479,131 @@ def guardarDanios(request):
                 orden=orden
             )
         messages.success(request, 'Danios registrados correctamente')
-        return redirect('/')
+        return redirect('listarDanios')
 
 def listarDanios(request):
-    danios = Danio.objects.all()
-    return render(request,'listar_danios.html',{'danios':danios})
+    
+    ordenes_con_danios = Orden.objects.filter(danio__isnull=False).distinct()
+    return render(request, 'listar_danios.html', {'danios': ordenes_con_danios})
 
-def obtenerDanios(request,id_ord):
+
+def obtenerDanios(request, id_ord):
     orden = get_object_or_404(Orden, id_ord=id_ord)
-    danios = Danio.objects.filter(orden=orden).values('x_pos', 'y_pos', 'descripcion_dan')
+    danios = Danio.objects.filter(orden=orden).values('id_dan', 'x_pos', 'y_pos', 'descripcion_dan')
     context = {
         'orden': orden,
         'danios': json.dumps(list(danios)),
     }
-    return render(request,'obtenerDanio.html',context)
+    return render(request, 'obtenerDanio.html', context)
+
+
+def actualizarDanios(request):
+    if request.method == 'POST':
+        orden_id = request.POST['orden']
+        orden = Orden.objects.get(id_ord=orden_id)
+
+        # Obtener listas de datos enviados por el formulario
+        id_dan_list = request.POST.getlist('id_dan[]')
+        x_pos_list = request.POST.getlist('x_pos[]')
+        y_pos_list = request.POST.getlist('y_pos[]')
+        descripcion_dan_list = request.POST.getlist('descripcion_dan[]')
+        delete_id_dan_list = request.POST.getlist('delete_id_dan[]')
+
+        # Eliminar marcadores
+        if delete_id_dan_list:
+            Danio.objects.filter(id_dan__in=delete_id_dan_list).delete()
+
+        # Actualizar o crear marcadores
+        for id_dan, x_pos, y_pos, descripcion_dan in zip(id_dan_list, x_pos_list, y_pos_list, descripcion_dan_list):
+            if id_dan.startswith('marker-'):  # Nuevo marcador
+                Danio.objects.create(
+                    x_pos=float(x_pos),
+                    y_pos=float(y_pos),
+                    descripcion_dan=descripcion_dan,
+                    orden=orden
+                )
+            else:  # Marcador existente
+                danio = Danio.objects.get(id_dan=id_dan)
+                danio.x_pos = float(x_pos)
+                danio.y_pos = float(y_pos)
+                danio.descripcion_dan = descripcion_dan
+                danio.save()
+
+        messages.success(request, 'Daños actualizados correctamente')
+        return redirect('listarDanios')
+    """
+  
+    if request.method == 'POST':
+        orden_id = request.POST['orden']
+        orden = Orden.objects.get(id_ord=orden_id)
+
+        x_positions = request.POST.getlist('x_pos[]')
+        y_positions = request.POST.getlist('y_pos[]')
+        descriptions = request.POST.getlist('descripcion_dan[]')
+        marker_ids = request.POST.getlist('marker_id[]')
+        deleted_marker_ids = request.POST.getlist('deleted_marker_ids[]')
+
+        # Eliminar los marcadores seleccionados para eliminación
+        for marker_id in deleted_marker_ids:
+            if not marker_id.startswith('marker-'):
+                Danio.objects.filter(id_dan=marker_id).delete()
+
+        for x, y, desc, marker_id in zip(x_positions, y_positions, descriptions, marker_ids):
+            if marker_id.startswith('marker-'):
+                Danio.objects.create(
+                    x_pos=float(x),
+                    y_pos=float(y),
+                    descripcion_dan=desc,
+                    orden=orden
+                )
+            else:
+                try:
+                    danio = Danio.objects.get(id_dan=marker_id)
+                    danio.x_pos = float(x)
+                    danio.y_pos = float(y)
+                    danio.descripcion_dan = desc
+                    danio.save()
+                except Danio.DoesNotExist:
+                    Danio.objects.create(
+                        x_pos=float(x),
+                        y_pos=float(y),
+                        descripcion_dan=desc,
+                        orden=orden
+                    )
+
+        messages.success(request, 'Daños actualizados correctamente')
+        return redirect('listarDanios')
+
+
+    if request.method == 'POST':
+        orden_id = request.POST['orden']
+        orden = Orden.objects.get(id_ord=orden_id)
+
+        # Primero, elimina los daños existentes
+        Danio.objects.filter(orden=orden).delete()
+
+        # Luego, agrega los daños actualizados
+        x_positions = request.POST.getlist('x_pos[]')
+        y_positions = request.POST.getlist('y_pos[]')
+        descriptions = request.POST.getlist('descripcion_dan[]')
+        marker_ids = request.POST.getlist('marker_id[]')
+
+        for marker_id, x, y, desc in zip(marker_ids, x_positions, y_positions, descriptions):
+            Danio.objects.create(
+                id=marker_id if marker_id != '' else None,  # Usa el id si existe, de lo contrario crea uno nuevo
+                x_pos=float(x),
+                y_pos=float(y),
+                descripcion_dan=desc,
+                orden=orden
+            )
+        messages.success(request, 'Daños actualizados correctamente')
+        return redirect('listarDanios')
+    """
+
+def eliminarDanios(request,id_ord):
+    orden = get_object_or_404(Orden, id_ord=id_ord)
+    # Eliminar todos los daños asociados a la orden
+    Danio.objects.filter(orden=orden).delete()
+    messages.success(request, 'Todos los daños asociados a la orden han sido eliminados correctamente')
+    return redirect('listarDanios')
+    

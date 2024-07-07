@@ -30,6 +30,8 @@ urlpatterns = [
     path('registrarDanios/',views.registrarDanios,name="registrarDanios"),
     path('guardarDanios/',views.guardarDanios),
     path('listarDanios/',views.listarDanios,name="listarDanios"),
-    path('editarDanio/<id_ord>/',views.obtenerDanios)
+    path('editarDanio/<id_ord>/',views.obtenerDanios),
+    path('actualizarDanios/',views.actualizarDanios),
+    path('eliminarDanio/<id_ord>/',views.eliminarDanios)
     
 ]

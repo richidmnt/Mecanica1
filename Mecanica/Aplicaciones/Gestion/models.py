@@ -106,7 +106,7 @@ class Inspeccion(models.Model):
     moquetas = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"Inspección: {self.id} - KM: {self.km}"
+        return f"Inspección: {self.id_ins} - KM: {self.km}"
     
 
 class Orden(models.Model):

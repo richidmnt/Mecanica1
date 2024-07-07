@@ -275,6 +275,7 @@
                     </div>
                   </div>
                   <div class="row">
+                    <!-- Primera columna de inspección -->
                     <div class="col-md-4">
                       <div class="form-check">
                         <input
@@ -337,6 +338,7 @@
                         >
                       </div>
                     </div>
+                    <!-- Segunda columna de inspección -->
                     <div class="col-md-4">
                       <div class="form-check">
                         <input
@@ -397,6 +399,7 @@
                         >
                       </div>
                     </div>
+                    <!-- Tercera columna de inspección -->
                     <div class="col-md-4">
                       <div class="form-check">
                         <input
@@ -459,6 +462,7 @@
                         >
                       </div>
                     </div>
+                    <!-- Cuarta columna de inspección -->
                     <div class="col-md-4">
                       <div class="form-check">
                         <input
@@ -521,6 +525,7 @@
                         >
                       </div>
                     </div>
+                    <!-- Quinta columna de inspección -->
                     <div class="col-md-4">
                       <div class="form-check">
                         <input
@@ -701,8 +706,8 @@
               </div>
 
               <!-- Servicios -->
-              <div class="card card-info mb-3">
-                <div class="card-header bg-info text-white">
+              <div class="card card-primary mb-3">
+                <div class="card-header bg-primary text-white">
                   <h4 class="card-title">Servicios</h4>
                 </div>
                 <div class="card-body">
@@ -748,6 +753,7 @@
                             <input
                               type="text"
                               class="form-control subtotal"
+                              name="subtotal[]"
                               readonly
                             />
                           </td>
@@ -788,7 +794,9 @@
                 <button type="submit" class="btn btn-primary">
                   Registrar Orden
                 </button>
-                <a href="" class="btn btn-secondary">Cancelar</a>
+                <a href="{% url 'listarOrdenes' %}" class="btn btn-secondary"
+                  >Cancelar</a
+                >
               </div>
             </form>
           </div>
@@ -844,7 +852,7 @@
         <select class="form-control" name="servicio_id[]" onchange="updateSubtotal(this)" required>
           <option value="">Seleccione un servicio</option>
           {% for servicio in servicios %}
-            <option value="{{ servicio.id }}" data-precio="{{ servicio.precio_ser }}">{{ servicio.nombre_ser }}</option>
+            <option value="{{ servicio.id_ser }}" data-precio="{{ servicio.precio_ser }}">{{ servicio.nombre_ser }}</option>
           {% endfor %}
         </select>
       </td>
@@ -852,7 +860,7 @@
         <input type="text" class="form-control precio" readonly />
       </td>
       <td>
-        <input type="text" class="form-control subtotal" readonly />
+        <input type="text" class="form-control subtotal" name="subtotal[]" readonly />
       </td>
       <td>
         <button type="button" class="btn btn-danger" onclick="removeRow(this)">Eliminar</button>

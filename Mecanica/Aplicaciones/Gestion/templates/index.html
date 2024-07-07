@@ -64,6 +64,55 @@
       rel="stylesheet"
       href="{% static 'lib/adminlte/css/adminlte.min.css' %}"
     />
+    <style>
+      .marker {
+        position: absolute;
+        background-color: transparent;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        z-index: 10;
+      }
+      .marker i {
+        color: red;
+        font-size: 20px;
+      }
+      .comment-box {
+        position: absolute;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 10px;
+        width: 250px;
+        display: none;
+        z-index: 1000;
+      }
+      #carImageContainer {
+        position: relative;
+        display: inline-block;
+        margin: 0 auto;
+        padding: 0;
+        width: 100%;
+        max-width: 800px;
+      }
+      #carImage {
+        width: 100%;
+        height: auto;
+        max-width: 800px;
+        display: block;
+      }
+      #markerContainer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+      #markerContainer .marker,
+      #markerContainer .comment-box {
+        pointer-events: auto;
+      }
+    </style>
   </head>
   <body class="hold-transition sidebar-mini layout-footer-fixed">
     <!-- Site wrapper -->

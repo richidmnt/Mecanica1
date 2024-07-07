@@ -19,21 +19,21 @@
                     <tr>
                       <th>Número de Orden</th>
                       <th>Placa del Vehículo</th>
-                      <th>Coordenadas (X, Y)</th>
-                      <th>Descripción del Daño</th>
+                      <th>Fecha de Orden</th>
+
                       <th>ACCIONES</th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for danio in danios %}
                     <tr class="align-middle">
-                      <td>{{ danio.orden.numero_ord }}</td>
-                      <td>{{ danio.orden.vehiculo_id.placa_veh }}</td>
-                      <td>{{ danio.x_pos }}, {{ danio.y_pos }}</td>
-                      <td>{{ danio.descripcion_dan }}</td>
+                      <td>{{ danio.numero_ord }}</td>
+                      <td>{{ danio.vehiculo_id.placa_veh }}</td>
+                      <td>{{ danio.fecha_ord }}</td>
+
                       <td>
                         <a
-                          href="/editarDanio/{{ danio.orden.id_ord }}/"
+                          href="/editarDanio/{{ danio.id_ord }}/"
                           class="btn btn-outline-warning"
                           >Editar</a
                         >
@@ -44,7 +44,7 @@
                         >
                         <a
                           href="#"
-                          onclick="eliminar('/eliminarDanio/{{ danio.id_dan }}/')"
+                          onclick="eliminar('/eliminarDanio/{{ danio.id_ord }}/')"
                           class="btn btn-danger"
                           ><i class="bi bi-trash"></i>Eliminar</a
                         >
