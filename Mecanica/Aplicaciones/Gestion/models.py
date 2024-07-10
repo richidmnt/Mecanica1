@@ -74,6 +74,7 @@ class Servicio(models.Model):
 
 class Inspeccion(models.Model):
     id_ins = models.AutoField(primary_key=True)
+    orden_id = models.ForeignKey('Orden', on_delete=models.PROTECT)
     km = models.PositiveIntegerField()
     nivel_gasolina = models.CharField(max_length=50)
     plumas = models.BooleanField(default=False)
@@ -125,7 +126,6 @@ class Orden(models.Model):
     estado_ord = models.CharField(max_length=20, choices=ESTADOS, default='PENDIENTE')
     usuario_id = models.ForeignKey('Usuario', on_delete=models.PROTECT, related_name='ordenes')
     vehiculo_id = models.ForeignKey('Vehiculo', on_delete=models.PROTECT, related_name='ordenes')
-    inspeccion_id = models.ForeignKey('Inspeccion', on_delete=models.PROTECT, related_name='ordenes')
     def __str__(self):
         return f"Orden: {self.numero_ord} - Estado: {self.get_estado_ord_display()}"
 
@@ -154,7 +154,7 @@ class Danio(models.Model):
     x_pos = models.FloatField()
     y_pos = models.FloatField()
     descripcion_dan = models.TextField()
-    orden = models.ForeignKey('Orden', on_delete=models.CASCADE)
+    inspeccion_id = models.ForeignKey(Inspeccion, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"Daño en Orden: {self.orden} - {self.descripcion_dan}"

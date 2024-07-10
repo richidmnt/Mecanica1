@@ -1,0 +1,150 @@
+{% extends "./index.html" %}
+
+{% block body %}
+<section class="content">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-lg-12 col-md-12">
+        <div class="card">
+          <div class="card-header bg-info text-white">
+            <h3 class="card-title">Registrar Repuestos</h3>
+          </div>
+          <div class="card-body">
+            <form id="repuestosForm" method="post" action="/guardarRepuestos/">
+              {% csrf_token %}
+              <div class="row">
+                <!-- Orden -->
+                <div class="col-lg-4 col-md-6">
+                  <div class="card card-primary mb-3">
+                    <div class="card-header bg-primary text-white">
+                      <h4 class="card-title">Orden</h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label for="orden_id" class="form-label">Elija una orden</label>
+                        <select name="orden_id" id="orden_id" class="form-control">
+                          {% for orden in ordenes %}
+                          <option value="{{ orden.id_ord }}">{{ orden.numero_ord }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Repuestos -->
+              <div class="card card-info mb-3">
+                <div class="card-header bg-info text-white">
+                  <h4 class="card-title">Repuestos</h4>
+                </div>
+                <div class="card-body">
+                  <div class="form-group">
+                    <label for="repuestos" class="form-label">Repuestos:</label>
+                    <table class="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th>Nombre del Repuesto</th>
+                          <th>Descripción</th>
+                          <th>Precio</th>
+                          <th>Cantidad</th>
+                          <th>Subtotal</th>
+                          <th>Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody id="repuestosTableBody">
+                        <tr>
+                          <td>
+                            <input type="text" class="form-control" name="nombre_rep[]" required />
+                          </td>
+                          <td>
+                            <textarea class="form-control" name="descripcion_rep[]" rows="2" required></textarea>
+                          </td>
+                          <td>
+                            <input type="number" class="form-control precio" name="precio_rep[]" step="0.01" onchange="updateSubtotal(this)" required />
+                          </td>
+                          <td>
+                            <input type="number" class="form-control cantidad" name="cantidad_rep[]" onchange="updateSubtotal(this)" required />
+                          </td>
+                          <td>
+                            <input type="text" class="form-control subtotal" name="subtotal_rep[]" readonly />
+                          </td>
+                          <td>
+                            <button type="button" class="btn btn-danger" onclick="removeRow(this)">Eliminar</button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <button type="button" class="btn btn-success mt-2" onclick="addRow()">Agregar Repuesto</button>
+                  </div>
+                  <div class="form-group">
+                    <label for="total" class="form-label">Total:</label>
+                    <input type="text" class="form-control" id="total" name="total" readonly />
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between mt-3">
+                <button type="submit" class="btn btn-primary">Guardar Repuesto</button>
+                <a href="" class="btn btn-secondary">Cancelar</a>
+              </div>
+            </form>
+          </div>
+          <div class="card-footer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function updateSubtotal(element) {
+    var row = element.closest('tr');
+    var precio = parseFloat(row.querySelector('.precio').value) || 0;
+    var cantidad = parseInt(row.querySelector('.cantidad').value) || 0;
+    var subtotal = precio * cantidad;
+    row.querySelector('.subtotal').value = subtotal.toFixed(2);
+    updateTotal();
+  }
+
+  function updateTotal() {
+    var total = 0;
+    document.querySelectorAll('.subtotal').forEach(function (subtotalInput) {
+      total += parseFloat(subtotalInput.value) || 0;
+    });
+    document.getElementById('total').value = total.toFixed(2);
+  }
+
+  function addRow() {
+    var newRow = `
+      <tr>
+        <td>
+          <input type="text" class="form-control" name="nombre_rep[]" required />
+        </td>
+        <td>
+          <textarea class="form-control" name="descripcion_rep[]" rows="2" required></textarea>
+        </td>
+        <td>
+          <input type="number" class="form-control precio" name="precio_rep[]" step="0.01" onchange="updateSubtotal(this)" required />
+        </td>
+        <td>
+          <input type="number" class="form-control cantidad" name="cantidad_rep[]" onchange="updateSubtotal(this)" required />
+        </td>
+        <td>
+          <input type="text" class="form-control subtotal" name="subtotal_rep[]" readonly />
+        </td>
+        <td>
+          <button type="button" class="btn btn-danger" onclick="removeRow(this)">Eliminar</button>
+        </td>
+      </tr>`;
+    document.getElementById('repuestosTableBody').insertAdjacentHTML('beforeend', newRow);
+  }
+
+  function removeRow(button) {
+    button.closest('tr').remove();
+    updateTotal();
+  }
+</script>
+{% endblock %}

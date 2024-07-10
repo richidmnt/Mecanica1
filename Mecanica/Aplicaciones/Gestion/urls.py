@@ -32,6 +32,6 @@ urlpatterns = [
     path('listarDanios/',views.listarDanios,name="listarDanios"),
     path('editarDanio/<id_ord>/',views.obtenerDanios),
     path('actualizarDanios/',views.actualizarDanios),
-    path('eliminarDanio/<id_ord>/',views.eliminarDanios)
+    path('eliminarDanio/<id_ins>/',views.eliminarDanios)
     
 ]

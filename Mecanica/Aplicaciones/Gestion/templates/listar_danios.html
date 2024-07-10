@@ -27,24 +27,24 @@
                   <tbody>
                     {% for danio in danios %}
                     <tr class="align-middle">
-                      <td>{{ danio.numero_ord }}</td>
-                      <td>{{ danio.vehiculo_id.placa_veh }}</td>
-                      <td>{{ danio.fecha_ord }}</td>
+                      <td>{{ danio.orden_id.numero_ord }}</td>
+                      <td>{{ danio.orden_id.vehiculo_id.placa_veh }}</td>
+                      <td>{{ danio.orden_id.fecha_ord }}</td>
 
                       <td>
                         <a
-                          href="/editarDanio/{{ danio.id_ord }}/"
+                          href="/editarDanio/{{ danio.id_ins}}/"
                           class="btn btn-outline-warning"
                           >Editar</a
                         >
                         <a
-                          href="/detalleDanio/{{ danio.id_dan }}/"
+                          href="/detalleDanio/{{ danio.id_ins }}/"
                           class="btn btn-outline-primary"
                           >Detalles</a
                         >
                         <a
                           href="#"
-                          onclick="eliminar('/eliminarDanio/{{ danio.id_ord }}/')"
+                          onclick="eliminar('/eliminarDanio/{{ danio.id_ins}}/')"
                           class="btn btn-danger"
                           ><i class="bi bi-trash"></i>Eliminar</a
                         >
