@@ -32,6 +32,17 @@ urlpatterns = [
     path('listarDanios/',views.listarDanios,name="listarDanios"),
     path('editarDanio/<id_ord>/',views.obtenerDanios),
     path('actualizarDanios/',views.actualizarDanios),
-    path('eliminarDanio/<id_ins>/',views.eliminarDanios)
+    path('eliminarDanio/<id_ins>/',views.eliminarDanios),
+    path('listarDetalle/',views.listarDetalleOrden,name="listaDetalle"),
+    path('guardarDetalle/',views.guardarDetalle,name="registrarDetalle"),
+    path('registrarRepuestos/',views.guardarRepuestos),
+    path('obtenerOrden/<id>/',views.obtenerOrden),
+    path('editarOrden/',views.editarOrden),
+    path('eliminarOrden/<id>/',views.eliminarOrden),
+    path('guardarOrden2/',views.guardarOrden2, name="guardarOrden2"),
+    path('registrarOrden2/',views.registrarOrden2),
+    path('obtenerRepuestos/<id>/',views.obtenerRepuestos),
+    path('editarRepuestos/',views.editarRepuestos),
+    path('eliminarDetalle/<id>/',views.eliminarRepuestos)
     
 ]

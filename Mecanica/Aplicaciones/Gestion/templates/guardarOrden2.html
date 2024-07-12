@@ -8,220 +8,37 @@
             <h3 class="card-title">Registrar Orden</h3>
           </div>
           <div class="card-body">
-            <form id="ordenForm" method="post" action="/registrarOrden/">
+            <form id="ordenForm" method="post" action="/registrarOrden2/">
               {% csrf_token %}
               <div class="row">
                 <!-- Cliente -->
                 <div class="col-lg-4 col-md-6">
                   <div class="card card-info mb-3">
                     <div class="card-header bg-info text-white">
-                      <h4 class="card-title">Registrar Cliente</h4>
+                      <h4 class="card-title">Registrar Vehiculo</h4>
                     </div>
                     <div class="card-body">
                       <div class="form-row">
-                        <div class="form-group col-md-6">
-                          <label for="nombre_cli" class="form-label"
-                            >Nombre:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="nombre_cli"
-                            name="nombre_cli"
-                            required
-                          />
-                        </div>
-                        <div class="form-group col-md-6">
-                          <label for="apellido_cli" class="form-label"
-                            >Apellido:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="apellido_cli"
-                            name="apellido_cli"
-                            required
-                          />
-                        </div>
-                        <div class="form-group col-md-6">
-                          <label for="ci_cli" class="form-label"
-                            >Cédula de Identidad:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="ci_cli"
-                            name="ci_cli"
-                            required
-                          />
-                        </div>
-                        <div class="form-group col-md-6">
-                          <label for="telefono_cli" class="form-label"
-                            >Teléfono:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="telefono_cli"
-                            name="telefono_cli"
-                            required
-                          />
-                        </div>
-                        <div class="form-group col-md-12">
-                          <label for="email_cli" class="form-label"
-                            >Correo Electrónico:</label
-                          >
-                          <input
-                            type="email"
-                            class="form-control"
-                            id="email_cli"
-                            name="email_cli"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <!-- Dirección -->
-                <div class="col-lg-4 col-md-6">
-                  <div class="card card-success mb-3">
-                    <div class="card-header bg-success text-white">
-                      <h4 class="card-title">Registrar Dirección</h4>
-                    </div>
-                    <div class="card-body">
-                      <div class="form-row">
-                        <div class="form-group col-md-12">
-                          <label for="ciudad_dir" class="form-label"
-                            >Ciudad:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="ciudad_dir"
-                            name="ciudad_dir"
-                            required
-                          />
-                        </div>
-                        <div class="form-group col-md-12">
-                          <label for="barrio_dir" class="form-label"
-                            >Barrio:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="barrio_dir"
-                            name="barrio_dir"
-                            required
-                          />
-                        </div>
-                        <div class="form-group col-md-12">
-                          <label for="calle_dir" class="form-label"
-                            >Calle:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="calle_dir"
-                            name="calle_dir"
-                            required
-                          />
-                        </div>
-                        <div class="form-group col-md-12">
-                          <label for="numero_dir" class="form-label"
-                            >Número:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="numero_dir"
-                            name="numero_dir"
-                            required
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Vehículo -->
-                <div class="col-lg-4 col-md-6">
-                  <div class="card card-warning mb-3">
-                    <div class="card-header bg-warning text-white">
-                      <h4 class="card-title">Registrar Vehículo</h4>
-                    </div>
-                    <div class="card-body">
-                      <div class="form-row">
-                        <div class="form-group col-md-6">
-                          <label for="marca_veh" class="form-label"
-                            >Marca:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="marca_veh"
-                            name="marca_veh"
-                            required
-                          />
-                        </div>
-                        <div class="form-group col-md-6">
-                          <label for="modelo_veh" class="form-label"
-                            >Modelo:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="modelo_veh"
-                            name="modelo_veh"
-                            required
-                          />
-                        </div>
-                        <div class="form-group col-md-6">
-                          <label for="placa_veh" class="form-label"
-                            >Placa:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="placa_veh"
-                            name="placa_veh"
-                            required
-                          />
-                        </div>
-                        <div class="form-group col-md-6">
-                          <label for="anio_veh" class="form-label">Año:</label>
-                          <input
-                            type="number"
-                            class="form-control"
-                            id="anio_veh"
-                            name="anio_veh"
-                            required
-                          />
-                        </div>
-                        <div class="form-group col-md-6">
-                          <label for="chasis_veh" class="form-label"
-                            >Chasis:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="chasis_veh"
-                            name="chasis_veh"
-                            required
-                          />
-                        </div>
-                        <div class="form-group col-md-6">
-                          <label for="color_veh" class="form-label"
-                            >Color:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="color_veh"
-                            name="color_veh"
-                            required
-                          />
-                        </div>
+                            <label for="vehiculoSelect" class="form-label">Elija un vehiculo</label>
+                <select class="form-control" name="vehiculo_id" id="vehiculoSelect2">
+                  <option value="">Seleccione un vehículo</option>
+                  {% for vehiculo in vehiculos %}
+                    <option value="{{ vehiculo.id_veh }}"
+                      data-nombre="{{ vehiculo.cli_id.nombre_cli }}"
+                      data-apellido="{{ vehiculo.cli_id.apellido_cli }}"
+                      data-email="{{ vehiculo.cli_id.email_cli }}"
+                      data-telefono="{{ vehiculo.cli_id.telefono_cli }}" >
+                      {{ vehiculo.placa_veh }}
+                    </option>
+                  {% endfor %}
+                </select>
+                 <div class="form-group">
+                <label for="cliente" class="form-label">Cliente</label>
+                <p><b>Nombre:</b> <span id="clienteNombre">{{ orden.vehiculo_id.cli_id.nombre_cli }}</span></p>
+                <p><b>Apellido:</b> <span id="clienteApellido">{{ orden.vehiculo_id.cli_id.apellido_cli }}</span></p>
+                <p><b>Email:</b> <span id="clienteEmail">{{ orden.vehiculo_id.cli_id.email_cli }}</span></p>
+                <p><b>Teléfono:</b> <span id="clienteTelefono">{{ orden.vehiculo_id.cli_id.telefono_cli }}</span></p>
+              </div>
                       </div>
                     </div>
                   </div>
@@ -475,5 +292,21 @@
     button.closest("tr").remove();
     updateTotal();
   }
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    $('#vehiculoSelect2').change(function() {
+      var selectedOption = $(this).find('option:selected');
+      var nombre = selectedOption.data('nombre');
+      var apellido = selectedOption.data('apellido');
+      var email = selectedOption.data('email');
+      var telefono = selectedOption.data('telefono');
+
+      $('#clienteNombre').text(nombre);
+      $('#clienteApellido').text(apellido);
+      $('#clienteEmail').text(email);
+      $('#clienteTelefono').text(telefono);
+    });
+  });
 </script>
 {% endblock %}

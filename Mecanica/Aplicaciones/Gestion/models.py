@@ -62,15 +62,18 @@ class Vehiculo(models.Model):
     modelo_veh = models.CharField(max_length=255)
     placa_veh = models.CharField(max_length=20, unique=True)
     anio_veh = models.IntegerField()
-    chasis_veh = models.CharField(max_length=255)
+    chasis_veh = models.CharField(max_length=255 ,unique=True)
     color_veh = models.CharField(max_length=255)
     cli_id = models.ForeignKey(Cliente, on_delete=models.PROTECT)
 
 class Servicio(models.Model):
     id_ser = models.AutoField(primary_key=True)
-    nombre_ser = models.CharField(max_length=255)
+    nombre_ser = models.CharField(max_length=255, unique=True) 
     descripcion_ser = models.TextField()
     precio_ser = models.DecimalField(max_digits=10, decimal_places=2)
+    def save(self, *args, **kwargs):
+        self.nombre_ser = self.nombre_ser.upper()
+        super(Servicio, self).save(*args, **kwargs)
 
 class Inspeccion(models.Model):
     id_ins = models.AutoField(primary_key=True)

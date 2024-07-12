@@ -23,6 +23,7 @@
                       <th>Ci</th>
                       <th>Telefono</th>
                       <th>Email</th>
+                      <th>Dirección</th>
                       <th>ACCIONES</th>
                     </tr>
                   </thead>
@@ -35,17 +36,16 @@
                       <th>{{cliente.ci_cli}}</th>
                       <th>{{cliente.telefono_cli}}</th>
                       <th>{{cliente.email_cli}}</th>
+                      <th>
+                        {{cliente.dir_id.ciudad_dir}},{{cliente.dir_id.barrio_dir}},{{cliente.dir_id.calle_dir}},{{cliente.dir_id.numero_dir}}
+                      </th>
                       <td>
                         <a
                           href="/obtenerCliente/{{cliente.id_cli}}/"
                           class="btn btn-outline-warning"
                           >Editar</a
                         >
-                        <a
-                          href="/detallesCliente/{{cliente.id_cli}}/"
-                          class="btn btn-outline-primary"
-                          >Detalles</a
-                        >
+                     
                         <a
                           href="#"
                           onclick="eliminar('/eliminarCliente/{{ cliente.id_cli}}')"

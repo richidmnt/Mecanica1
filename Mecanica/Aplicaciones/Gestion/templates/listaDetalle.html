@@ -6,22 +6,21 @@
         <!-- Default box -->
         <div class="card card-primary">
           <div class="card-header">
-            <h3 class="card-title">Lista de Órdenes No Finalizadas</h3>
+            <h3 class="card-title">Lista de Daños</h3>
           </div>
           <div class="card-body">
             <div class="row">
               <div class="card-body table-responsive p-0">
                 <table
-                  id="tbl_ordenes"
+                  id="tbl_danios"
                   class="table table-head-fixed text-nowrap"
                 >
                   <thead>
                     <tr>
                       <th>Número de Orden</th>
-                      <th>Fecha de Inicio</th>
-                      <th>Cliente</th>
-                      <th>Auto</th>
-                      <th>Estado</th>
+                      <th>Placa del Vehículo</th>
+                      <th>Fecha de Orden</th>
+                      <th>Estado de Orden</th>
                       <th>ACCIONES</th>
                     </tr>
                   </thead>
@@ -29,35 +28,22 @@
                     {% for orden in ordenes %}
                     <tr class="align-middle">
                       <td>{{ orden.numero_ord }}</td>
-                      <td>{{ orden.fecha_ord|date:"d/m/Y H:i" }}</td>
-                      <td>
-                        {{ orden.vehiculo_id.cli_id.nombre_cli }}
-                        {{orden.vehiculo_id.cli_id.apellido_cli }}
-                      </td>
-                      <td>
-                        {{ orden.vehiculo_id.marca_veh}}
-                        {{orden.vehiculo_id.modelo_veh }}
-                        {{orden.vehiculo_id.placa_veh }}
-                      </td>
-                      <td>{{ orden.get_estado_ord_display }}</td>
+                      <td>{{ orden.vehiculo_id.placa_veh }}</td>
+                      <td>{{ orden.fecha_ord }}</td>
+                      <td>{{ orden.estado_ord }}</td>
+
                       <td>
                         <a
-                          href="/detalleOrden/{{ orden.id_ord }}/"
-                          class="btn btn-outline-primary"
-                          >Detalles</a
-                        >
-                        <a
-                          href="/obtenerOrden/{{ orden.id_ord }}/"
+                          href="/obtenerRepuestos/{{ orden.id_ord}}/"
                           class="btn btn-outline-warning"
                           >Editar</a
                         >
                         <a
                           href="#"
-                          onclick="eliminar('/eliminarOrden/{{ orden.id_ord }}/')"
+                          onclick="eliminar('/eliminarDetalle/{{ orden.id_ord}}/')"
                           class="btn btn-danger"
+                          ><i class="bi bi-trash"></i>Eliminar</a
                         >
-                          <i class="bi bi-trash"></i> Eliminar
-                        </a>
                       </td>
                     </tr>
                     {% endfor %}
@@ -68,9 +54,9 @@
           </div>
           <!-- /.card-body -->
           <div class="card-footer">
-            <a href="{%  url 'guardarOrden2' %}" class="btn btn-success">
-              <i class="fa fa-plus nav-icon"></i> Nueva Orden
-            </a>
+            <a href="{% url 'registrarDetalle' %}" class="btn btn-success"
+              ><i class="fa fa-plus nav-icon"></i> Nuevo Detalle Orden</a
+            >
           </div>
           <!-- /.card-footer-->
         </div>
@@ -79,6 +65,7 @@
     </div>
   </div>
 </section>
+
 <script>
   function eliminar(url) {
     iziToast.question({
@@ -89,7 +76,7 @@
       id: "question",
       zindex: 999,
       title: "Confirmación",
-      message: "¿Está seguro de eliminar la orden seleccionada?",
+      message: "¿Está seguro de eliminar el detalle seleccionado?",
       position: "center",
       buttons: [
         [
@@ -115,11 +102,18 @@
       },
     });
   }
+  function mostrarMensaje() {
+    iziToast.success({
+      title: "OK",
+      message: "¡Registro insertado con éxito!",
+      position: "topRight",
+    });
+  }
 </script>
 <!--/ Bordered Table -->
 <script type="text/javascript">
   $(document).ready(function () {
-    $("#tbl_ordenes").DataTable({
+    $("#tbl_danios").DataTable({
       dom: "Bfrtip",
       language: {
         sProcessing: "Procesando...",
@@ -169,7 +163,7 @@
 {% endblock %} {% block extra_scripts %}
 <script>
   $(document).ready(function () {
-    $("#tbl_ordenes")
+    $("#tbl_danios")
       .DataTable({
         responsive: true,
         lengthChange: false,
@@ -178,7 +172,7 @@
       })
       .buttons()
       .container()
-      .appendTo("#tbl_ordenes_wrapper .col-md-6:eq(0)");
+      .appendTo("#tbl_danios_wrapper .col-md-6:eq(0)");
   });
 </script>
 {% endblock %}

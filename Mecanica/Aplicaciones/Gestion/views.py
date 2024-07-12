@@ -1,50 +1,65 @@
+from gettext import translation
 import json
+from django.db import transaction, IntegrityError
 from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models.deletion import ProtectedError
+from django.core.exceptions import ObjectDoesNotExist
 from .models import *
+
 # Gestion de usuarios
 def index(request):
     usuarios = Usuario.objects.all()
     return render(request, 'listaUsuarios.html', {'usuarios': usuarios})
 
 def guardarUsuario(request):
-    return render(request, 'detallesOrden.html')
+    return render(request, 'guardarUsuario.html')
 
 def registrarUsuario(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        nombre = request.POST.get('nombre')
-        apellido = request.POST.get('apellido')
+        username = request.POST.get('username').strip()
+        nombre = request.POST.get('nombre').upper()
+        apellido = request.POST.get('apellido').upper()
         telefono = request.POST.get('telefono')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
+        email = request.POST.get('email').strip()
+        password = request.POST.get('password').strip()
         rol = request.POST.get('rol')
         is_active = 'is_active' in request.POST
 
-        # Verificar si el username o el email ya existen
-        if Usuario.objects.filter(username=username).exists():
-            messages.error(request, 'El nombre de usuario ya existe. Por favor, elige otro.')
-            return redirect('guardarUsuario')
+        try:
+            # Verificar si el username o el email ya existen
+            if Usuario.objects.filter(username=username).exists():
+                messages.error(request, 'El nombre de usuario ya existe. Por favor, elige otro.')
+                return redirect('guardarUsuario')
 
-        if Usuario.objects.filter(email=email).exists():
-            messages.error(request, 'El email ya existe. Por favor, ingresa otro.')
-            return redirect('guardarUsuario')
+            if Usuario.objects.filter(email=email).exists():
+                messages.error(request, 'El email ya existe. Por favor, ingresa otro.')
+                return redirect('guardarUsuario')
 
-        usuario = Usuario.objects.create(
-            username=username,
-            nombre=nombre,
-            apellido=apellido,
-            telefono=telefono,
-            email=email,
-            rol=rol,
-            is_active=is_active
-        )
-        usuario.set_password(password)
-        usuario.save()
-        
-        messages.success(request, 'Usuario guardado correctamente')
-        return redirect('index')
+            usuario = Usuario.objects.create(
+                username=username,
+                nombre=nombre,
+                apellido=apellido,
+                telefono=telefono,
+                email=email,
+                rol=rol,
+                is_active=is_active
+            )
+            usuario.set_password(password)
+            usuario.save()
+            
+            messages.success(request, 'Usuario guardado correctamente')
+            return redirect('index')
+
+        except IntegrityError as e:
+            if 'username' in str(e):
+                messages.error(request, 'El nombre de usuario ya existe. Por favor, elige otro.')
+            elif 'email' in str(e):
+                messages.error(request, 'El email ya existe. Por favor, ingresa otro.')
+            else:
+                messages.error(request, 'Ocurrió un error al guardar el usuario. Por favor, inténtalo de nuevo.')
+            return redirect('guardarUsuario')
     else:
         return render(request, 'guardarUsuario.html')
 
@@ -55,6 +70,12 @@ def eliminarUsuario(request, id):
         messages.success(request, 'Usuario eliminado correctamente')
     except Usuario.DoesNotExist:
         messages.error(request, 'El usuario no existe')
+    except ProtectedError as e:
+        messages.error(request, 'No se puede eliminar el usuario porque está asociado con una o más órdenes.')
+    except IntegrityError as e:
+        messages.error(request, 'No se puede eliminar el usuario debido a una restricción de integridad.')
+    except Exception as e:
+        messages.error(request, f'Ocurrió un error al eliminar el usuario: {str(e)}')
     
     return redirect('index')
 
@@ -64,40 +85,63 @@ def eliminarUsuario(request, id):
 def listaClientes(request):
     clientes = Cliente.objects.all()
     return render(request,'listaClientes.html',{'clientes':clientes})
+
 def guardarCliente(request):
     return render(request,'guardarCliente.html')
 
 def registrarCliente(request):
     if request.method == 'POST':
-        # Datos de la dirección
-        ciudad = request.POST['ciudad_dir']
-        barrio = request.POST['barrio_dir']
-        calle = request.POST['calle_dir']
-        numero = request.POST['numero_dir']
+        try:
+            ciudad = request.POST['ciudad_dir'].strip().upper()
+            barrio = request.POST['barrio_dir'].strip().upper()
+            calle = request.POST['calle_dir'].strip().upper()
+            numero = request.POST['numero_dir']
 
-        # Crear la instancia de la dirección y guardarla
-        direccion = Direccion(ciudad_dir=ciudad, barrio_dir=barrio, calle_dir=calle, numero_dir=numero)
-        direccion.save()
+            direccion = Direccion(ciudad_dir=ciudad, barrio_dir=barrio, calle_dir=calle, numero_dir=numero)
+            direccion.save()
 
-        # Datos del cliente
-        nombre = request.POST['nombre_cli']
-        apellido = request.POST['apellido_cli']
-        ci = request.POST['ci_cli']
-        telefono = request.POST['telefono_cli']
-        email = request.POST['email_cli']
+        
+            nombre = request.POST['nombre_cli'].strip().upper()
+            apellido = request.POST['apellido_cli'].strip().upper()
+            ci = request.POST['ci_cli'].strip()
+            telefono = request.POST['telefono_cli'].strip()
+            email = request.POST['email_cli'].strip()
 
-        # Crear la instancia del cliente y guardarla
-        cliente = Cliente(nombre_cli=nombre, apellido_cli=apellido, ci_cli=ci, telefono_cli=telefono, email_cli=email, dir_id=direccion)
-        cliente.save()
+            
+            if Cliente.objects.filter(ci_cli=ci).exists():
+                messages.error(request, 'El cliente con este CI ya existe.')
+                return redirect('guardarCliente')
 
-        return redirect('listaClientes')  # Redirige a la lista de clientes después de registrar
+            if Cliente.objects.filter(email_cli=email).exists():
+                messages.error(request, 'El cliente con este email ya existe.')
+                return redirect('guardarCliente')
+
+            
+            cliente = Cliente(nombre_cli=nombre, apellido_cli=apellido, ci_cli=ci, telefono_cli=telefono, email_cli=email, dir_id=direccion)
+            cliente.save()
+
+            messages.success(request, 'Cliente registrado correctamente.')
+            return redirect('listaClientes')  # Redirige a la lista de clientes después de registrar
+
+        except Exception as e:
+            # Manejar cualquier otra excepción que pueda ocurrir
+            messages.error(request, f'Error al registrar el cliente: {e}')
+            return redirect('registrarCliente')
 
     return render(request, 'registro_cliente.html')
 
-def eliminarCliente(request,id):
-    cliente = Cliente.objects.get(id_cli=id)
-    cliente.delete()
-    messages.success(request, 'Cliente eliminado correctamente')
+def eliminarCliente(request, id):
+    try:
+        cliente = get_object_or_404(Cliente, id_cli=id)
+        cliente.delete()
+        messages.success(request, 'Cliente eliminado correctamente')
+    except Cliente.DoesNotExist:
+        messages.error(request, 'El cliente no existe')
+    except ProtectedError as e:
+        messages.error(request, f'No se puede eliminar el cliente porque está relacionado con uno  más vehiculos')
+    except Exception as e:
+        messages.error(request, f'Ocurrió un error al intentar eliminar el cliente: {e}')
+    
     return redirect('listaClientes')
 
 def obtenerClietne(request,id):
@@ -109,17 +153,17 @@ def actualizarCliente(request):
     if request.method == 'POST':
         id_cli = request.POST["id_cli"]
         cliente = Cliente.objects.get(id_cli=id_cli)
-        cliente.dir_id.ciudad_dir = request.POST['ciudad_dir']
-        cliente.dir_id.barrio_dir = request.POST['barrio_dir']
-        cliente.dir_id.calle_dir = request.POST['calle_dir']
+        cliente.dir_id.ciudad_dir = request.POST['ciudad_dir'].strip().upper()
+        cliente.dir_id.barrio_dir = request.POST['barrio_dir'].strip().upper()
+        cliente.dir_id.calle_dir = request.POST['calle_dir'].strip().upper()
         cliente.dir_id.numero_dir = request.POST['numero_dir']
         cliente.dir_id.save()
         
-        cliente.nombre_cli = request.POST['nombre_cli']
-        cliente.apellido_cli = request.POST['apellido_cli']
-        cliente.ci_cli = request.POST['ci_cli']
-        cliente.telefono_cli = request.POST['telefono_cli']
-        cliente.email_cli = request.POST['email_cli']
+        cliente.nombre_cli = request.POST['nombre_cli'].strip().upper()
+        cliente.apellido_cli = request.POST['apellido_cli'].strip().upper()
+        cliente.ci_cli = request.POST['ci_cli'].strip()
+        cliente.telefono_cli = request.POST['telefono_cli'].strip()
+        cliente.email_cli = request.POST['email_cli'].strip()
         cliente.save()
         messages.success(request, 'Cliente actualizado correctamente')
         return redirect('listaClientes') 
@@ -136,13 +180,28 @@ def guardarServicio(request):
 
 def registrarServicio(request):
     if request.method == 'POST':
-        nombre = request.POST['nombre_ser']
-        descripcion = request.POST['descripcion_ser']
+        nombre = request.POST['nombre_ser'].strip().upper()
+        descripcion = request.POST['descripcion_ser'].upper()
         precio = request.POST['precio_ser']
-        servicio = Servicio(nombre_ser=nombre, descripcion_ser=descripcion, precio_ser=precio)
-        servicio.save()
-        messages.success(request, 'Servicio creado correctamente')
-        return redirect('listaServicios')
+
+        try:
+            if Servicio.objects.filter(nombre_ser=nombre).exists():
+                messages.error(request, 'El nombre del servicio ya existe. Por favor, elige otro nombre.')
+                return redirect('guardarServicio')
+
+            servicio = Servicio(
+                nombre_ser=nombre,
+                descripcion_ser=descripcion,
+                precio_ser=precio
+            )
+            servicio.save()
+            messages.success(request, 'Servicio creado correctamente')
+            return redirect('listaServicios')
+        except IntegrityError:
+            messages.error(request, 'El nombre del servicio ya existe. Por favor, elige otro nombre.')
+            return redirect('guardarServicio')
+    else:
+        return render(request, 'guardarServicio.html')
 
 
 def eliminarServicio(request,id):
@@ -159,8 +218,8 @@ def actualizarServicio(request):
     if request.method == 'POST':
         servicio_id = request.POST['id_ser']
         servicio = Servicio.objects.get(id_ser=servicio_id)
-        servicio.nombre_ser = request.POST['nombre_ser']
-        servicio.descripcion_ser = request.POST['descripcion_ser']
+        servicio.nombre_ser = request.POST['nombre_ser'].strip().upper()
+        servicio.descripcion_ser = request.POST['descripcion_ser'].upper()
         servicio.precio_ser = request.POST['precio_ser']
         servicio.save()
         messages.success(request, 'Servicio actualizado correctamente')
@@ -178,33 +237,47 @@ def guardarVehiculo(request):
 
 def registrarVehiculo(request):
     if request.method == 'POST':
-        marca = request.POST['marca_veh']
-        modelo = request.POST['modelo_veh']
-        placa = request.POST['placa_veh']
-        anio = request.POST['anio_veh']
-        chasis = request.POST['chasis_veh']
-        color = request.POST['color_veh']
-        cliente_id = request.POST['id_cli']
-        cliente = Cliente.objects.get(id_cli=cliente_id)
+        try:
+            marca = request.POST['marca_veh'].strip().upper()
+            modelo = request.POST['modelo_veh'].strip().upper()
+            placa = request.POST['placa_veh'].strip().upper()
+            anio = request.POST['anio_veh']
+            chasis = request.POST['chasis_veh']
+            color = request.POST['color_veh'].strip().upper()
+            cliente_id = request.POST['id_cli']
+            cliente = Cliente.objects.get(id_cli=cliente_id)
 
-        vehiculo = Vehiculo(
-            marca_veh=marca,
-            modelo_veh=modelo,
-            placa_veh=placa,
-            anio_veh=anio,
-            chasis_veh=chasis,
-            color_veh=color,
-            cli_id=cliente
-        )
-        vehiculo.save()
-        messages.success(request, 'Vehículo creado correctamente')
-        return redirect('listaVehiculos')
+            vehiculo = Vehiculo(
+                marca_veh=marca,
+                modelo_veh=modelo,
+                placa_veh=placa,
+                anio_veh=anio,
+                chasis_veh=chasis,
+                color_veh=color,
+                cli_id=cliente
+            )
 
-def eliminarVehiculo(request,id):
-    vehiculo = Vehiculo.objects.get(id_veh=id)
-    vehiculo.delete()
-    messages.success(request, 'Vehículo eliminado correctamente')
-    return redirect("listaVehiculos")
+            vehiculo.save()
+            messages.success(request, 'Vehículo creado correctamente')
+            return redirect('listaVehiculos')  
+        except Cliente.DoesNotExist:
+            messages.error(request, 'El cliente no existe. Por favor, seleccione un cliente válido.')
+        except IntegrityError:
+            messages.error(request, 'La placa o el chasis ya están registrados. Por favor, ingrese datos únicos.')
+        except Exception as e:
+            messages.error(request, f'Error inesperado: {e}')
+        return redirect('guardarVehiculo')
+
+        
+
+def eliminarVehiculo(request, id):
+    vehiculo = get_object_or_404(Vehiculo, id_veh=id)
+    try:
+        vehiculo.delete()
+        messages.success(request, 'Vehículo eliminado correctamente')
+    except ProtectedError as e:
+        messages.error(request, f'No se puede eliminar el vehículo porque está asociado a una o más órdenes')
+    return redirect('listaVehiculos')
 
 def obtenerVehiculo(request,id):
     vehiculo = Vehiculo.objects.get(id_veh=id)
@@ -336,7 +409,6 @@ def registrarOrden(request):
 """
 def registrarOrden(request):
     if request.method == 'POST':
-        print("Datos POST recibidos:", request.POST)  # Añadir esta línea
         try:
             # Crear dirección
             direccion = Direccion.objects.create(
@@ -403,14 +475,60 @@ def registrarOrden(request):
             messages.error(request, f'Error al crear la orden: {e}')
             return redirect('listarOrdenes')
 
-    
+def guardarOrden2(request):
+    max_numero_ord = Orden.objects.aggregate(models.Max('numero_ord'))['numero_ord__max']
+    next_numero_ord = 1 if max_numero_ord is None else max_numero_ord + 1
+    context = {
+            'next_numero_ord': next_numero_ord,
+            'usuarios': Usuario.objects.all(),
+            'servicios': Servicio.objects.all(),
+            'ESTADOS': Orden.ESTADOS,
+            'vehiculos': Vehiculo.objects.all()
+        }
+    return render(request,'guardarOrden2.html',context)
 
-  
-   
+
+def registrarOrden2(request):
+    if request.method == 'POST':
+        print("Datos POST recibidos:", request.POST)  # Añadir esta línea
+        try:
+            vehiculo_id = request.POST['vehiculo_id']
+            vehiculo = Vehiculo.objects.get(id_veh = vehiculo_id)
+            # Generar el próximo número de orden
+            ultimo_numero_ord = Orden.objects.all().order_by('numero_ord').last()
+            next_numero_ord = ultimo_numero_ord.numero_ord + 1 if ultimo_numero_ord else 1
+            # Crear la orden
+            orden = Orden.objects.create(
+                fecha_ord=timezone.now(),
+                numero_ord=next_numero_ord,
+                observaciones_ord=request.POST['observaciones_ord'],
+                estado_ord=request.POST['estado_ord'],
+                usuario_id=Usuario.objects.get(id_usr=request.POST['usuario_id']),
+                vehiculo_id=vehiculo,
+            )
+          
+            servicios_ids = request.POST.getlist('servicio_id[]')
+            subtotales = request.POST.getlist('subtotal[]')
+
+            for servicio_id, subtotal in zip(servicios_ids, subtotales):
+                if servicio_id and subtotal:
+                    subtotal = subtotal.replace(',', '.')
+                    OrdenServicio.objects.create(
+                        orden_id=orden,
+                        servicio_id=Servicio.objects.get(id_ser=servicio_id),
+                        subtotal=subtotal
+                    )
+
+            messages.success(request, 'Orden creada correctamente')
+            return redirect('listarOrdenes')
+
+        except Exception as e:
+            messages.error(request, f'Error al crear la orden: {e}')
+            return redirect('listarOrdenes')
 
 
 
-    
+
 def listarOrdenesNoFinalizadas(request):
     ordenes_no_finalizadas = Orden.objects.exclude(estado_ord='FINALIZADA')
     context = {
@@ -418,7 +536,73 @@ def listarOrdenesNoFinalizadas(request):
     }
     return render(request, 'listarOrdenesF.html', context)
 
+def obtenerOrden(request,id):
+    orden = get_object_or_404(Orden, id_ord=id)
+    servicios = Servicio.objects.all()
+    usuarios = Usuario.objects.filter(is_active=True)
+    orden_servicios = OrdenServicio.objects.filter(orden_id=orden)
+    vehiculos=Vehiculo.objects.all()
+    ESTADOS = Orden.ESTADOS
+    context = {
+        'orden': orden,
+        'servicios': servicios,
+        'usuarios': usuarios,
+        'ESTADOS': ESTADOS,
+        'orden_servicios': orden_servicios,
+        'vehiculos':vehiculos
+    }
+    return render(request, 'obtenerOrden.html', context)
 
+def editarOrden(request):
+    if request.method == 'POST':
+        vehiculo_id = request.POST['vehiculo_id']
+        vehiculo = Vehiculo.objects.get(id_veh=vehiculo_id)
+        id_ord =request.POST['id_ord']
+        orden = Orden.objects.get(id_ord=id_ord)
+        orden.vehiculo_id_id = vehiculo
+        orden.fecha_ord = request.POST['fecha_ord']
+        orden.numero_ord = request.POST['numero_ord']
+        orden.observaciones_ord = request.POST['observaciones_ord']
+        orden.estado_ord = request.POST['estado_ord']
+        orden.usuario_id_id = request.POST['usuario_id']
+        
+        orden.save()
+
+        # Eliminar los servicios antiguos y agregar los nuevos
+        OrdenServicio.objects.filter(orden_id=orden).delete()
+        servicio_ids = request.POST.getlist('servicio_id[]')
+        subtotales = request.POST.getlist('subtotal[]')
+        
+        for servicio_id, subtotal in zip(servicio_ids, subtotales):
+            subtotal = subtotal.replace(',', '.')
+            OrdenServicio.objects.create(
+                orden_id=orden,
+                servicio_id_id=servicio_id,
+                subtotal=subtotal
+            )
+
+        messages.success(request, 'Orden actualizada correctamente.')
+        return redirect('listarOrdenes')
+
+def eliminarOrden(request, id):
+    orden = get_object_or_404(Orden, id_ord=id)
+    try:
+        with transaction.atomic():
+            OrdenServicio.objects.filter(orden_id=orden).delete()
+            orden.delete()
+            messages.success(request, 'Orden eliminada correctamente.')
+        return redirect('listarOrdenes')   
+    except ProtectedError as e:
+        messages.error(request, f'No se puede eliminar la orden porque está referenciada por: {e.protected_objects}')
+        return redirect('listarOrdenes')  
+    except Orden.DoesNotExist:
+        messages.error(request, 'La orden no existe.')
+        return redirect('listarOrdenes')  
+    except IntegrityError:
+        messages.error(request, 'Ha ocurrido un error durante la eliminación de la orden.')
+        return redirect('listarOrdenes')
+   
+    
 
 
 #Registrar Danios
@@ -535,7 +719,7 @@ def actualizarDanios(request):
         if delete_id_dan_list:
             Danio.objects.filter(id_dan__in=delete_id_dan_list).delete()
 
-        # Actualizar o crear marcadores
+    
         for id_dan, x_pos, y_pos, descripcion_dan in zip(id_dan_list, x_pos_list, y_pos_list, descripcion_dan_list):
             if id_dan.startswith('marker-'):  # Nuevo marcador
                 Danio.objects.create(
@@ -544,7 +728,7 @@ def actualizarDanios(request):
                     descripcion_dan=descripcion_dan,
                     inspeccion_id=inspeccion,
                 )
-            else:  # Marcador existente
+            else:  
                 danio = Danio.objects.get(id_dan=id_dan)
                 danio.x_pos = float(x_pos)
                 danio.y_pos = float(y_pos)
@@ -556,10 +740,89 @@ def actualizarDanios(request):
 
 def eliminarDanios(request,id_ins):
     inspeccion = get_object_or_404(Inspeccion, id_ins=id_ins)
-
-    # Eliminar todos los daños asociados a la orden
     Danio.objects.filter(inspeccion_id=inspeccion).delete()
     inspeccion.delete()
     messages.success(request, 'Todos los daños asociados a la orden han sido eliminados correctamente')
     return redirect('listarDanios')
     
+#DETALLES ORDENES
+def listarDetalleOrden(request):
+    ordenes_con_repuestos = Orden.objects.filter(ordenrepuesto__isnull=False).distinct()
+    return render(request, 'listaDetalle.html', {'ordenes': ordenes_con_repuestos})
+
+
+def guardarDetalle(request):
+    ordenes = Orden.objects.all()
+    return render(request,'detallesOrden.html',{'ordenes':ordenes})
+
+def guardarRepuestos(request):
+    if request.method == 'POST':
+        orden_id = request.POST.get('orden_id')
+        orden = Orden.objects.get(id_ord=orden_id)
+
+        nombres_rep = request.POST.getlist('nombre_rep[]')
+        descripciones_rep = request.POST.getlist('descripcion_rep[]')
+        precios_rep = request.POST.getlist('precio_rep[]')
+        cantidades_rep = request.POST.getlist('cantidad_rep[]')
+        subtotales_rep = request.POST.getlist('subtotal_rep[]')
+
+        for nombre, descripcion, precio, cantidad, subtotal in zip(nombres_rep, descripciones_rep, precios_rep, cantidades_rep, subtotales_rep):
+            OrdenRepuesto.objects.create(
+                orden_id=orden,
+                nombre_rep=nombre,
+                descripcion_rep=descripcion,
+                precio_rep=precio,
+                cantidad_rep=cantidad,
+                subtotal_rep=subtotal
+            )
+
+        messages.success(request, 'Repuesto(s) guardado(s) correctamente')
+        return redirect('listaDetalle')
+    
+def obtenerRepuestos(request, id):
+    orden = get_object_or_404(Orden, id_ord=id)
+    try:
+        repuestos = OrdenRepuesto.objects.filter(orden_id=orden)
+    except ObjectDoesNotExist:
+        repuestos = []
+    
+    context = {
+        'orden': orden,
+        'repuestos': repuestos,
+    }
+    return render(request, 'obtenerRepuestos.html', context)
+
+def editarRepuestos(request):
+    if request.method == 'POST':
+        
+        orden_id = request.POST['orden_id']
+        orden = Orden.objects.get(id_ord=orden_id)
+        OrdenRepuesto.objects.filter(orden_id=orden).delete()
+        nombre_rep_list = request.POST.getlist('nombre_rep[]')
+        descripcion_rep_list = request.POST.getlist('descripcion_rep[]')
+        precio_rep_list = request.POST.getlist('precio_rep[]')
+        cantidad_rep_list = request.POST.getlist('cantidad_rep[]')
+        subtotal_rep_list = request.POST.getlist('subtotal_rep[]')
+        
+        for nombre_rep, descripcion_rep, precio_rep, cantidad_rep, subtotal_rep in zip(nombre_rep_list, descripcion_rep_list, precio_rep_list, cantidad_rep_list, subtotal_rep_list):
+            subtotal_rep = subtotal_rep.replace(',', '.')
+            OrdenRepuesto.objects.create(
+                orden_id=orden,
+                nombre_rep=nombre_rep,
+                descripcion_rep=descripcion_rep,
+                precio_rep=precio_rep,
+                cantidad_rep=cantidad_rep,
+                subtotal_rep=subtotal_rep
+            )
+
+        messages.success(request, 'Detalle actualizado correctamente.')
+        return redirect('listaDetalle')
+    
+def eliminarRepuestos(request,id):
+    orden = get_object_or_404(Orden, id_ord=id)
+    try:
+        OrdenRepuesto.objects.filter(orden_id=orden).delete()
+        messages.success(request, 'Todos los repuestos asociados a la orden han sido eliminados correctamente.')
+    except Exception as e:
+        messages.error(request, f'Error al eliminar repuestos: {str(e)}')
+    return redirect('listaDetalle')
