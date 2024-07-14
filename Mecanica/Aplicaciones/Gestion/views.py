@@ -1,6 +1,7 @@
 from gettext import translation
 import json
 from django.db import transaction, IntegrityError
+from django.forms import ValidationError
 from django.utils import timezone
 from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
@@ -92,43 +93,53 @@ def guardarCliente(request):
 def registrarCliente(request):
     if request.method == 'POST':
         try:
-            ciudad = request.POST['ciudad_dir'].strip().upper()
-            barrio = request.POST['barrio_dir'].strip().upper()
-            calle = request.POST['calle_dir'].strip().upper()
-            numero = request.POST['numero_dir']
+            with transaction.atomic():
+                ciudad = request.POST['ciudad_dir'].strip().upper()
+                barrio = request.POST['barrio_dir'].strip().upper()
+                calle = request.POST['calle_dir'].strip().upper()
+                numero = request.POST['numero_dir']
 
-            direccion = Direccion(ciudad_dir=ciudad, barrio_dir=barrio, calle_dir=calle, numero_dir=numero)
-            direccion.save()
+                # Crear la instancia de la dirección pero no guardarla aún
+                direccion = Direccion(ciudad_dir=ciudad, barrio_dir=barrio, calle_dir=calle, numero_dir=numero)
 
-        
-            nombre = request.POST['nombre_cli'].strip().upper()
-            apellido = request.POST['apellido_cli'].strip().upper()
-            ci = request.POST['ci_cli'].strip()
-            telefono = request.POST['telefono_cli'].strip()
-            email = request.POST['email_cli'].strip()
+                nombre = request.POST['nombre_cli'].strip().upper()
+                apellido = request.POST['apellido_cli'].strip().upper()
+                ci = request.POST['ci_cli'].strip()
+                telefono = request.POST['telefono_cli'].strip()
+                email = request.POST['email_cli'].strip()
 
-            
-            if Cliente.objects.filter(ci_cli=ci).exists():
-                messages.error(request, 'El cliente con este CI ya existe.')
-                return redirect('guardarCliente')
+                # Verificar si el CI del cliente ya existe
+                if Cliente.objects.filter(ci_cli=ci).exists():
+                    messages.error(request, 'El cliente con este CI ya existe.')
+                    raise IntegrityError('CI del cliente duplicado')
 
-            if Cliente.objects.filter(email_cli=email).exists():
-                messages.error(request, 'El cliente con este email ya existe.')
-                return redirect('guardarCliente')
+                # Verificar si el email del cliente ya existe
+                if Cliente.objects.filter(email_cli=email).exists():
+                    messages.error(request, 'El cliente con este email ya existe.')
+                    raise IntegrityError('Email del cliente duplicado')
 
-            
-            cliente = Cliente(nombre_cli=nombre, apellido_cli=apellido, ci_cli=ci, telefono_cli=telefono, email_cli=email, dir_id=direccion)
-            cliente.save()
+                # Guardar la dirección y luego el cliente
+                direccion.save()
+                cliente = Cliente(nombre_cli=nombre, apellido_cli=apellido, ci_cli=ci, telefono_cli=telefono, email_cli=email, dir_id=direccion)
+                cliente.save()
 
             messages.success(request, 'Cliente registrado correctamente.')
-            return redirect('listaClientes')  # Redirige a la lista de clientes después de registrar
+            return redirect('listaClientes') 
 
+        except IntegrityError as e:
+            error_message = str(e)
+            if 'ci_cli' in error_message:
+                messages.error(request, 'El CI del cliente ya existe. Por favor, ingresa otro.')
+            elif 'email_cli' in error_message:
+                messages.error(request, 'El email del cliente ya existe. Por favor, ingresa otro.')
+            else:
+                messages.error(request, f'Error de integridad: {error_message}')
         except Exception as e:
-            # Manejar cualquier otra excepción que pueda ocurrir
             messages.error(request, f'Error al registrar el cliente: {e}')
-            return redirect('registrarCliente')
 
-    return render(request, 'registro_cliente.html')
+        return redirect('guardarCliente')
+
+
 
 def eliminarCliente(request, id):
     try:
@@ -204,10 +215,13 @@ def registrarServicio(request):
         return render(request, 'guardarServicio.html')
 
 
-def eliminarServicio(request,id):
-    servicio = Servicio.objects.get(id_ser =id)
-    servicio.delete()
-    messages.success(request, 'Servicio eliminado correctamente')
+def eliminarServicio(request, id):
+    servicio = get_object_or_404(Servicio, id_ser=id)
+    try:
+        servicio.delete()
+        messages.success(request, 'Servicio eliminado correctamente')
+    except ProtectedError:
+        messages.error(request, 'No se puede eliminar el servicio porque está referenciado en órdenes existentes.')
     return redirect('listaServicios')
 
 def obtenerServicio(request,id):
@@ -216,14 +230,26 @@ def obtenerServicio(request,id):
 
 def actualizarServicio(request):
     if request.method == 'POST':
-        servicio_id = request.POST['id_ser']
-        servicio = Servicio.objects.get(id_ser=servicio_id)
-        servicio.nombre_ser = request.POST['nombre_ser'].strip().upper()
-        servicio.descripcion_ser = request.POST['descripcion_ser'].upper()
-        servicio.precio_ser = request.POST['precio_ser']
-        servicio.save()
-        messages.success(request, 'Servicio actualizado correctamente')
-        return redirect('listaServicios')  # Redirige a la lista de servicios después de actualizar
+        try:
+            servicio_id = request.POST['id_ser']
+            servicio = Servicio.objects.get(id_ser=servicio_id)
+            servicio.nombre_ser = request.POST['nombre_ser'].strip().upper()
+            servicio.descripcion_ser = request.POST['descripcion_ser'].upper()
+            servicio.precio_ser = request.POST['precio_ser']
+            servicio.save()
+            messages.success(request, 'Servicio actualizado correctamente')
+        except IntegrityError:
+            messages.error(request, 'El nombre del servicio ya existe. Por favor, elige otro nombre.')
+        except Servicio.DoesNotExist:
+            messages.error(request, 'El servicio no existe.')
+        except ValueError:
+            messages.error(request, 'El precio debe ser un número decimal válido.')
+        except Exception as e:
+            messages.error(request, f'Error inesperado: {str(e)}')
+        
+        return redirect('listaServicios')
+    else:
+        return render(request, 'obtenerServicio') 
 
 # Gestion de  Ordenes de trabajo
 def listaVehiculos(request):
@@ -410,70 +436,108 @@ def registrarOrden(request):
 def registrarOrden(request):
     if request.method == 'POST':
         try:
-            # Crear dirección
-            direccion = Direccion.objects.create(
-                ciudad_dir=request.POST['ciudad_dir'],
-                barrio_dir=request.POST['barrio_dir'],
-                calle_dir=request.POST['calle_dir'],
-                numero_dir=request.POST['numero_dir']
-            )
+            with transaction.atomic():
+                
+                direccion = Direccion.objects.create(
+                    ciudad_dir=request.POST['ciudad_dir'].strip().upper(),
+                    barrio_dir=request.POST['barrio_dir'].strip().upper(),
+                    calle_dir=request.POST['calle_dir'].strip().upper(),
+                    numero_dir=request.POST['numero_dir']
+                )
 
-            # Crear cliente
-            cliente = Cliente.objects.create(
-                nombre_cli=request.POST['nombre_cli'],
-                apellido_cli=request.POST['apellido_cli'],
-                ci_cli=request.POST['ci_cli'],
-                telefono_cli=request.POST['telefono_cli'],
-                email_cli=request.POST['email_cli'],
-                dir_id=direccion
-            )
+                
+                if Cliente.objects.filter(ci_cli=request.POST['ci_cli']).exists():
+                    raise IntegrityError('ci_cli')
 
-            # Crear vehículo
-            vehiculo = Vehiculo.objects.create(
-                marca_veh=request.POST['marca_veh'],
-                modelo_veh=request.POST['modelo_veh'],
-                placa_veh=request.POST['placa_veh'],
-                anio_veh=request.POST['anio_veh'],
-                chasis_veh=request.POST['chasis_veh'],
-                color_veh=request.POST['color_veh'],
-                cli_id=cliente
-            )
-            # Generar el próximo número de orden
-            ultimo_numero_ord = Orden.objects.all().order_by('numero_ord').last()
-            next_numero_ord = ultimo_numero_ord.numero_ord + 1 if ultimo_numero_ord else 1
+                
+                if Cliente.objects.filter(email_cli=request.POST['email_cli']).exists():
+                    raise IntegrityError('email_cli')
 
-            # Crear la orden
-            orden = Orden.objects.create(
-                fecha_ord=timezone.now(),
-                numero_ord=next_numero_ord,
-                observaciones_ord=request.POST['observaciones_ord'],
-                estado_ord=request.POST['estado_ord'],
-                usuario_id=Usuario.objects.get(id_usr=request.POST['usuario_id']),
-                vehiculo_id=vehiculo,
-            )
+        
+                cliente = Cliente.objects.create(
+                    nombre_cli=request.POST['nombre_cli'].strip().upper(),
+                    apellido_cli=request.POST['apellido_cli'].strip().upper(),
+                    ci_cli=request.POST['ci_cli'].strip(),
+                    telefono_cli=request.POST['telefono_cli'].strip(),
+                    email_cli=request.POST['email_cli'],
+                    dir_id=direccion
+                )
 
-            # Crear servicios de la orden
-            servicios_ids = request.POST.getlist('servicio_id[]')
-            subtotales = request.POST.getlist('subtotal[]')
+                
+                if Vehiculo.objects.filter(placa_veh=request.POST['placa_veh']).exists():
+                    raise IntegrityError('placa_veh')
 
-            print("Servicios IDs:", servicios_ids)  # Añadir esta línea
-            print("Subtotales:", subtotales)  # Añadir esta línea
+            
+                if Vehiculo.objects.filter(chasis_veh=request.POST['chasis_veh']).exists():
+                    raise IntegrityError('chasis_veh')
 
-            for servicio_id, subtotal in zip(servicios_ids, subtotales):
-                if servicio_id and subtotal:
-                    subtotal = subtotal.replace(',', '.')
-                    OrdenServicio.objects.create(
-                        orden_id=orden,
-                        servicio_id=Servicio.objects.get(id_ser=servicio_id),
-                        subtotal=subtotal
-                    )
+                
+                vehiculo = Vehiculo.objects.create(
+                    marca_veh=request.POST['marca_veh'].strip().upper(),
+                    modelo_veh=request.POST['modelo_veh'].strip().upper(),
+                    placa_veh=request.POST['placa_veh'].strip().upper(),
+                    anio_veh=request.POST['anio_veh'],
+                    chasis_veh=request.POST['chasis_veh'],
+                    color_veh=request.POST['color_veh'].strip().upper(),
+                    cli_id=cliente
+                )
+
+                # Generar el próximo número de orden
+                ultimo_numero_ord = Orden.objects.all().order_by('numero_ord').last()
+                next_numero_ord = ultimo_numero_ord.numero_ord + 1 if ultimo_numero_ord else 1
+
+                # Crear la orden
+                orden = Orden.objects.create(
+                    fecha_ord=timezone.now(),
+                    numero_ord=next_numero_ord,
+                    observaciones_ord=request.POST['observaciones_ord'],
+                    estado_ord=request.POST['estado_ord'],
+                    usuario_id=Usuario.objects.get(id_usr=request.POST['usuario_id']),
+                    vehiculo_id=vehiculo,
+                )
+
+                # Crear servicios de la orden
+                servicios_ids = request.POST.getlist('servicio_id[]')
+                subtotales = request.POST.getlist('subtotal[]')
+
+                for servicio_id, subtotal in zip(servicios_ids, subtotales):
+                    if servicio_id and subtotal:
+                        subtotal = subtotal.replace(',', '.')
+                        OrdenServicio.objects.create(
+                            orden_id=orden,
+                            servicio_id=Servicio.objects.get(id_ser=servicio_id),
+                            subtotal=subtotal
+                        )
 
             messages.success(request, 'Orden creada correctamente')
             return redirect('listarOrdenes')
 
+        except IntegrityError as e:
+            if str(e) == 'ci_cli':
+                messages.error(request, 'El CI del cliente ya existe. Por favor, ingresa otro.')
+            elif str(e) == 'email_cli':
+                messages.error(request, 'El email del cliente ya existe. Por favor, ingresa otro.')
+            elif str(e) == 'placa_veh':
+                messages.error(request, 'La placa del vehículo ya existe. Por favor, ingresa otra.')
+            elif str(e) == 'chasis_veh':
+                messages.error(request, 'El chasis del vehículo ya existe. Por favor, ingresa otro.')
+            else:
+                messages.error(request, f'Error de integridad: {e}')
+        except ValidationError as e:
+            messages.error(request, f'Error de validación: {e}')
+        except ObjectDoesNotExist as e:
+            messages.error(request, f'Error de objeto no encontrado: {e}')
         except Exception as e:
-            messages.error(request, f'Error al crear la orden: {e}')
-            return redirect('listarOrdenes')
+            messages.error(request, f'Error inesperado: {e}')
+        
+      
+        return redirect('ordenCliente')
+
+    
+
+    
+
+   
 
 def guardarOrden2(request):
     max_numero_ord = Orden.objects.aggregate(models.Max('numero_ord'))['numero_ord__max']
@@ -614,6 +678,9 @@ def guardarDanios(request):
     if request.method == 'POST':
         orden_id = request.POST['orden']
         orden = Orden.objects.get(id_ord=orden_id)
+        if Inspeccion.objects.filter(orden_id=orden).exists():
+            messages.error(request, 'Ya existe una inspección para esta orden.')
+            return redirect('registrarDanios')
         # Crear inspección
         inspeccion = Inspeccion.objects.create(
                 km=request.POST['km'],
@@ -760,24 +827,36 @@ def guardarRepuestos(request):
         orden_id = request.POST.get('orden_id')
         orden = Orden.objects.get(id_ord=orden_id)
 
-        nombres_rep = request.POST.getlist('nombre_rep[]')
-        descripciones_rep = request.POST.getlist('descripcion_rep[]')
+        if OrdenRepuesto.objects.filter(orden_id=orden).exists():
+            messages.error(request, 'Ya existen repuestos registrados para esta orden.')
+            return redirect('registrarDetalle')
+
+        nombres_rep = [nombre.upper() for nombre in request.POST.getlist('nombre_rep[]')]
+        descripciones_rep = [descripcion.upper() for descripcion in request.POST.getlist('descripcion_rep[]')]
         precios_rep = request.POST.getlist('precio_rep[]')
         cantidades_rep = request.POST.getlist('cantidad_rep[]')
         subtotales_rep = request.POST.getlist('subtotal_rep[]')
 
-        for nombre, descripcion, precio, cantidad, subtotal in zip(nombres_rep, descripciones_rep, precios_rep, cantidades_rep, subtotales_rep):
-            OrdenRepuesto.objects.create(
-                orden_id=orden,
-                nombre_rep=nombre,
-                descripcion_rep=descripcion,
-                precio_rep=precio,
-                cantidad_rep=cantidad,
-                subtotal_rep=subtotal
-            )
+        try:
+            with transaction.atomic():
+                for nombre, descripcion, precio, cantidad, subtotal in zip(nombres_rep, descripciones_rep, precios_rep, cantidades_rep, subtotales_rep):
+                    OrdenRepuesto.objects.create(
+                        orden_id=orden,
+                        nombre_rep=nombre,
+                        descripcion_rep=descripcion,
+                        precio_rep=precio,
+                        cantidad_rep=cantidad,
+                        subtotal_rep=subtotal
+                    )
+            
+            messages.success(request, 'Repuesto(s) guardado(s) correctamente')
+            return redirect('listaDetalle')
 
-        messages.success(request, 'Repuesto(s) guardado(s) correctamente')
-        return redirect('listaDetalle')
+        except Exception as e:
+            messages.error(request, f'Error al guardar repuestos: {e}')
+            return redirect('registrarDetalle')
+    
+    
     
 def obtenerRepuestos(request, id):
     orden = get_object_or_404(Orden, id_ord=id)
@@ -798,8 +877,8 @@ def editarRepuestos(request):
         orden_id = request.POST['orden_id']
         orden = Orden.objects.get(id_ord=orden_id)
         OrdenRepuesto.objects.filter(orden_id=orden).delete()
-        nombre_rep_list = request.POST.getlist('nombre_rep[]')
-        descripcion_rep_list = request.POST.getlist('descripcion_rep[]')
+        nombre_rep_list = [nombre.upper() for nombre in request.POST.getlist('nombre_rep[]')]
+        descripcion_rep_list= [descripcion.upper() for descripcion in request.POST.getlist('descripcion_rep[]')]
         precio_rep_list = request.POST.getlist('precio_rep[]')
         cantidad_rep_list = request.POST.getlist('cantidad_rep[]')
         subtotal_rep_list = request.POST.getlist('subtotal_rep[]')
@@ -826,3 +905,37 @@ def eliminarRepuestos(request,id):
     except Exception as e:
         messages.error(request, f'Error al eliminar repuestos: {str(e)}')
     return redirect('listaDetalle')
+
+
+def detalleOrden(request, id):
+    orden = get_object_or_404(Orden, id_ord=id)
+    cliente = orden.vehiculo_id.cli_id
+    vehiculo = orden.vehiculo_id
+    servicios = OrdenServicio.objects.filter(orden_id=orden)
+    repuestos = OrdenRepuesto.objects.filter(orden_id=orden)
+    total_servicios = sum(servicio.subtotal for servicio in servicios)
+    total_repuestos = sum(repuesto.subtotal_rep for repuesto in repuestos)
+    total = total_servicios + total_repuestos
+    
+    context = {
+        'orden': orden,
+        'cliente': cliente,
+        'vehiculo': vehiculo,
+        'servicios': servicios,
+        'repuestos': repuestos,
+        'total': total,
+    }
+    
+    return render(request, 'detalle_orden.html', context)
+
+def reporte_inspeccion(request, id):
+    inspeccion = get_object_or_404(Inspeccion, id_ins=id)
+    danios = Danio.objects.filter(inspeccion_id=inspeccion).values('id_dan', 'x_pos', 'y_pos', 'descripcion_dan')
+    ordenes = Orden.objects.all()
+    context = {
+        'ordenes':ordenes,
+        'inspeccion': inspeccion,
+        'danios': json.dumps(list(danios)),
+    }
+   
+    return render(request, 'reporte_danios.html', context)

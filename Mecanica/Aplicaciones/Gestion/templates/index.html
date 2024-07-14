@@ -112,7 +112,15 @@
       #markerContainer .comment-box {
         pointer-events: auto;
       }
+
+  .marker:hover .comment-box {
+    display: block;
+  }
+  
+      
     </style>
+    {% block extra_styles %}{% endblock %}
+
   </head>
   <body class="hold-transition sidebar-mini layout-footer-fixed">
     <!-- Site wrapper -->

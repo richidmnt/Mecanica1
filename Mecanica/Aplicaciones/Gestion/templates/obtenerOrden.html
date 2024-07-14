@@ -1,4 +1,5 @@
 {% extends "./index.html" %}
+
 {% block body %}
 <section class="content">
   <div class="container-fluid">
@@ -12,7 +13,7 @@
             <form id="ordenForm" method="post" action="/editarOrden/">
               {% csrf_token %}
               <!-- Campos de la Orden -->
-               <input type="hidden" name="id_ord" value="{{orden.id_ord}}">
+              <input type="hidden" name="id_ord" value="{{orden.id_ord}}">
               <div class="form-group">
                 <label for="vehiculoSelect" class="form-label">Elija un vehiculo</label>
                 <select class="form-control" name="vehiculo_id" id="vehiculoSelect">
@@ -46,7 +47,7 @@
               </div>
               <div class="form-group">
                 <label for="observaciones_ord" class="form-label">Observaciones:</label>
-                <textarea class="form-control" id="observaciones_ord" name="observaciones_ord" rows="3">{{ orden.observaciones_ord }}</textarea>
+                <textarea class="form-control" id="observaciones_ord" name="observaciones_ord" rows="3" minlength="10" maxlength="100">{{ orden.observaciones_ord }}</textarea>
               </div>
               <div class="form-group">
                 <label for="estado_ord" class="form-label">Estado:</label>
@@ -87,10 +88,10 @@
                         {% for orden_servicio in orden_servicios %}
                         <tr>
                           <td>
-                            <select class="form-control" name="servicio_id[]" onchange="updateSubtotal(this)" required>
+                            <select class="form-control servicio-select" name="servicio_id[]" onchange="updateSubtotal(this)" required>
                               <option value="">Seleccione un servicio</option>
                               {% for servicio in servicios %}
-                                <option value="{{ servicio.id_ser }}" data-precio="{{ servicio.precio_ser }}" {% if orden_servicio.servicio_id.id_ser == servicio.id_ser %}selected{% endif %}>{{ servicio.nombre_ser }}</option>
+                                <option value="{{ servicio.id_ser }}" data-precio="{{ servicio.precio_ser }}" data-nombre="{{ servicio.nombre_ser }}" {% if orden_servicio.servicio_id.id_ser == servicio.id_ser %}selected{% endif %}>{{ servicio.nombre_ser }}</option>
                               {% endfor %}
                             </select>
                           </td>
@@ -159,10 +160,10 @@
   function addRow() {
     var newRow = `<tr>
       <td>
-        <select class="form-control" name="servicio_id[]" onchange="updateSubtotal(this)" required>
+        <select class="form-control servicio-select" name="servicio_id[]" onchange="updateSubtotal(this)" required>
           <option value="">Seleccione un servicio</option>
           {% for servicio in servicios %}
-            <option value="{{ servicio.id_ser }}" data-precio="{{ servicio.precio_ser }}">{{ servicio.nombre_ser }}</option>
+            <option value="{{ servicio.id_ser }}" data-precio="{{ servicio.precio_ser }}" data-nombre="{{ servicio.nombre_ser }}">{{ servicio.nombre_ser }}</option>
           {% endfor %}
         </select>
       </td>
@@ -183,8 +184,87 @@
     button.closest("tr").remove();
     updateTotal();
   }
-</script>
-<script>
+
+  document.getElementById('ordenForm').addEventListener('submit', function (e) {
+    var servicioSelects = document.querySelectorAll('.servicio-select');
+    var servicios = [];
+    var duplicado = false;
+    var duplicadoNombre = "";
+
+    servicioSelects.forEach(function (select) {
+      var servicioId = select.value;
+      var servicioNombre = select.options[select.selectedIndex].dataset.nombre;
+      if (servicios.includes(servicioId)) {
+        duplicado = true;
+        duplicadoNombre = servicioNombre;
+      }
+      servicios.push(servicioId);
+    });
+
+    if (duplicado) {
+      e.preventDefault();
+      iziToast.error({
+        title: 'Error',
+        message: `El servicio "${duplicadoNombre}" ya está agregado.`,
+        position: 'topRight'
+      });
+    }
+  });
+
+  $(document).ready(function() {
+    $("#ordenForm").validate({
+      rules: {
+        vehiculo_id: {
+          required: true,
+        },
+        observaciones_ord: {
+          required: true,
+          minlength: 10,
+          maxlength: 100
+        },
+        estado_ord: {
+          required: true
+        },
+        usuario_id: {
+          required: true
+        },
+        "servicio_id[]": {
+          required: true
+        }
+      },
+      messages: {
+        vehiculo_id: {
+          required: "Por favor, seleccione un vehículo"
+        },
+        observaciones_ord: {
+          required: "Por favor, ingrese observaciones",
+          minlength: "Las observaciones deben tener al menos 10 caracteres",
+          maxlength: "Las observaciones no pueden tener más de 100 caracteres"
+        },
+        estado_ord: {
+          required: "Por favor, seleccione un estado"
+        },
+        usuario_id: {
+          required: "Por favor, seleccione un usuario"
+        },
+        "servicio_id[]": {
+          required: "Por favor, seleccione un servicio"
+        }
+      },
+      errorElement: "span",
+      errorPlacement: function (error, element) {
+        error.addClass("invalid-feedback");
+        element.closest("div").append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass("is-invalid");
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass("is-invalid");
+      }
+    });
+  });
+
   document.addEventListener("DOMContentLoaded", function() {
     $('#vehiculoSelect').change(function() {
       var selectedOption = $(this).find('option:selected');
@@ -200,5 +280,4 @@
     });
   });
 </script>
-
 {% endblock %}

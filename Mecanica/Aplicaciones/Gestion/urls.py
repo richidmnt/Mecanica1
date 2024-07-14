@@ -16,7 +16,7 @@ urlpatterns = [
     path('guardarServicio/',views.guardarServicio,name="guardarServicio"),
     path('registrarServicio/',views.registrarServicio),
     path('eliminarServicio/<id>/',views.eliminarServicio),
-    path('obtenerServicio/<id>/',views.obtenerServicio),
+    path('obtenerServicio/<id>/',views.obtenerServicio,name='obtenerServicio'),
     path('actualizarServicio/',views.actualizarServicio),
     path('listaVehiculos/',views.listaVehiculos,name="listaVehiculos"),
     path('guardarVehiculo/',views.guardarVehiculo,name="guardarVehiculo"),
@@ -43,6 +43,8 @@ urlpatterns = [
     path('registrarOrden2/',views.registrarOrden2),
     path('obtenerRepuestos/<id>/',views.obtenerRepuestos),
     path('editarRepuestos/',views.editarRepuestos),
-    path('eliminarDetalle/<id>/',views.eliminarRepuestos)
+    path('eliminarDetalle/<id>/',views.eliminarRepuestos),
+    path('detalleOrden/<id>/',views.detalleOrden),
+    path('detalleInspeccion/<id>/',views.reporte_inspeccion)
     
 ]

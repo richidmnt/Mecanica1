@@ -1,4 +1,5 @@
-{% extends "./index.html" %} {% block body %}
+{% extends "./index.html" %}
+{% block body %}
 <section class="content">
   <div class="container-fluid">
     <div class="row justify-content-center">
@@ -10,13 +11,12 @@
           <div class="card-body">
             <form id="daniosForm" method="post" action="/actualizarDanios/">
               {% csrf_token %}
-  
-<input type="hidden" name="id_ins" value="{{ inspeccion.id_ins }}">
-              <label for=""class="form-label">Ordenes</label>
+              <input type="hidden" name="id_ins" value="{{ inspeccion.id_ins }}">
+              <label for="" class="form-label">Ordenes</label>
               <select name="orden_id" id="orden">
-                {%  for orden in ordenes %}
-                <option value="{{ orden.id_ord }}" {% if orden.id == inspeccion.orden_id.id %}selected{% endif %}> {{orden.numero_ord}}</option>
-                {%  endfor %}
+                {% for orden in ordenes %}
+                <option value="{{ orden.id_ord }}" {% if orden.id == inspeccion.orden_id.id %}selected{% endif %}> {{ orden.numero_ord }}</option>
+                {% endfor %}
               </select>
               <div class="card card-danger mb-3">
                 <div class="card-header bg-danger text-white">
@@ -25,31 +25,13 @@
                 <div class="card-body">
                   <div class="form-group">
                     <label for="km" class="form-label">Kilometraje:</label>
-                    <input
-                      type="number"
-                      class="form-control"
-                      id="km"
-                      name="km"
-                      value="{{ inspeccion.km }}"
-                      required
-                    />
+                    <input type="number" class="form-control" id="km" name="km" value="{{ inspeccion.km }}" required />
                   </div>
                   <div class="form-group">
                     <label for="nivel_gasolina" class="form-label">Nivel de Gasolina:</label>
                     <div class="d-flex justify-content-between align-items-center">
                       <span>E</span>
-                      <input
-                        type="range"
-                        class="form-control-range"
-                        id="nivel_gasolina"
-                        name="nivel_gasolina"
-                        min="0"
-                        max="100"
-                        step="25"
-                        value="{{ inspeccion.nivel_gasolina }}"
-                        oninput="updateGasolinaLabel(this.value)"
-                        required
-                      />
+                      <input type="range" class="form-control-range" id="nivel_gasolina" name="nivel_gasolina" min="0" max="100" step="25" value="{{ inspeccion.nivel_gasolina }}" oninput="updateGasolinaLabel(this.value)" required />
                       <span>F</span>
                     </div>
                     <div class="d-flex justify-content-between mt-2">
@@ -221,7 +203,8 @@
     </div>
   </div>
 </section>
-{% endblock %} {% block extra_scripts %}
+{% endblock %}
+{% block extra_scripts %}
 <script>
   let markerCount = 0;
   const carImage = document.getElementById("carImage");
@@ -276,7 +259,7 @@
       commentBox.innerHTML = `
         <textarea class="form-control mb-2" placeholder="Describa el daño">${description}</textarea>
         <button class="btn btn-success btn-sm mr-2" onclick="saveComment(event, this, ${x}, ${y})">Guardar</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteMarker('${marker.dataset.id}', this)">Eliminar</button>
+        <button class="btn btn-danger btn-sm" onclick="confirmDeleteMarker(event, '${marker.dataset.id}', this)">Eliminar</button>
       `;
       markerContainer.appendChild(commentBox);
     }
@@ -315,22 +298,57 @@
     form.appendChild(inputY);
     form.appendChild(inputDescription);
 
-    alert(`Comentario guardado: ${description}`);
+    iziToast.success({
+      title: 'Guardado',
+      message: `Comentario guardado: ${description}`,
+      position: 'topRight'
+    });
     commentBox.style.display = "none";
   }
 
-  function deleteMarker(id, button) {
-    const form = document.getElementById("daniosForm");
-    const inputDelete = document.createElement("input");
-    inputDelete.type = "hidden";
-    inputDelete.name = "delete_id_dan[]";
-    inputDelete.value = id;
-    form.appendChild(inputDelete);
+  function confirmDeleteMarker(event, markerId, button) {
+    event.preventDefault();
+    iziToast.question({
+      timeout: 20000,
+      close: false,
+      overlay: true,
+      displayMode: 'once',
+      id: 'question',
+      zindex: 999,
+      title: 'Confirmación',
+      message: '¿Está seguro de que desea eliminar este marcador?',
+      position: 'center',
+      buttons: [
+        ['<button><b>SI</b></button>', function (instance, toast) {
+          deleteMarker(markerId, button);
+          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+        }, true],
+        ['<button>NO</button>', function (instance, toast) {
+          instance.hide({ transitionOut: 'fadeOut' }, toast, 'button');
+        }]
+      ],
+    });
+  }
 
+  function deleteMarker(markerId, button) {
     const commentBox = button.parentElement;
-    const marker = document.querySelector(`[data-id='${id}']`);
+    const marker = document.querySelector(`[data-id='${markerId}']`);
     marker.remove();
     commentBox.remove();
+
+    // Añadir un input oculto para marcar el marcador como eliminado
+    const form = document.getElementById("daniosForm");
+    const inputDeletedMarkerId = document.createElement("input");
+    inputDeletedMarkerId.type = "hidden";
+    inputDeletedMarkerId.name = "deleted_marker_ids[]";
+    inputDeletedMarkerId.value = markerId;
+    form.appendChild(inputDeletedMarkerId);
+
+    iziToast.success({
+      title: 'Eliminado',
+      message: 'El marcador ha sido eliminado.',
+      position: 'topRight'
+    });
   }
 </script>
 {% endblock %}

@@ -148,7 +148,7 @@ class Orden(models.Model):
 class OrdenServicio(models.Model):
     id_ord_ser = models.AutoField(primary_key=True)
     orden_id = models.ForeignKey(Orden, on_delete=models.CASCADE)
-    servicio_id = models.ForeignKey(Servicio, on_delete=models.CASCADE)
+    servicio_id = models.ForeignKey(Servicio, on_delete=models.PROTECT)
     subtotal = models.DecimalField(max_digits=10,decimal_places=2)
 
 

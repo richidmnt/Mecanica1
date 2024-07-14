@@ -55,19 +55,19 @@
                       <tbody id="repuestosTableBody">
                         <tr>
                           <td>
-                            <input type="text" class="form-control" name="nombre_rep[]" required />
+                            <input type="text" class="form-control" name="nombre_rep[]" id="nombre_rep_0" required minlength="5" maxlength="50" />
                           </td>
                           <td>
-                            <textarea class="form-control" name="descripcion_rep[]" rows="2" required></textarea>
+                            <textarea class="form-control" name="descripcion_rep[]" id="descripcion_rep_0" rows="2" required minlength="5" maxlength="100"></textarea>
                           </td>
                           <td>
-                            <input type="number" class="form-control precio" name="precio_rep[]" step="0.01" onchange="updateSubtotal(this)" required />
+                            <input type="number" class="form-control precio" name="precio_rep[]" id="precio_rep_0" step="0.01" required min="2" max="1000" onchange="updateSubtotal(this)" />
                           </td>
                           <td>
-                            <input type="number" class="form-control cantidad" name="cantidad_rep[]" onchange="updateSubtotal(this)" required />
+                            <input type="number" class="form-control cantidad" name="cantidad_rep[]" id="cantidad_rep_0" required min="1" max="100" onchange="updateSubtotal(this)" />
                           </td>
                           <td>
-                            <input type="text" class="form-control subtotal" name="subtotal_rep[]" readonly />
+                            <input type="text" class="form-control subtotal" name="subtotal_rep[]" id="subtotal_rep_0" readonly />
                           </td>
                           <td>
                             <button type="button" class="btn btn-danger" onclick="removeRow(this)">Eliminar</button>
@@ -86,7 +86,7 @@
 
               <div class="d-flex justify-content-between mt-3">
                 <button type="submit" class="btn btn-primary">Guardar Repuesto</button>
-                <a href="{%  url 'listaDetalle' %}" class="btn btn-secondary">Cancelar</a>
+                <a href="{% url 'listaDetalle' %}" class="btn btn-secondary">Cancelar</a>
               </div>
             </form>
           </div>
@@ -100,6 +100,8 @@
 
 {% block extra_scripts %}
 <script>
+  let rowIndex = 1;
+
   function updateSubtotal(element) {
     var row = element.closest('tr');
     var precio = parseFloat(row.querySelector('.precio').value) || 0;
@@ -121,30 +123,115 @@
     var newRow = `
       <tr>
         <td>
-          <input type="text" class="form-control" name="nombre_rep[]" required />
+          <input type="text" class="form-control" name="nombre_rep[]" id="nombre_rep_${rowIndex}" required minlength="5" maxlength="50" />
         </td>
         <td>
-          <textarea class="form-control" name="descripcion_rep[]" rows="2" required></textarea>
+          <textarea class="form-control" name="descripcion_rep[]" id="descripcion_rep_${rowIndex}" rows="2" required minlength="5" maxlength="100"></textarea>
         </td>
         <td>
-          <input type="number" class="form-control precio" name="precio_rep[]" step="0.01" onchange="updateSubtotal(this)" required />
+          <input type="number" class="form-control precio" name="precio_rep[]" id="precio_rep_${rowIndex}" step="0.01" required min="2" max="1000" onchange="updateSubtotal(this)" />
         </td>
         <td>
-          <input type="number" class="form-control cantidad" name="cantidad_rep[]" onchange="updateSubtotal(this)" required />
+          <input type="number" class="form-control cantidad" name="cantidad_rep[]" id="cantidad_rep_${rowIndex}" required min="1" max="100" onchange="updateSubtotal(this)" />
         </td>
         <td>
-          <input type="text" class="form-control subtotal" name="subtotal_rep[]" readonly />
+          <input type="text" class="form-control subtotal" name="subtotal_rep[]" id="subtotal_rep_${rowIndex}" readonly />
         </td>
         <td>
           <button type="button" class="btn btn-danger" onclick="removeRow(this)">Eliminar</button>
         </td>
       </tr>`;
     document.getElementById('repuestosTableBody').insertAdjacentHTML('beforeend', newRow);
+    rowIndex++;
   }
 
   function removeRow(button) {
     button.closest('tr').remove();
     updateTotal();
   }
+
+  $(document).ready(function() {
+    $("#repuestosForm").on('submit', function(e) {
+      let isValid = true;
+
+      // Validar todos los campos dinámicos
+      $(this).find('input, textarea').each(function() {
+        if (!this.checkValidity()) {
+          isValid = false;
+          $(this).addClass('is-invalid');
+        } else {
+          $(this).removeClass('is-invalid');
+        }
+      });
+
+      if (!isValid) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    $("#repuestosForm").validate({
+      ignore: [],
+      rules: {
+        "nombre_rep[]": {
+          required: true,
+          minlength: 5,
+          maxlength: 50
+        },
+        "descripcion_rep[]": {
+          required: true,
+          minlength: 5,
+          maxlength:100
+        },
+        "precio_rep[]": {
+          required: true,
+          number: true,
+          min: 2,
+          max: 1000
+        },
+        "cantidad_rep[]": {
+          required: true,
+          number: true,
+          min: 1,
+          max: 100
+        }
+      },
+      messages: {
+        "nombre_rep[]": {
+          required: "Por favor, ingrese el nombre del repuesto",
+          minlength: "El nombre debe tener al menos 5 caracteres",
+          maxlength: "El nombre no puede tener más de 50caracteres"
+        },
+        "descripcion_rep[]": {
+          required: "Por favor, ingrese una descripción del repuesto",
+          minlength: "La descripción debe tener al menos 5 caracteres",
+          maxlength:"La descripción debe tener máximo 100 caracteres"
+        },
+        "precio_rep[]": {
+          required: "Por favor, ingrese el precio del repuesto",
+          number: "Por favor, ingrese un número válido",
+          min: "El precio debe ser al menos 2",
+          max: "El precio no puede ser más de 1000"
+        },
+        "cantidad_rep[]": {
+          required: "Por favor, ingrese la cantidad de repuestos",
+          number: "Por favor, ingrese un número válido",
+          min: "La cantidad debe ser al menos 1",
+          max: "La cantidad no puede ser más de 100"
+        }
+      },
+      errorElement: "span",
+      errorPlacement: function (error, element) {
+        error.addClass("invalid-feedback");
+        element.closest("td").append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass("is-invalid");
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass("is-invalid");
+      }
+    });
+  });
 </script>
 {% endblock %}
