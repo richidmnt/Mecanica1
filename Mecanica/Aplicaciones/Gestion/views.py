@@ -7,13 +7,52 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models.deletion import ProtectedError
 from django.core.exceptions import ObjectDoesNotExist
+
+from .decorators import login_required,admin_required,mecanico_required
 from .models import *
 
-# Gestion de usuarios
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        try:
+            user = Usuario.objects.get(username=username)
+            if user.check_password(password):
+                if user.is_active:
+                    request.session['id_usr'] = user.id_usr
+                    messages.success(request, 'Inicio de sesión exitoso')
+                    if user.rol == Usuario.ADMINISTRADOR:
+                        return redirect('home')
+                    elif user.rol == Usuario.MECANICO:
+                        return redirect('home2')
+                else:
+                    messages.error(request, 'Cuenta inactiva. Contacta al administrador.')
+            else:
+                messages.error(request, 'Contraseña incorrecta')
+        except Usuario.DoesNotExist:
+            messages.error(request, 'Usuario no encontrado')
+    return render(request, 'login.html')
+def logout(request):
+    if 'id_usr' in request.session:
+        del request.session['id_usr']
+    return redirect('login')
+
+@admin_required
+def home(request):
+    # request.user ya estará disponible gracias al middleware
+    return render(request, 'index.html')
+
+
+@mecanico_required
+def home2(request):
+    return render(request,'prueba.html')
+
+@admin_required
 def index(request):
     usuarios = Usuario.objects.all()
     return render(request, 'listaUsuarios.html', {'usuarios': usuarios})
 
+@admin_required
 def guardarUsuario(request):
     return render(request, 'guardarUsuario.html')
 
@@ -82,13 +121,15 @@ def eliminarUsuario(request, id):
 
 
 # Gestion de Clientes
-
+@admin_required
 def listaClientes(request):
     clientes = Cliente.objects.all()
     return render(request,'listaClientes.html',{'clientes':clientes})
 
+@admin_required
 def guardarCliente(request):
     return render(request,'guardarCliente.html')
+
 
 def registrarCliente(request):
     if request.method == 'POST':
@@ -154,7 +195,7 @@ def eliminarCliente(request, id):
         messages.error(request, f'Ocurrió un error al intentar eliminar el cliente: {e}')
     
     return redirect('listaClientes')
-
+@admin_required
 def obtenerClietne(request,id):
     cliente = Cliente.objects.get(id_cli=id)
     return render(request,'obtenerCliente.html',{'cliente':cliente})
@@ -180,15 +221,15 @@ def actualizarCliente(request):
         return redirect('listaClientes') 
     
 # Gestion de servicios
-
+@admin_required
 def listaServicios(request):
     servicios = Servicio.objects.all()
     return render(request,'listaServicios.html',{'servicios':servicios})
-
+@admin_required
 def guardarServicio(request):
     return render(request,'guardarServicio.html')
 
-
+@admin_required
 def registrarServicio(request):
     if request.method == 'POST':
         nombre = request.POST['nombre_ser'].strip().upper()
@@ -223,11 +264,11 @@ def eliminarServicio(request, id):
     except ProtectedError:
         messages.error(request, 'No se puede eliminar el servicio porque está referenciado en órdenes existentes.')
     return redirect('listaServicios')
-
+@admin_required
 def obtenerServicio(request,id):
     servicio = Servicio.objects.get(id_ser = id)
     return render(request,'obtenerServicio.html',{'servicio':servicio})
-
+@admin_required
 def actualizarServicio(request):
     if request.method == 'POST':
         try:
@@ -251,16 +292,16 @@ def actualizarServicio(request):
     else:
         return render(request, 'obtenerServicio') 
 
-# Gestion de  Ordenes de trabajo
+@admin_required
 def listaVehiculos(request):
     vehiculos =Vehiculo.objects.all()
     
     return render(request,'listaVehiculos.html',{'vehiculos':vehiculos})
-
+@admin_required
 def guardarVehiculo(request):
     clientes = Cliente.objects.all()
     return render(request,'guardarVehiculo.html',{'clientes':clientes})
-
+@admin_required
 def registrarVehiculo(request):
     if request.method == 'POST':
         try:
@@ -295,7 +336,7 @@ def registrarVehiculo(request):
         return redirect('guardarVehiculo')
 
         
-
+@admin_required
 def eliminarVehiculo(request, id):
     vehiculo = get_object_or_404(Vehiculo, id_veh=id)
     try:
@@ -304,12 +345,12 @@ def eliminarVehiculo(request, id):
     except ProtectedError as e:
         messages.error(request, f'No se puede eliminar el vehículo porque está asociado a una o más órdenes')
     return redirect('listaVehiculos')
-
+@admin_required
 def obtenerVehiculo(request,id):
     vehiculo = Vehiculo.objects.get(id_veh=id)
     clientes = Cliente.objects.all()
     return render(request,'obtenerVehiculo.html',{'vehiculo':vehiculo,'clientes':clientes})
-
+@admin_required
 def actualizarVehiculo(request):
     if request.method == 'POST':
         id_veh=request.POST['id_veh']
@@ -327,7 +368,7 @@ def actualizarVehiculo(request):
         return redirect('listaVehiculos')
     
 #Registrar Orden Cliente
- 
+@admin_required
 def guardarOrden(request):
     max_numero_ord = Orden.objects.aggregate(models.Max('numero_ord'))['numero_ord__max']
     next_numero_ord = 1 if max_numero_ord is None else max_numero_ord + 1
@@ -433,6 +474,7 @@ def registrarOrden(request):
         messages.success(request, 'orden creado correctamente')
         return redirect('/') 
 """
+@admin_required
 def registrarOrden(request):
     if request.method == 'POST':
         try:
@@ -538,7 +580,7 @@ def registrarOrden(request):
     
 
    
-
+@admin_required
 def guardarOrden2(request):
     max_numero_ord = Orden.objects.aggregate(models.Max('numero_ord'))['numero_ord__max']
     next_numero_ord = 1 if max_numero_ord is None else max_numero_ord + 1
@@ -551,7 +593,7 @@ def guardarOrden2(request):
         }
     return render(request,'guardarOrden2.html',context)
 
-
+@admin_required
 def registrarOrden2(request):
     if request.method == 'POST':
         print("Datos POST recibidos:", request.POST)  # Añadir esta línea
@@ -592,14 +634,14 @@ def registrarOrden2(request):
 
 
 
-
+@admin_required
 def listarOrdenesNoFinalizadas(request):
     ordenes_no_finalizadas = Orden.objects.exclude(estado_ord='FINALIZADA')
     context = {
         'ordenes': ordenes_no_finalizadas
     }
     return render(request, 'listarOrdenesF.html', context)
-
+@admin_required
 def obtenerOrden(request,id):
     orden = get_object_or_404(Orden, id_ord=id)
     servicios = Servicio.objects.all()
@@ -616,7 +658,7 @@ def obtenerOrden(request,id):
         'vehiculos':vehiculos
     }
     return render(request, 'obtenerOrden.html', context)
-
+@admin_required
 def editarOrden(request):
     if request.method == 'POST':
         vehiculo_id = request.POST['vehiculo_id']
@@ -647,7 +689,7 @@ def editarOrden(request):
 
         messages.success(request, 'Orden actualizada correctamente.')
         return redirect('listarOrdenes')
-
+@admin_required
 def eliminarOrden(request, id):
     orden = get_object_or_404(Orden, id_ord=id)
     try:
@@ -812,16 +854,16 @@ def eliminarDanios(request,id_ins):
     messages.success(request, 'Todos los daños asociados a la orden han sido eliminados correctamente')
     return redirect('listarDanios')
     
-#DETALLES ORDENES
+@admin_required
 def listarDetalleOrden(request):
     ordenes_con_repuestos = Orden.objects.filter(ordenrepuesto__isnull=False).distinct()
     return render(request, 'listaDetalle.html', {'ordenes': ordenes_con_repuestos})
 
-
+@admin_required
 def guardarDetalle(request):
     ordenes = Orden.objects.all()
     return render(request,'detallesOrden.html',{'ordenes':ordenes})
-
+@admin_required
 def guardarRepuestos(request):
     if request.method == 'POST':
         orden_id = request.POST.get('orden_id')
@@ -857,7 +899,7 @@ def guardarRepuestos(request):
             return redirect('registrarDetalle')
     
     
-    
+@admin_required  
 def obtenerRepuestos(request, id):
     orden = get_object_or_404(Orden, id_ord=id)
     try:
@@ -870,7 +912,7 @@ def obtenerRepuestos(request, id):
         'repuestos': repuestos,
     }
     return render(request, 'obtenerRepuestos.html', context)
-
+@admin_required
 def editarRepuestos(request):
     if request.method == 'POST':
         
@@ -896,7 +938,7 @@ def editarRepuestos(request):
 
         messages.success(request, 'Detalle actualizado correctamente.')
         return redirect('listaDetalle')
-    
+@admin_required  
 def eliminarRepuestos(request,id):
     orden = get_object_or_404(Orden, id_ord=id)
     try:
@@ -906,7 +948,7 @@ def eliminarRepuestos(request,id):
         messages.error(request, f'Error al eliminar repuestos: {str(e)}')
     return redirect('listaDetalle')
 
-
+@admin_required
 def detalleOrden(request, id):
     orden = get_object_or_404(Orden, id_ord=id)
     cliente = orden.vehiculo_id.cli_id
@@ -927,7 +969,7 @@ def detalleOrden(request, id):
     }
     
     return render(request, 'detalle_orden.html', context)
-
+@admin_required
 def reporte_inspeccion(request, id):
     inspeccion = get_object_or_404(Inspeccion, id_ins=id)
     danios = Danio.objects.filter(inspeccion_id=inspeccion).values('id_dan', 'x_pos', 'y_pos', 'descripcion_dan')
@@ -939,3 +981,55 @@ def reporte_inspeccion(request, id):
     }
    
     return render(request, 'reporte_danios.html', context)
+
+
+@mecanico_required
+def ordenes_mecanico(request):
+    user = request.user
+    if user.rol == Usuario.MECANICO:
+        ordenes = Orden.objects.filter(usuario_id=user, estado_ord='PENDIENTE')
+        ordenes_con_servicios = []
+        for orden in ordenes:
+            servicios = OrdenServicio.objects.filter(orden_id=orden)
+            ordenes_con_servicios.append((orden, servicios))
+        return render(request, 'lista_orden_m.html', {'ordenes_con_servicios': ordenes_con_servicios})
+    else:
+        return redirect('home2')
+    
+@mecanico_required 
+def aceptar_orden(request, id_ord):
+    orden = get_object_or_404(Orden, id_ord=id_ord)
+    if request.user.rol == Usuario.MECANICO and orden.usuario_id == request.user:
+        orden.estado_ord = 'EN_PROGRESO'
+        orden.save()
+        messages.success(request,'Orden acepta correctamente')
+        return render(request,'inspeccion_m.html',{'orden':orden})
+@mecanico_required    
+def lista_progreso(request):
+    user = request.user
+    if user.rol == Usuario.MECANICO:
+        ordenes = Orden.objects.filter(usuario_id=user, estado_ord__in=['EN_PROGRESO', 'ESPERANDO_REPUESTOS'])
+        ordenes_con_servicios = []
+        for orden in ordenes:
+            servicios = OrdenServicio.objects.filter(orden_id=orden)
+            ordenes_con_servicios.append((orden, servicios))
+        return render(request, 'lista_orden_progreso.html', {'ordenes_con_servicios': ordenes_con_servicios})
+    else:
+        return redirect('home2')
+
+@mecanico_required
+def cambiar_estado_orden(request, id_ord, nuevo_estado):
+    orden = get_object_or_404(Orden, id_ord=id_ord)
+    if request.user.rol == Usuario.MECANICO and orden.usuario_id == request.user:
+        orden.estado_ord = nuevo_estado
+        orden.save()
+        messages.success(request, f'Orden cambiada a estado {nuevo_estado} exitosamente.')
+    else:
+        messages.error(request, 'No tienes permiso para cambiar el estado de esta orden.')
+    return redirect('listaProgreso')
+
+@mecanico_required
+def listar_inspecciones(request):
+    usuario_actual = request.user
+    inspecciones = Inspeccion.objects.filter(orden_id__usuario_id=usuario_actual)
+    return render(request, 'listar_inspecciones_m.html', {'danios': inspecciones})

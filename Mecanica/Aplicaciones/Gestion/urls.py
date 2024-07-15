@@ -2,7 +2,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index, name="index"),
+    path('',views.login_view,name="login"),
+    path('home/',views.home,name="home"),
+    path('home2/',views.home2,name="home2"),
+    path('index/', views.index, name="index"),
     path('guardarUsuario/', views.guardarUsuario, name="guardarUsuario"),
     path('registrarUsuario/', views.registrarUsuario),
     path('eliminarUsuario/<id>', views.eliminarUsuario, name="eliminarUsuario"),
@@ -45,6 +48,13 @@ urlpatterns = [
     path('editarRepuestos/',views.editarRepuestos),
     path('eliminarDetalle/<id>/',views.eliminarRepuestos),
     path('detalleOrden/<id>/',views.detalleOrden),
-    path('detalleInspeccion/<id>/',views.reporte_inspeccion)
+    path('detalleInspeccion/<id>/',views.reporte_inspeccion),
+    path('login/',views.login_view,name="login"),
+    path('logout/',views.logout,name="logout"),
+    path('listaOrdenM/',views.ordenes_mecanico,name="ordenesM"),
+    path('aceptar_orden/<int:id_ord>/', views.aceptar_orden, name='aceptar_orden'),
+    path('lista-progreso/',views.lista_progreso,name="listaProgreso"),
+    path('cambiar_estado_orden/<int:id_ord>/<str:nuevo_estado>/', views.cambiar_estado_orden, name='cambiar_estado_orden'),
+    path('listar_inspecciones/',views.listar_inspecciones,name="listarInspeccionM")
     
 ]
