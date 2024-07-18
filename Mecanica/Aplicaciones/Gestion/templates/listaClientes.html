@@ -1,20 +1,22 @@
-{% extends "./index.html" %} {% load static %} {% block body %}
+{% extends "./index.html" %}
+{% load static %}
+{% block body %}
 <section class="content">
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
         <!-- Default box -->
-        <div class="card card-primary">
-          <div class="card-header">
-            <h3 class="card-title">Lista de Usuarios</h3>
-          </div>
+        <div class="card card-secondary">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title">Lista de Clientes</h3>
+            <a href="{% url 'guardarCliente' %}" class="btn btn-primary ml-auto">
+                <i class="fa fa-plus nav-icon"></i> Nuevo Cliente
+            </a>
+          </div>     
           <div class="card-body">
             <div class="row">
               <div class="card-body table-responsive p-0">
-                <table
-                  id="tbl_equipos"
-                  class="table table-head-fixed text-nowrap"
-                >
+                <table id="tbl_cliente" class="table table-head-fixed text-nowrap">
                   <thead>
                     <tr>
                       <th>ID</th>
@@ -33,25 +35,19 @@
                       <td>{{cliente.id_cli}}</td>
                       <td>{{cliente.nombre_cli}}</td>
                       <td>{{cliente.apellido_cli}}</td>
-                      <th>{{cliente.ci_cli}}</th>
-                      <th>{{cliente.telefono_cli}}</th>
-                      <th>{{cliente.email_cli}}</th>
-                      <th>
-                        {{cliente.dir_id.ciudad_dir}},{{cliente.dir_id.barrio_dir}},{{cliente.dir_id.calle_dir}},{{cliente.dir_id.numero_dir}}
-                      </th>
+                      <td>{{cliente.ci_cli}}</td>
                       <td>
-                        <a
-                          href="/obtenerCliente/{{cliente.id_cli}}/"
-                          class="btn btn-outline-warning"
-                          >Editar</a
-                        >
-                     
-                        <a
-                          href="#"
-                          onclick="eliminar('/eliminarCliente/{{ cliente.id_cli}}')"
-                          class="btn btn-danger"
-                          ><i class="bi bi-trash"></i>Eliminar</a
-                        >
+                        <a href="https://wa.me/593{{ cliente.telefono_cli }}" target="_blank">{{cliente.telefono_cli}}</a>
+                      </td>
+                      <td>{{cliente.email_cli}}</td>
+                      <td>
+                        {{cliente.dir_id.ciudad_dir}},{{cliente.dir_id.barrio_dir}},{{cliente.dir_id.calle_dir}},{{cliente.dir_id.numero_dir}}
+                      </td>
+                      <td>
+                        <a title="Editar" href="/obtenerCliente/{{cliente.id_cli}}/" class="btn btn-warning"><i class="fas fa-pen"></i></a>
+                        <a href="#" title="Eliminar" onclick="eliminar('/eliminarCliente/{{ cliente.id_cli}}')" class="btn btn-danger">
+                          <i class="fas fa-trash"></i>
+                        </a>
                       </td>
                     </tr>
                     {% endfor %}
@@ -62,9 +58,7 @@
           </div>
           <!-- /.card-body -->
           <div class="card-footer">
-            <a href="{% url 'guardarCliente' %}" class="btn btn-success"
-              ><i class="fa fa-plus nav-icon"></i> Nuevo Cliente</a
-            >
+           
           </div>
           <!-- /.card-footer-->
         </div>
@@ -118,68 +112,58 @@
   }
 </script>
 <!--/ Bordered Table -->
+
+{% endblock %} {% block extra_scripts %}
 <script type="text/javascript">
   $(document).ready(function () {
-    $("#tbl_proveedor").DataTable({
-      dom: "Bfrtip",
-      language: {
-        sProcessing: "Procesando...",
-        sLengthMenu: "Mostrar _MENU_ registros",
-        sZeroRecords: "No se encontraron resultados",
-        sEmptyTable: "Ningún dato disponible en esta tabla",
-        sInfo:
-          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-        sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
-        sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
-        sInfoPostFix: "",
-        sSearch: "Buscar:",
-        sUrl: "",
-        sInfoThousands: ",",
-        sLoadingRecords: "Cargando...",
-        oPaginate: {
-          sFirst: "Primero",
-          sLast: "Último",
-          sNext: "Siguiente",
-          sPrevious: "Anterior",
-        },
-        oAria: {
-          sSortAscending:
-            ": Activar para ordenar la columna de manera ascendente",
-          sSortDescending:
-            ": Activar para ordenar la columna de manera descendente",
-        },
-      },
-      buttons: [
-        {
-          extend: "pdfHtml5",
-          messageTop: "PDF creado por PDFMake con botones para DataTables.",
-          className: "btn btn-success", // Agregar clase de estilo de Bootstrap
-        },
-        {
-          extend: "print",
-          className: "btn btn-success", // Agregar clase de estilo de Bootstrap
-        },
-        {
-          extend: "csv",
-          className: "btn btn-success", // Agregar clase de estilo de Bootstrap
-        },
-      ],
-    });
-  });
-</script>
-{% endblock %} {% block extra_scripts %}
-<script>
-  $(document).ready(function () {
-    $("#tbl_equipos")
-      .DataTable({
+    if (!$.fn.dataTable.isDataTable("#tbl_cliente")) {
+      $("#tbl_cliente").DataTable({
+        dom: "Bfrtip",
         responsive: true,
         lengthChange: false,
         autoWidth: false,
-        buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
-      })
-      .buttons()
-      .container()
-      .appendTo("#tbl_equipos_wrapper .col-md-6:eq(0)");
+        language: {
+          url: "//cdn.datatables.net/plug-ins/1.11.5/i18n/Spanish.json",
+          sProcessing: "Procesando...",
+          sLengthMenu: "Mostrar _MENU_ registros",
+          sZeroRecords: "No se encontraron resultados",
+          sEmptyTable: "Ningún dato disponible en esta tabla",
+          sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+          sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+          sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+          sInfoPostFix: "",
+          sSearch: "Buscar:",
+          sUrl: "",
+          sInfoThousands: ",",
+          sLoadingRecords: "Cargando...",
+          oPaginate: {
+            sFirst: "Primero",
+            sLast: "Último",
+            sNext: "Siguiente",
+            sPrevious: "Anterior",
+          },
+          oAria: {
+            sSortAscending: ": Activar para ordenar la columna de manera ascendente",
+            sSortDescending: ": Activar para ordenar la columna de manera descendente",
+          },
+        },
+        buttons: [
+          {
+            extend: "pdfHtml5",
+            messageTop: "PDF creado por PDFMake con botones para DataTables.",
+            className: "btn btn-warning",
+          },
+          {
+            extend: "print",
+            className: "btn btn-warning",
+          },
+          {
+            extend: "csv",
+            className: "btn btn-warning",
+          },
+        ],
+      }).buttons().container().appendTo("#tbl_cliente_wrapper .col-md-6:eq(0)");
+    }
   });
 </script>
 {% endblock %}

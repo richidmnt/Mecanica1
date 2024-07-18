@@ -4,15 +4,17 @@
     <div class="row">
       <div class="col-12">
         <!-- Default box -->
-        <div class="card card-primary">
-          <div class="card-header">
-            <h3 class="card-title">Lista de Usuarios</h3>
-          </div>
+        <div class="card card-secondary">
+           <div class="card-header d-flex justify-content-between align-items-center">
+    <h3 class="card-title">Lista de Usuarios</h3>
+    <a href="{% url 'guardarUsuario' %}" class="btn btn-primary ml-auto">
+        <i class="fa fa-plus nav-icon"></i> Nuevo Usuario    </a>
+</div>       
           <div class="card-body">
             <div class="row">
               <div class="card-body table-responsive p-0">
                 <table
-                  id="tbl_equipos"
+                  id="tbl_usuarios"
                   class="table table-head-fixed text-nowrap"
                 >
                   <thead>
@@ -49,14 +51,16 @@
                       <td>
                         <a
                           href="/obtenerUsuario/{{usuario.id_usr}}/"
-                          class="btn btn-outline-warning"
-                          >Editar</a
+                          class="btn btn-warning"
+                          title="Editar"
+                          ><i class="fas fa-pen"></i></a
                         >
                         <a
                           href="#"
+                          title="Eliminar"
                           onclick="eliminar('/eliminarUsuario/{{ usuario.id_usr}}')"
                           class="btn btn-danger"
-                          ><i class="bi bi-trash"></i>Eliminar</a
+                          ><i class="fas fa-trash"></i></a
                         >
                       </td>
                     </tr>
@@ -67,10 +71,8 @@
             </div>
           </div>
           <!-- /.card-body -->
-          <div class="card-footer">
-            <a href="{% url 'guardarUsuario' %}" class="btn btn-success"
-              ><i class="fa fa-plus nav-icon"></i> Nuevo Usuario</a
-            >
+          <div class="card-footer ">
+           
           </div>
           <!-- /.card-footer-->
         </div>
@@ -123,69 +125,58 @@
     });
   }
 </script>
-<!--/ Bordered Table -->
+
+{% endblock %} {% block extra_scripts %}
 <script type="text/javascript">
   $(document).ready(function () {
-    $("#tbl_proveedor").DataTable({
-      dom: "Bfrtip",
-      language: {
-        sProcessing: "Procesando...",
-        sLengthMenu: "Mostrar _MENU_ registros",
-        sZeroRecords: "No se encontraron resultados",
-        sEmptyTable: "Ningún dato disponible en esta tabla",
-        sInfo:
-          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-        sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
-        sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
-        sInfoPostFix: "",
-        sSearch: "Buscar:",
-        sUrl: "",
-        sInfoThousands: ",",
-        sLoadingRecords: "Cargando...",
-        oPaginate: {
-          sFirst: "Primero",
-          sLast: "Último",
-          sNext: "Siguiente",
-          sPrevious: "Anterior",
-        },
-        oAria: {
-          sSortAscending:
-            ": Activar para ordenar la columna de manera ascendente",
-          sSortDescending:
-            ": Activar para ordenar la columna de manera descendente",
-        },
-      },
-      buttons: [
-        {
-          extend: "pdfHtml5",
-          messageTop: "PDF creado por PDFMake con botones para DataTables.",
-          className: "btn btn-success", // Agregar clase de estilo de Bootstrap
-        },
-        {
-          extend: "print",
-          className: "btn btn-success", // Agregar clase de estilo de Bootstrap
-        },
-        {
-          extend: "csv",
-          className: "btn btn-success", // Agregar clase de estilo de Bootstrap
-        },
-      ],
-    });
-  });
-</script>
-{% endblock %} {% block extra_scripts %}
-<script>
-  $(document).ready(function () {
-    $("#tbl_equipos")
-      .DataTable({
+    if (!$.fn.dataTable.isDataTable("#tbl_usuarios")) {
+      $("#tbl_usuarios").DataTable({
+        dom: "Bfrtip",
         responsive: true,
         lengthChange: false,
         autoWidth: false,
-        buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
-      })
-      .buttons()
-      .container()
-      .appendTo("#tbl_equipos_wrapper .col-md-6:eq(0)");
+        language: {
+          
+          sProcessing: "Procesando...",
+          sLengthMenu: "Mostrar _MENU_ registros",
+          sZeroRecords: "No se encontraron resultados",
+          sEmptyTable: "Ningún dato disponible en esta tabla",
+          sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+          sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+          sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+          sInfoPostFix: "",
+          sSearch: "Buscar:",
+          sUrl: "",
+          sInfoThousands: ",",
+          sLoadingRecords: "Cargando...",
+          oPaginate: {
+            sFirst: "Primero",
+            sLast: "Último",
+            sNext: "Siguiente",
+            sPrevious: "Anterior",
+          },
+          oAria: {
+            sSortAscending: ": Activar para ordenar la columna de manera ascendente",
+            sSortDescending: ": Activar para ordenar la columna de manera descendente",
+          },
+        },
+        buttons: [
+          {
+            extend: "pdfHtml5",
+            messageTop: "PDF creado por PDFMake con botones para DataTables.",
+            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+          },
+          {
+            extend: "print",
+            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+          },
+          {
+            extend: "csv",
+            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+          },
+        ],
+      }).buttons().container().appendTo("#tbl_usuarios_wrapper .col-md-6:eq(0)");
+    }
   });
 </script>
 {% endblock %}

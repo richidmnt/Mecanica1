@@ -1,20 +1,22 @@
-{% extends "./index.html" %} {% load static %} {% block body %}
+{% extends "./index.html" %}
+{% load static %}
+{% block body %}
 <section class="content">
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
         <!-- Default box -->
-        <div class="card card-primary">
-          <div class="card-header">
-            <h3 class="card-title">Lista de Órdenes No Finalizadas</h3>
-          </div>
+        <div class="card card-secondary">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="card-title">Lista Ordenes no Finalizadas</h3>
+            <a href="{% url 'guardarOrden2' %}" class="btn btn-primary ml-auto">
+                <i class="fa fa-plus nav-icon"></i> Nueva Orden
+            </a>
+          </div>     
           <div class="card-body">
             <div class="row">
               <div class="card-body table-responsive p-0">
-                <table
-                  id="tbl_ordenes"
-                  class="table table-head-fixed text-nowrap"
-                >
+                <table id="tbl_ordenes" class="table table-head-fixed text-nowrap">
                   <thead>
                     <tr>
                       <th>Número de Orden</th>
@@ -31,32 +33,29 @@
                       <td>{{ orden.numero_ord }}</td>
                       <td>{{ orden.fecha_ord|date:"d/m/Y H:i" }}</td>
                       <td>
-                        {{ orden.vehiculo_id.cli_id.nombre_cli }}
-                        {{orden.vehiculo_id.cli_id.apellido_cli }}
+                        {{ orden.vehiculo_id.cli_id.nombre_cli }} {{ orden.vehiculo_id.cli_id.apellido_cli }}
                       </td>
                       <td>
-                        {{ orden.vehiculo_id.marca_veh}}
-                        {{orden.vehiculo_id.modelo_veh }}
-                        {{orden.vehiculo_id.placa_veh }}
+                        {{ orden.vehiculo_id.marca_veh }} {{ orden.vehiculo_id.modelo_veh }} {{ orden.vehiculo_id.placa_veh }}
                       </td>
-                      <td>{{ orden.get_estado_ord_display }}</td>
                       <td>
-                        <a
-                          href="/detalleOrden/{{ orden.id_ord }}/"
-                          class="btn btn-outline-primary"
-                          >Detalles</a
-                        >
-                        <a
-                          href="/obtenerOrden/{{ orden.id_ord }}/"
-                          class="btn btn-outline-warning"
-                          >Editar</a
-                        >
-                        <a
-                          href="#"
-                          onclick="eliminar('/eliminarOrden/{{ orden.id_ord }}/')"
-                          class="btn btn-danger"
-                        >
-                          <i class="bi bi-trash"></i> Eliminar
+                        {% if orden.estado_ord == 'PENDIENTE' %}
+                          <span class="badge bg-danger">Pendiente</span>
+                        {% elif orden.estado_ord == 'EN_PROGRESO' %}
+                          <span class="badge bg-warning text-dark">En Progreso</span>
+                        {% elif orden.estado_ord == 'ESPERANDO_REPUESTOS' %}
+                          <span class="badge bg-info text-dark">Esperando Repuestos</span>
+                        {% elif orden.estado_ord == 'COMPLETADA' %}
+                          <span class="badge bg-success">Completada</span>
+                        {% elif orden.estado_ord == 'FINALIZADA' %}
+                          <span class="badge bg-secondary">Finalizada</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        <a href="/detalleOrden/{{ orden.id_ord }}/"  title="Detalle" class="btn btn-primary"><i class="fas fa-book"></i></a>
+                        <a href="/obtenerOrden/{{ orden.id_ord }}/" title="Editar" class="btn btn-warning"><i class="fas fa-pen"></i></a>
+                        <a href="#"  title="Eliminar"  onclick="eliminar('/eliminarOrden/{{ orden.id_ord }}/')" class="btn btn-danger">
+                          <i class="fas fa-trash"></i> 
                         </a>
                       </td>
                     </tr>
@@ -68,9 +67,7 @@
           </div>
           <!-- /.card-body -->
           <div class="card-footer">
-            <a href="{%  url 'guardarOrden2' %}" class="btn btn-success">
-              <i class="fa fa-plus nav-icon"></i> Nueva Orden
-            </a>
+            <!-- Footer Content -->
           </div>
           <!-- /.card-footer-->
         </div>
@@ -116,69 +113,61 @@
     });
   }
 </script>
-<!--/ Bordered Table -->
+
+
+{% endblock %}
+{% block extra_scripts %}
 <script type="text/javascript">
   $(document).ready(function () {
-    $("#tbl_ordenes").DataTable({
-      dom: "Bfrtip",
-      language: {
-        sProcessing: "Procesando...",
-        sLengthMenu: "Mostrar _MENU_ registros",
-        sZeroRecords: "No se encontraron resultados",
-        sEmptyTable: "Ningún dato disponible en esta tabla",
-        sInfo:
-          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-        sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
-        sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
-        sInfoPostFix: "",
-        sSearch: "Buscar:",
-        sUrl: "",
-        sInfoThousands: ",",
-        sLoadingRecords: "Cargando...",
-        oPaginate: {
-          sFirst: "Primero",
-          sLast: "Último",
-          sNext: "Siguiente",
-          sPrevious: "Anterior",
-        },
-        oAria: {
-          sSortAscending:
-            ": Activar para ordenar la columna de manera ascendente",
-          sSortDescending:
-            ": Activar para ordenar la columna de manera descendente",
-        },
-      },
-      buttons: [
-        {
-          extend: "pdfHtml5",
-          messageTop: "PDF creado por PDFMake con botones para DataTables.",
-          className: "btn btn-success",
-        },
-        {
-          extend: "print",
-          className: "btn btn-success",
-        },
-        {
-          extend: "csv",
-          className: "btn btn-success",
-        },
-      ],
-    });
-  });
-</script>
-{% endblock %} {% block extra_scripts %}
-<script>
-  $(document).ready(function () {
-    $("#tbl_ordenes")
-      .DataTable({
+    if (!$.fn.dataTable.isDataTable("#tbl_ordens")) {
+      $("#tbl_ordenes").DataTable({
+        dom: "Bfrtip",
         responsive: true,
         lengthChange: false,
         autoWidth: false,
-        buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
-      })
-      .buttons()
-      .container()
-      .appendTo("#tbl_ordenes_wrapper .col-md-6:eq(0)");
+        language: {
+          
+          sProcessing: "Procesando...",
+          sLengthMenu: "Mostrar _MENU_ registros",
+          sZeroRecords: "No se encontraron resultados",
+          sEmptyTable: "Ningún dato disponible en esta tabla",
+          sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+          sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+          sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+          sInfoPostFix: "",
+          sSearch: "Buscar:",
+          sUrl: "",
+          sInfoThousands: ",",
+          sLoadingRecords: "Cargando...",
+          oPaginate: {
+            sFirst: "Primero",
+            sLast: "Último",
+            sNext: "Siguiente",
+            sPrevious: "Anterior",
+          },
+          oAria: {
+            sSortAscending: ": Activar para ordenar la columna de manera ascendente",
+            sSortDescending: ": Activar para ordenar la columna de manera descendente",
+          },
+        },
+        buttons: [
+          {
+            extend: "pdfHtml5",
+            messageTop: "PDF creado por PDFMake con botones para DataTables.",
+            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+          },
+          {
+            extend: "print",
+            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+          },
+          {
+            extend: "csv",
+            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+          },
+        ],
+      }).buttons().container().appendTo("#tbl_ordenes_wrapper .col-md-6:eq(0)");
+    }
   });
 </script>
+
 {% endblock %}

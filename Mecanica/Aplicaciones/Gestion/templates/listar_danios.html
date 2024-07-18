@@ -4,15 +4,18 @@
     <div class="row">
       <div class="col-12">
         <!-- Default box -->
-        <div class="card card-primary">
-          <div class="card-header">
-            <h3 class="card-title">Lista de Daños</h3>
-          </div>
+        <div class="card card-secondary">
+          <div class="card-header d-flex justify-content-between align-items-center">
+    <h3 class="card-title">Lista de Inspecciones</h3>
+    <a href="{% url 'registrarDanios' %}" class="btn btn-primary ml-auto">
+        <i class="fa fa-plus nav-icon"></i> Nuevo Inspección
+    </a>
+</div>     
           <div class="card-body">
             <div class="row">
               <div class="card-body table-responsive p-0">
                 <table
-                  id="tbl_danios"
+                  id="tbl_daniosM"
                   class="table table-head-fixed text-nowrap"
                 >
                   <thead>
@@ -34,19 +37,17 @@
                       <td>
                         <a
                           href="/editarDanio/{{ danio.id_ins}}/"
-                          class="btn btn-outline-warning"
-                          >Editar</a
+                          title="Editar"
+                          class="btn btn-warning"
+                          ><i class="fas fa-pen"></i></a
                         >
-                        <a
-                          href="/detalleInspeccion/{{ danio.id_ins }}/"
-                          class="btn btn-outline-primary"
-                          >Detalles</a
-                        >
+                       
                         <a
                           href="#"
+                          title="Eliminar"
                           onclick="eliminar('/eliminarDanio/{{ danio.id_ins}}/')"
                           class="btn btn-danger"
-                          ><i class="bi bi-trash"></i>Eliminar</a
+                          ><i class="fas fa-trash"></i></a
                         >
                       </td>
                     </tr>
@@ -58,9 +59,7 @@
           </div>
           <!-- /.card-body -->
           <div class="card-footer">
-            <a href="{% url 'registrarDanios' %}" class="btn btn-success"
-              ><i class="fa fa-plus nav-icon"></i> Nueva Inspección</a
-            >
+          
           </div>
           <!-- /.card-footer-->
         </div>
@@ -114,69 +113,58 @@
     });
   }
 </script>
-<!--/ Bordered Table -->
+
+{% endblock %} {% block extra_scripts %}
 <script type="text/javascript">
   $(document).ready(function () {
-    $("#tbl_danios").DataTable({
-      dom: "Bfrtip",
-      language: {
-        sProcessing: "Procesando...",
-        sLengthMenu: "Mostrar _MENU_ registros",
-        sZeroRecords: "No se encontraron resultados",
-        sEmptyTable: "Ningún dato disponible en esta tabla",
-        sInfo:
-          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
-        sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
-        sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
-        sInfoPostFix: "",
-        sSearch: "Buscar:",
-        sUrl: "",
-        sInfoThousands: ",",
-        sLoadingRecords: "Cargando...",
-        oPaginate: {
-          sFirst: "Primero",
-          sLast: "Último",
-          sNext: "Siguiente",
-          sPrevious: "Anterior",
-        },
-        oAria: {
-          sSortAscending:
-            ": Activar para ordenar la columna de manera ascendente",
-          sSortDescending:
-            ": Activar para ordenar la columna de manera descendente",
-        },
-      },
-      buttons: [
-        {
-          extend: "pdfHtml5",
-          messageTop: "PDF creado por PDFMake con botones para DataTables.",
-          className: "btn btn-success",
-        },
-        {
-          extend: "print",
-          className: "btn btn-success",
-        },
-        {
-          extend: "csv",
-          className: "btn btn-success",
-        },
-      ],
-    });
-  });
-</script>
-{% endblock %} {% block extra_scripts %}
-<script>
-  $(document).ready(function () {
-    $("#tbl_danios")
-      .DataTable({
+    if (!$.fn.dataTable.isDataTable("#tbl_daniosM")) {
+      $("#tbl_daniosM").DataTable({
+        dom: "Bfrtip",
         responsive: true,
         lengthChange: false,
         autoWidth: false,
-        buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"],
-      })
-      .buttons()
-      .container()
-      .appendTo("#tbl_danios_wrapper .col-md-6:eq(0)");
+        language: {
+          
+          sProcessing: "Procesando...",
+          sLengthMenu: "Mostrar _MENU_ registros",
+          sZeroRecords: "No se encontraron resultados",
+          sEmptyTable: "Ningún dato disponible en esta tabla",
+          sInfo: "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+          sInfoEmpty: "Mostrando registros del 0 al 0 de un total de 0 registros",
+          sInfoFiltered: "(filtrado de un total de _MAX_ registros)",
+          sInfoPostFix: "",
+          sSearch: "Buscar:",
+          sUrl: "",
+          sInfoThousands: ",",
+          sLoadingRecords: "Cargando...",
+          oPaginate: {
+            sFirst: "Primero",
+            sLast: "Último",
+            sNext: "Siguiente",
+            sPrevious: "Anterior",
+          },
+          oAria: {
+            sSortAscending: ": Activar para ordenar la columna de manera ascendente",
+            sSortDescending: ": Activar para ordenar la columna de manera descendente",
+          },
+        },
+        buttons: [
+          {
+            extend: "pdfHtml5",
+            messageTop: "PDF creado por PDFMake con botones para DataTables.",
+            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+          },
+          {
+            extend: "print",
+            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+          },
+          {
+            extend: "csv",
+            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+          },
+        ],
+      }).buttons().container().appendTo("#tbl_daniosM_wrapper .col-md-6:eq(0)");
+    }
   });
 </script>
 {% endblock %}

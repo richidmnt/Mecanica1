@@ -55,6 +55,11 @@ urlpatterns = [
     path('aceptar_orden/<int:id_ord>/', views.aceptar_orden, name='aceptar_orden'),
     path('lista-progreso/',views.lista_progreso,name="listaProgreso"),
     path('cambiar_estado_orden/<int:id_ord>/<str:nuevo_estado>/', views.cambiar_estado_orden, name='cambiar_estado_orden'),
-    path('listar_inspecciones/',views.listar_inspecciones,name="listarInspeccionM")
+    path('listar_inspecciones/',views.listar_inspecciones,name="listarInspeccionM"),
+    path('guardarDaniosM/',views.guardarDaniosM),
+    path('actualizarDaniosM/',views.actualizarDaniosM),
+    path('editarDanioM/<id_ord>/',views.obtenerDaniosM),
+    path('actualizarDaniosM/',views.actualizarDaniosM),
+    path('eliminarDanioM/<id_ins>/',views.eliminarDaniosM)
     
 ]
