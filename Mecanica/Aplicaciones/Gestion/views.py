@@ -39,13 +39,36 @@ def logout(request):
 
 @admin_required
 def home(request):
-    # request.user ya estará disponible gracias al middleware
-    return render(request, 'index.html')
+    total_clientes = Cliente.objects.count()
+    ordenes_pendientes_count = Orden.objects.filter(estado_ord='PENDIENTE').count()
+    ordenes_completadas_count = Orden.objects.filter(estado_ord='COMPLETADA').count()
+    ordenes_finalizadas_count = Orden.objects.filter(estado_ord='FINALIZADA').count()
+
+    context = {
+        'total_clientes': total_clientes,
+        'ordenes_pendientes_count': ordenes_pendientes_count,
+        'ordenes_completadas_count': ordenes_completadas_count,
+        'ordenes_finalizadas_count': ordenes_finalizadas_count,
+    }
+    return render(request, 'index.html',context)
 
 
 @mecanico_required
 def home2(request):
-    return render(request,'prueba.html')
+    usuario_actual = request.user
+
+    ordenes_pendientes_count = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='PENDIENTE').count()
+    ordenes_progreso_count = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='EN_PROGRESO').count()
+    ordenes_buscando_repuestos_count = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='ESPERANDO_REPUESTOS').count()
+    ordenes_completadas_count = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='COMPLETADA').count()
+
+    context = {
+        'ordenes_pendientes_count': ordenes_pendientes_count,
+        'ordenes_progreso_count': ordenes_progreso_count,
+        'ordenes_buscando_repuestos_count': ordenes_buscando_repuestos_count,
+        'ordenes_completadas_count': ordenes_completadas_count,
+    }
+    return render(request,'prueba.html',context)
 
 
 def index(request):
@@ -636,7 +659,8 @@ def registrarOrden2(request):
 
 @admin_required
 def listarOrdenesNoFinalizadas(request):
-    ordenes_no_finalizadas = Orden.objects.exclude(estado_ord='FINALIZADA')
+    #ordenes_no_finalizadas = Orden.objects.exclude(estado_ord='FINALIZADA')
+    ordenes_no_finalizadas = Orden.objects.all()
     context = {
         'ordenes': ordenes_no_finalizadas
     }
@@ -1164,3 +1188,9 @@ def eliminarDaniosM(request,id_ins):
     inspeccion.delete()
     messages.success(request, 'Todos los daños asociados a la orden han sido eliminados correctamente')
     return redirect('listarInspeccionM')
+
+@mecanico_required
+def listar_ordenes_completadas(request):
+    usuario_actual = request.user
+    ordenes_completadas = Orden.objects.filter(estado_ord='COMPLETADA', usuario_id=usuario_actual)
+    return render(request, 'lista_ordenes_f.html', {'ordenes': ordenes_completadas})

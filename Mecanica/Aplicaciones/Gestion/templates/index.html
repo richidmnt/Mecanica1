@@ -121,6 +121,7 @@
 
   </head>
   <body class="hold-transition sidebar-mini layout-footer-fixed">
+
     <!-- Site wrapper -->
     <div class="wrapper">
       <!-- Navbar -->
@@ -344,7 +345,7 @@
               <input
                 class="form-control form-control-sidebar"
                 type="search"
-                placeholder="Search"
+                placeholder="Buscar"
                 aria-label="Search"
               />
               <div class="input-group-append">
@@ -384,7 +385,7 @@
               </li>
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="nav-icon fas fa-tachometer-alt"></i>
+                  <i class="nav-icon fas fa-users"></i>
                   <p>
                     Clientes
                     <i class="right fas fa-angle-left"></i>
@@ -401,7 +402,7 @@
               </li>
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="nav-icon fas fa-truck-alt"></i>
+                  <i class="nav-icon fas fa-book"></i>
                   <p>
                     Servicios
                     <i class="right fas fa-angle-left"></i>
@@ -418,7 +419,7 @@
               </li>
               <li class="nav-item">
                 <a href="" class="nav-link">
-                  <i class="nav-icon fas fa-car-alt"></i>
+                  <i class="nav-icon fas fa-car"></i>
                   <p>
                     Vehículos
                     <i class="right fas fa-angle-left"></i>
@@ -467,9 +468,17 @@
                     </a>
                   </li>
                 </ul>
-                 <ul>
-                <a href="{%  url 'logout' %}"">SaLIR</a>
-                </ul>
+              </li>
+               <li class="nav-item">
+                <a href="{% url 'logout' %}" class="nav-link">
+                  <i class="nav-icon fas fa-circle"></i>
+                  
+                  <p>
+                    Salir
+                  
+                  </p>
+                </a>
+                
               </li>
             </ul>
           </nav>
@@ -477,7 +486,9 @@
         </div>
         <!-- /.sidebar -->
       </aside>
-
+           <div class="preloader flex-column justify-content-center align-items-center">
+        <img class="animation__shake" src="{% static 'lib/adminlte/img/AdminLTELogo.png' %}" alt="AdminLTELogo" height="60" width="60">
+    </div>
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">
         <!-- Content Header (Page header) -->
@@ -490,7 +501,7 @@
               </div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                  <li class="breadcrumb-item"><a href="#">Home</a></li>
+                  <li class="breadcrumb-item"><a href="{%  url 'home' %}">Home</a></li>
                   <li class="breadcrumb-item"><a href="#">Layout</a></li>
                   <li class="breadcrumb-item active">Fixed Footer Layout</li>
                 </ol>
@@ -501,7 +512,70 @@
         </section>
 
         <!-- Main content -->
-        {% block body %} {% endblock %}
+        {% block body %} 
+        <section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Total de Clientes -->
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-primary">
+          <div class="inner">
+            <h3>{{ total_clientes }}</h3>
+            <p>Total de Clientes</p>
+          </div>
+          <div class="icon">
+            <i class="fas fa-users"></i> <!-- Icono de usuarios para clientes -->
+          </div>
+          <a href="" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Órdenes Pendientes -->
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-danger">
+          <div class="inner">
+            <h3>{{ ordenes_pendientes_count }}</h3>
+            <p>Órdenes Pendientes</p>
+          </div>
+          <div class="icon">
+            <i class="fas fa-clock"></i> <!-- Icono de reloj para pendientes -->
+          </div>
+          <a href="" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Órdenes Completadas -->
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-success">
+          <div class="inner">
+            <h3>{{ ordenes_completadas_count }}</h3>
+            <p>Órdenes Completadas</p>
+          </div>
+          <div class="icon">
+            <i class="fas fa-check-circle"></i> <!-- Icono de check circle para completadas -->
+          </div>
+          <a href="" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+
+      <!-- Órdenes Finalizadas -->
+      <div class="col-lg-3 col-6">
+        <div class="small-box bg-secondary">
+          <div class="inner">
+            <h3>{{ ordenes_finalizadas_count }}</h3>
+            <p>Órdenes Finalizadas</p>
+          </div>
+          <div class="icon">
+            <i class="fas fa-flag-checkered"></i> <!-- Icono de bandera para finalizadas -->
+          </div>
+          <a href="" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+        
+        {% endblock %}
         <!-- /.content -->
       </div>
       <!-- /.content-wrapper -->

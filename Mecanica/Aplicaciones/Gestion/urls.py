@@ -60,6 +60,7 @@ urlpatterns = [
     path('actualizarDaniosM/',views.actualizarDaniosM),
     path('editarDanioM/<id_ord>/',views.obtenerDaniosM),
     path('actualizarDaniosM/',views.actualizarDaniosM),
-    path('eliminarDanioM/<id_ins>/',views.eliminarDaniosM)
+    path('eliminarDanioM/<id_ins>/',views.eliminarDaniosM),
+    path('ordenesCompletas/',views.listar_ordenes_completadas,name="ordenesCompletas")
     
 ]
