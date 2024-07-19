@@ -319,12 +319,12 @@
         <!-- Brand Logo -->
         <a href="../../index3.html" class="brand-link">
           <img
-            src="../../dist/img/AdminLTELogo.png"
+            src="{% static 'lib/adminlte/img/logoMulti.jpeg' %}"
             alt="AdminLTE Logo"
-            class="brand-image img-circle elevation-3"
+            class="brand-image img-circle  elevation-3"
             style="opacity: 0.8"
           />
-          <span class="brand-text font-weight-light">AdminLTE 3</span>
+          <span class="brand-text font-weight-light">MultiAuto</span>
         </a>
 
         <!-- Sidebar -->
@@ -332,10 +332,10 @@
           <!-- Sidebar user (optional) -->
           <div class="user-panel mt-3 pb-3 mb-3 d-flex">
             <div class="image">
-              
+              <img src="{% static 'lib/adminlte/img/AdminLTELogo.png' %}" alt="" class="img-size-50 img-circle mr-3">
             </div>
             <div class="info">
-               {{ request.user.nombre }} {{ request.user.apellido }}
+               <b class="text-white">{{ request.user.nombre }} {{ request.user.apellido }}</b>
             </div>
           </div>
 
@@ -487,7 +487,7 @@
         <!-- /.sidebar -->
       </aside>
            <div class="preloader flex-column justify-content-center align-items-center">
-        <img class="animation__shake" src="{% static 'lib/adminlte/img/AdminLTELogo.png' %}" alt="AdminLTELogo" height="60" width="60">
+        <img class="animation__shake" src="{% static 'lib/adminlte/img/Logo_Multiauto.png' %}" alt="AdminLTELogo" height="300" width="300">
     </div>
       <!-- Content Wrapper. Contains page content -->
       <div class="content-wrapper">

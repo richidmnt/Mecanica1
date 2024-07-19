@@ -1,3 +1,4 @@
+{%  load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -125,8 +126,7 @@ footer {
     <div class="comprobante" id="comprobante">
         <header>
             <div class="header-left">
-                <h1>MULTIAUTO</h1>
-                <p>SERVICIOS INTEGRADOS</p>
+                <img src="{% static 'lib/adminlte/img/logoMulti.jpeg' %}" alt=""  width="250px" class="img-size-25 img-circle mr-3">
                 <p>Dirección: Calle Falsa 123</p>
                 <p>Tel: (123) 456-7890</p>
             </div>
@@ -201,6 +201,7 @@ footer {
                     {% endfor %}
                 </tbody>
             </table>
+            <br>
             <h2 class="total">Total: {{ total }}</h2>
         </section>
         <section class="responsable">
