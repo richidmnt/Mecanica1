@@ -331,13 +331,14 @@
         <div class="sidebar">
           <!-- Sidebar user (optional) -->
           <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <div class="image">
-              <img src="{% static 'lib/adminlte/img/AdminLTELogo.png' %}" alt="" class="img-size-50 img-circle mr-3">
-            </div>
-            <div class="info">
-               <b class="text-white">{{ request.user.nombre }} {{ request.user.apellido }}</b>
-            </div>
-          </div>
+    <div class="image">
+        <img src="https://ui-avatars.com/api/?name={{ request.user.nombre }}+{{ request.user.apellido }}&background=random&color=fff&size=50" alt="" class="img-size-50 img-circle mr-3">
+    </div>
+    <div class="info">
+        <b class="text-white">{{ request.user.nombre }} {{ request.user.apellido }}</b>
+    </div>
+</div>
+
 
           <!-- SidebarSearch Form -->
           <div class="form-inline">
@@ -381,6 +382,12 @@
                       <p>Lista Usuarios</p>
                     </a>
                   </li>
+                  <li class="nav-item">
+                    <a href="{%  url 'usuariosEliminados' %}" class="nav-link">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Usuarios Eliminados</p>
+                    </a>
+                  </li>
                 </ul>
               </li>
               <li class="nav-item">
@@ -398,6 +405,12 @@
                       <p>Lista Clientes</p>
                     </a>
                   </li>
+                  <li class="nav-item">
+                    <a href="{% url 'clientesEliminados' %}" class="nav-link">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>Clientes Eliminados</p>
+                    </a>
+                  </li>
                 </ul>
               </li>
               <li class="nav-item">
@@ -413,6 +426,12 @@
                     <a href="{% url 'listaServicios' %}" class="nav-link">
                       <i class="far fa-circle nav-icon"></i>
                       <p>Lista Servicios</p>
+                    </a>
+                  </li>
+                    <li class="nav-item">
+                    <a href="{% url 'serviciosEliminados' %}" class="nav-link">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p> Servicios Eliminados</p>
                     </a>
                   </li>
                 </ul>

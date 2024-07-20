@@ -72,10 +72,23 @@ def home2(request):
 
 
 def index(request):
-    usuarios = Usuario.objects.all()
+    usuarios = Usuario.objects.filter(is_deleted=False)
     return render(request, 'listaUsuarios.html', {'usuarios': usuarios})
 
-@admin_required
+def listaUsuariosEliminados(request):
+    usuarios = Usuario.objects.filter(is_deleted=True)
+    return render(request, 'lista_usuarios_eliminados.html', {'usuarios': usuarios})
+
+def restaurarUsuario(request,id):
+    usuario = get_object_or_404(Usuario, id_usr=id)
+    usuario.is_active=True
+    usuario.is_deleted=False
+    usuario.deleted_at=None
+    usuario.save()
+    messages.success(request,f'Usuario {usuario.username} restaurado correctamente.')
+    return redirect('usuariosEliminados')
+
+
 def guardarUsuario(request):
     return render(request, 'guardarUsuario.html')
 
@@ -126,11 +139,18 @@ def registrarUsuario(request):
     else:
         return render(request, 'guardarUsuario.html')
 
-def eliminarUsuario(request, id):
+def eliminarUsuario(request, id,permanent= False):
     try:
+        
         usuario = Usuario.objects.get(id_usr=id)
-        usuario.delete()
-        messages.success(request, 'Usuario eliminado correctamente')
+        if permanent:
+            messages.success(request, 'Usuario eliminado permanentemente.')
+        else:
+            usuario.is_deleted = True
+            usuario.is_active = False  # Set is_active to False when soft deleting
+            usuario.deleted_at = timezone.now()
+            usuario.save()
+            messages.success(request, 'Usuario eliminado correctamente.')
     except Usuario.DoesNotExist:
         messages.error(request, 'El usuario no existe')
     except ProtectedError as e:
@@ -146,8 +166,12 @@ def eliminarUsuario(request, id):
 # Gestion de Clientes
 @admin_required
 def listaClientes(request):
-    clientes = Cliente.objects.all()
+    clientes = Cliente.objects.filter(is_deleted =False)
     return render(request,'listaClientes.html',{'clientes':clientes})
+@admin_required
+def clientesEliminados(request):
+    clientes = Cliente.objects.filter(is_deleted=True)
+    return render(request,'lista_clientes_eliminados.html',{'clientes':clientes})
 
 @admin_required
 def guardarCliente(request):
@@ -205,11 +229,17 @@ def registrarCliente(request):
 
 
 
-def eliminarCliente(request, id):
+def eliminarCliente(request, id,permanent=False):
     try:
         cliente = get_object_or_404(Cliente, id_cli=id)
-        cliente.delete()
-        messages.success(request, 'Cliente eliminado correctamente')
+        if permanent:
+            messages.success(request, 'Cliente eliminado permanentemente.')
+        else:
+            cliente.is_deleted = True 
+            cliente.deleted_at = timezone.now()
+            cliente.save()
+            messages.success(request, 'Cliente eliminado correctamente.')
+    
     except Cliente.DoesNotExist:
         messages.error(request, 'El cliente no existe')
     except ProtectedError as e:
@@ -218,6 +248,16 @@ def eliminarCliente(request, id):
         messages.error(request, f'Ocurrió un error al intentar eliminar el cliente: {e}')
     
     return redirect('listaClientes')
+
+def restaurarCliente(request,id):
+    cliente = get_object_or_404(Cliente, id_cli=id)
+    cliente.is_deleted = False
+    cliente.deleted_at = None
+    cliente.save()
+    messages.success(request, f'Cliente {cliente.nombre_cli} {cliente.apellido_cli} restaurado correctamente.')
+    return redirect("clientesEliminados")
+
+
 @admin_required
 def obtenerClietne(request,id):
     cliente = Cliente.objects.get(id_cli=id)
@@ -246,8 +286,14 @@ def actualizarCliente(request):
 # Gestion de servicios
 @admin_required
 def listaServicios(request):
-    servicios = Servicio.objects.all()
+    servicios = Servicio.objects.filter(is_deleted=False)
     return render(request,'listaServicios.html',{'servicios':servicios})
+
+def serviciosEliminados(request):
+    servicios = Servicio.objects.filter(is_deleted=True)
+    return render(request,'lista_servicios_eliminados.html',{'servicios':servicios})
+
+
 @admin_required
 def guardarServicio(request):
     return render(request,'guardarServicio.html')
@@ -282,11 +328,24 @@ def registrarServicio(request):
 def eliminarServicio(request, id):
     servicio = get_object_or_404(Servicio, id_ser=id)
     try:
-        servicio.delete()
-        messages.success(request, 'Servicio eliminado correctamente')
+        servicio.is_deleted=True
+        servicio.deleted_at= timezone.now()
+        servicio.save()
+        messages.success(request, f'Servicio  {servicio.nombre_ser}  eliminado correctamente')
     except ProtectedError:
         messages.error(request, 'No se puede eliminar el servicio porque está referenciado en órdenes existentes.')
     return redirect('listaServicios')
+
+def restaurarServicio(request,id):
+    servicio = get_object_or_404(Servicio,id_ser=id)
+    servicio.is_deleted = False
+    servicio.deleted_at = None
+    servicio.save()
+    messages.success(request, f'Servicio  {servicio.nombre_ser}  restaurado correctamente')
+    return redirect('serviciosEliminados')
+
+
+
 @admin_required
 def obtenerServicio(request,id):
     servicio = Servicio.objects.get(id_ser = id)
@@ -870,6 +929,9 @@ def actualizarDanios(request):
 
         messages.success(request, 'Daños actualizados correctamente')
         return redirect('listarDanios')
+    
+def custom_404_view(request, exception):
+    return render(request, '404.html')
 
 def eliminarDanios(request,id_ins):
     inspeccion = get_object_or_404(Inspeccion, id_ins=id_ins)
@@ -885,7 +947,7 @@ def listarDetalleOrden(request):
 
 @admin_required
 def guardarDetalle(request):
-    ordenes = Orden.objects.all()
+    ordenes = Orden.objects.filter(estado_ord ="COMPLETADA")
     return render(request,'detallesOrden.html',{'ordenes':ordenes})
 @admin_required
 def guardarRepuestos(request):

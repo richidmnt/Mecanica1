@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
-
+from django.utils import timezone
 class Taller(models.Model):
     nombre_tall = models.CharField(max_length=255)
     descripcion_tall = models.TextField()
@@ -8,6 +8,8 @@ class Taller(models.Model):
     direccion_tall = models.CharField(max_length=100)
     email_tall = models.EmailField()
     telefono_tall = models.CharField(max_length=11)
+
+
 
 
 
@@ -19,7 +21,7 @@ class Usuario(models.Model):
     telefono = models.CharField(max_length=15, blank=True, null=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)
-    
+
     ADMINISTRADOR = 'ADMINISTRADOR'
     MECANICO = 'MECANICO'
     ROLES = [
@@ -28,6 +30,10 @@ class Usuario(models.Model):
     ]
     rol = models.CharField(max_length=20, choices=ROLES)
     is_active = models.BooleanField(default=True)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+   
 
     def set_password(self, raw_password):
         self.password = make_password(raw_password)
@@ -36,9 +42,10 @@ class Usuario(models.Model):
     def check_password(self, raw_password):
         return check_password(raw_password, self.password)
 
+    
+
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.username})"
-
 
 class Direccion(models.Model):
     id_dir = models.AutoField(primary_key=True)
@@ -47,14 +54,23 @@ class Direccion(models.Model):
     calle_dir = models.CharField(max_length=255)
     numero_dir = models.CharField(max_length=10)
 
+
+
 class Cliente(models.Model):
     id_cli = models.AutoField(primary_key=True)
     nombre_cli = models.CharField(max_length=255)
     apellido_cli = models.CharField(max_length=255)
-    ci_cli = models.CharField(max_length=10,unique=True)
+    ci_cli = models.CharField(max_length=10, unique=True)
     telefono_cli = models.CharField(max_length=20)
     email_cli = models.EmailField(unique=True)
     dir_id = models.ForeignKey(Direccion, on_delete=models.CASCADE)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.nombre_cli} {self.apellido_cli} ({self.ci_cli})"
+
+
 
 class Vehiculo(models.Model):
     id_veh = models.AutoField(primary_key=True)
@@ -62,18 +78,38 @@ class Vehiculo(models.Model):
     modelo_veh = models.CharField(max_length=255)
     placa_veh = models.CharField(max_length=20, unique=True)
     anio_veh = models.IntegerField()
-    chasis_veh = models.CharField(max_length=255 ,unique=True)
+    chasis_veh = models.CharField(max_length=255, unique=True)
     color_veh = models.CharField(max_length=255)
     cli_id = models.ForeignKey(Cliente, on_delete=models.PROTECT)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    
+
+    def __str__(self):
+        return f"{self.marca_veh} {self.modelo_veh} ({self.placa_veh})"
+
+
 
 class Servicio(models.Model):
     id_ser = models.AutoField(primary_key=True)
-    nombre_ser = models.CharField(max_length=255, unique=True) 
+    nombre_ser = models.CharField(max_length=255, unique=True)
     descripcion_ser = models.TextField()
     precio_ser = models.DecimalField(max_digits=10, decimal_places=2)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+  
+
+   
+
     def save(self, *args, **kwargs):
         self.nombre_ser = self.nombre_ser.upper()
         super(Servicio, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.nombre_ser
+
 
 class Inspeccion(models.Model):
     id_ins = models.AutoField(primary_key=True)
@@ -108,10 +144,19 @@ class Inspeccion(models.Model):
     emblemas = models.BooleanField(default=False)
     placas = models.BooleanField(default=False)
     moquetas = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+   
+
+    
+      
 
     def __str__(self):
         return f"Inspección: {self.id_ins} - KM: {self.km}"
     
+
+
 
 class Orden(models.Model):
     ESTADOS = [
@@ -129,6 +174,11 @@ class Orden(models.Model):
     estado_ord = models.CharField(max_length=20, choices=ESTADOS, default='PENDIENTE')
     usuario_id = models.ForeignKey('Usuario', on_delete=models.PROTECT, related_name='ordenes')
     vehiculo_id = models.ForeignKey('Vehiculo', on_delete=models.PROTECT, related_name='ordenes')
+    is_deleted = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+
+
     def __str__(self):
         return f"Orden: {self.numero_ord} - Estado: {self.get_estado_ord_display()}"
 
@@ -136,6 +186,7 @@ class Orden(models.Model):
         total_servicios = sum(item.subtotal for item in self.servicios.all())
         total_repuestos = sum(item.subtotal_rep for item in self.repuestos.all())
         return total_servicios + total_repuestos
+
     def save(self, *args, **kwargs):
         if self.numero_ord is None:
             max_numero_ord = Orden.objects.aggregate(models.Max('numero_ord'))['numero_ord__max']

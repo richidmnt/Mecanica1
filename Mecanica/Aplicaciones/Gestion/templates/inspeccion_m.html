@@ -12,8 +12,14 @@
             <form id="daniosForm" method="post" action="/guardarDaniosM/">
               {% csrf_token %}
               <div class="form-group">
-                <label for="" class="form-label">orden</label>
-                <input type="text" name="orden" value="{{orden.id_ord}}" readonly>
+                <input type="text" name="orden" value="{{orden.id_ord}}">
+                <h3 class=""><i class="fas fa-file-alt"></i> ORDEN: {{ orden.numero_ord }}</h3>
+                      <p><strong><i class="fas fa-car-side"></i>Datos del Vehículo:</strong></p>
+                      <ul>
+                        <li><strong><i class="fas fa-car"></i> Placa:</strong> {{ orden.vehiculo_id.placa_veh }}</li>
+                        <li><strong><i class="fas fa-industry"></i> Marca:</strong> {{ orden.vehiculo_id.marca_veh }}</li>
+                        <li><strong><i class="fas fa-cogs"></i> Modelo:</strong> {{ orden.vehiculo_id.modelo_veh }}</li>
+                      </ul>
               </div>
               <!-- Inspección -->
               <div class="card card-danger mb-3">

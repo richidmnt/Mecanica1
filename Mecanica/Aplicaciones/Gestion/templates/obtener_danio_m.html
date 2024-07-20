@@ -6,18 +6,22 @@
       <div class="col-lg-8 col-md-10">
         <div class="card card-danger">
           <div class="card-header">
-            <h3 class="card-title">Actualizar Daños</h3>
+            <h3 class="card-title">Actualizar Inspección</h3>
           </div>
           <div class="card-body">
             <form id="daniosForm" method="post" action="/actualizarDaniosM/">
               {% csrf_token %}
               <input type="hidden" name="id_ins" value="{{ inspeccion.id_ins }}">
-              <label for="" class="form-label">Ordenes</label>
-              <select name="orden_id" id="orden">
-                {% for orden in ordenes %}
-                <option value="{{ orden.id_ord }}" {% if orden.id == inspeccion.orden_id.id %}selected{% endif %}> {{ orden.numero_ord }}</option>
-                {% endfor %}
-              </select>
+              <div class="form-group">
+                <input type="hidden" name="orden_id" value="{{inspeccion.orden_id.id_ord}}">
+                <h3 class=""><i class="fas fa-file-alt"></i> ORDEN: {{ inspeccion.orden_id.numero_ord }}</h3>
+                      <p><strong><i class="fas fa-car-side"></i>Datos del Vehículo:</strong></p>
+                      <ul>
+                        <li><strong><i class="fas fa-car"></i> Placa:</strong> {{ inspeccion.orden_id.vehiculo_id.placa_veh }}</li>
+                        <li><strong><i class="fas fa-industry"></i> Marca:</strong> {{ inspeccion.orden_id.vehiculo_id.marca_veh }}</li>
+                        <li><strong><i class="fas fa-cogs"></i> Modelo:</strong> {{ inspeccion.orden_id.vehiculo_id.modelo_veh }}</li>
+                      </ul>
+              </div>
               <div class="card card-danger mb-3">
                 <div class="card-header bg-danger text-white">
                   <h4 class="card-title">Actualizar Inspección</h4>

@@ -21,19 +21,19 @@
                     </div>
                     <div class="card-body">
                       <p><strong><i class="fas fa-user"></i> Datos del Cliente:</strong></p>
-                      <p><strong>Nombres:</strong> {{ orden.vehiculo_id.cli_id.nombre_cli }}</p>
-                      <p><strong>Apellidos:</strong> {{ orden.vehiculo_id.cli_id.apellido_cli }}</p>
+                      <p><strong>Nombre:</strong> {{ orden.vehiculo_id.cli_id.nombre_cli }}</p>
+                      <p><strong>Apellido:</strong> {{ orden.vehiculo_id.cli_id.apellido_cli }}</p>
+                      <p><strong>Teléfono:</strong> {{ orden.vehiculo_id.cli_id.telefono_cli }}</p>
                       <p><strong><i class="fas fa-car-side"></i>Datos del Vehículo:</strong></p>
                       <ul>
                         <li><strong><i class="fas fa-car"></i> Placa:</strong> {{ orden.vehiculo_id.placa_veh }}</li>
                         <li><strong><i class="fas fa-industry"></i> Marca:</strong> {{ orden.vehiculo_id.marca_veh }}</li>
                         <li><strong><i class="fas fa-cogs"></i> Modelo:</strong> {{ orden.vehiculo_id.modelo_veh }}</li>
-                        <li><strong><i class="fas fa-tachometer-alt"></i> Kilometraje:</strong> {{ orden.vehiculo_id.km }}</li>
                       </ul>
                       <p><i class="fas fa-check"></i><strong>Servicios:</strong></p>
                       <ul>
                         {% for orden_servicio in servicios %}
-                        <li>{{ orden_servicio.servicio_id.nombre_ser }}</li>
+                        <li type="">{{ orden_servicio.servicio_id.nombre_ser }}</li>
                         {% endfor %}
                       </ul>
                       <p><i class="fas fa-exclamation-triangle"></i><strong>Observaciones:</strong> {{ orden.observaciones_ord }}</p>

@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-
 urlpatterns = [
     path('',views.login_view,name="login"),
     path('home/',views.home,name="home"),
@@ -61,6 +60,12 @@ urlpatterns = [
     path('editarDanioM/<id_ord>/',views.obtenerDaniosM),
     path('actualizarDaniosM/',views.actualizarDaniosM),
     path('eliminarDanioM/<id_ins>/',views.eliminarDaniosM),
-    path('ordenesCompletas/',views.listar_ordenes_completadas,name="ordenesCompletas")
-    
+    path('ordenesCompletas/',views.listar_ordenes_completadas,name="ordenesCompletas"),
+    path('usuariosEliminados/',views.listaUsuariosEliminados,name="usuariosEliminados"),
+    path('restaurarUsuario/<id>/',views.restaurarUsuario),
+    path('clientesEliminados/', views.clientesEliminados,name="clientesEliminados"),
+    path('restaurarCliente/<id>/',views.restaurarCliente),
+    path('serviciosEliminados/',views.serviciosEliminados,name="serviciosEliminados"),
+    path('restaurarServicio/<id>/',views.restaurarServicio)
 ]
+
