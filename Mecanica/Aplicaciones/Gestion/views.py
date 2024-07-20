@@ -1128,18 +1128,15 @@ def obtenerDaniosM(request, id_ord):
     
 def actualizarDaniosM(request):
     if request.method == 'POST':
-        
-        # Actualizar inspección
         orden_id = request.POST['orden_id']
         orden = get_object_or_404(Orden, id_ord=orden_id)
         id_ins = request.POST['id_ins']
 
-        # Actualizar inspección
         inspeccion, created = Inspeccion.objects.get_or_create(id_ins=id_ins)
-        inspeccion.orden_id = orden  # Asegúrate de asignar el objeto Orden directamente
+        inspeccion.orden_id = orden
         inspeccion.km = request.POST.get('km')
         inspeccion.nivel_gasolina = request.POST.get('nivel_gasolina')
-        
+
         checkboxes = [
             'plumas', 'antena', 'radio', 'encendedor', 'espejos',
             'gata', 'llave_de_ruedas', 'llanta_emergencia', 'parlantes',
@@ -1153,17 +1150,18 @@ def actualizarDaniosM(request):
             setattr(inspeccion, checkbox, checkbox in request.POST)
 
         inspeccion.save()
+
         id_dan_list = request.POST.getlist('id_dan[]')
         x_pos_list = request.POST.getlist('x_pos[]')
         y_pos_list = request.POST.getlist('y_pos[]')
         descripcion_dan_list = request.POST.getlist('descripcion_dan[]')
-        delete_id_dan_list = request.POST.getlist('delete_id_dan[]')
+        delete_id_dan_list = request.POST.getlist('deleted_marker_ids[]')
 
         # Eliminar marcadores
         if delete_id_dan_list:
             Danio.objects.filter(id_dan__in=delete_id_dan_list).delete()
 
-    
+        # Actualizar o crear nuevos marcadores
         for id_dan, x_pos, y_pos, descripcion_dan in zip(id_dan_list, x_pos_list, y_pos_list, descripcion_dan_list):
             if id_dan.startswith('marker-'):  # Nuevo marcador
                 Danio.objects.create(
@@ -1172,7 +1170,7 @@ def actualizarDaniosM(request):
                     descripcion_dan=descripcion_dan,
                     inspeccion_id=inspeccion,
                 )
-            else:  
+            else:
                 danio = Danio.objects.get(id_dan=id_dan)
                 danio.x_pos = float(x_pos)
                 danio.y_pos = float(y_pos)
@@ -1181,6 +1179,8 @@ def actualizarDaniosM(request):
 
         messages.success(request, 'Daños actualizados correctamente')
         return redirect('listarInspeccionM')
+
+    return redirect('listarInspeccionM')
     
 def eliminarDaniosM(request,id_ins):
     inspeccion = get_object_or_404(Inspeccion, id_ins=id_ins)
