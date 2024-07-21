@@ -5,13 +5,10 @@
     <div class="row justify-content-center">
       <div class="col-lg-8 col-md-10">
         <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">Actualizar Vehículo</h3>
-          </div>
           <div class="card-body">
             <div class="row justify-content-center">
               <div class="col-lg-12">
-                <div class="card card-success">
+                <div class="card card-secondary">
                   <div class="card-header">
                     <h2 class="card-title text-center">Actualizar Vehículo</h2>
                   </div>
@@ -52,17 +49,20 @@
                       <div class="form-row">
                         <div class="form-group col-md-12">
                           <label for="cli_id" class="form-label">Cliente:</label>
-                          <select class="form-control select2" id="cli_id" name="cli_id" required>
+                          <select class="form-control" id="id_cli" name="cli_id" required>
                             <option value="">Seleccione un cliente</option>
                             {% for cliente in clientes %}
-                              <option value="{{ cliente.id_cli }}" {% if cliente.id == vehiculo.cli_id.id %}selected{% endif %}>{{ cliente.ci_cli }}</option>
+                              <option value="{{ cliente.id_cli }}">{{ cliente.ci_cli }}</option>
                             {% endfor %}
                           </select>
                         </div>
+                        <script>
+                          document.getElementById("id_cli").value="{{vehiculo.cli_id.id_cli}}";
+                        </script>
                       </div>
-                      <div class="d-flex justify-content-between mt-3">
+                      <div class="d-flex justify-content-start mt-3">
                         <button type="submit" class="btn btn-primary">Actualizar Vehículo</button>
-                        <a href="{% url 'listaVehiculos' %}" class="btn btn-secondary">Cancelar</a>
+                        <a href="{% url 'listaVehiculos' %}" class="btn btn-danger ml-2">Cancelar</a>
                       </div>
                     </form>
                   </div>
@@ -77,84 +77,117 @@
   </div>
 </section>
 {% endblock %}
-
 {% block extra_scripts %}
 <script>
-  // Validación del formulario utilizando jQuery Validation
-  $("#vehiculoForm").validate({
-    rules: {
-      marca_veh: {
-        required: true,
-        minlength: 2,
-      },
-      modelo_veh: {
-        required: true,
-        minlength: 2,
-      },
-      placa_veh: {
-        required: true,
-        minlength: 5,
-      },
-      anio_veh: {
-        required: true,
-        digits: true,
-        minlength: 4,
-        maxlength: 4,
-      },
-      chasis_veh: {
-        required: true,
-        minlength: 5,
-      },
-      color_veh: {
-        required: true,
-        minlength: 3,
-      },
-      cli_id: {
-        required: true,
-      },
+  $(document).ready(function () {
+    $.validator.addMethod(
+    "lettersonly",
+    function (value, element) {
+      return this.optional(element) || /^[a-zA-Z\s]+$/i.test(value);
     },
-    messages: {
-      marca_veh: {
-        required: "Por favor, ingresa la marca del vehículo",
-        minlength: "La marca debe tener al menos 2 caracteres",
+    "Por favor, ingresa solo letras"
+  );
+    // Añadir método de validación para la placa ecuatoriana
+    $.validator.addMethod("placaEcuador", function (value, element) {
+      return this.optional(element) || /^[A-Z]{3}-\d{3,4}$|^[A-Z]{1}\d{3}-[A-Z]{2}$/.test(value);
+    }, "Por favor ingrese una placa válida (ej. ABC-1234 o P123-AB)");
+
+    // Validación del formulario utilizando jQuery Validation
+    $("#vehiculoForm").validate({
+      rules: {
+        marca_veh: {
+          required: true,
+          minlength: 3,
+          maxlength:30,
+          lettersonly:true
+        },
+        modelo_veh: {
+          required: true,
+          minlength: 2,
+          maxlength: 50
+        },
+        placa_veh: {
+          required: true,
+          placaEcuador: true,
+        },
+        anio_veh: {
+          required: true,
+          digits: true,
+          minlength: 4,
+          maxlength: 4,
+        },
+        chasis_veh: {
+          required: true,
+          minlength: 17,
+          maxlength:17
+        },
+        color_veh: {
+          required: true,
+          minlength: 4,
+          maxlength: 25,
+          lettersonly:true
+        },
+        id_cli: {
+          required: true,
+        },
       },
-      modelo_veh: {
-        required: "Por favor, ingresa el modelo del vehículo",
-        minlength: "El modelo debe tener al menos 2 caracteres",
+      messages: {
+        marca_veh: {
+          required: "Por favor, ingresa la marca del vehículo",
+          minlength: "La marca debe tener al menos 3 caracteres",
+          maxlength:"La marca debe tener máximo 30 caracteres",
+          lettersonly:"Por favor, ingresa solo letras"
+        },
+        modelo_veh: {
+          required: "Por favor, ingresa el modelo del vehículo",
+          minlength: "El modelo debe tener al menos 2 caracteres",
+          maxlength: "El modelo debe tener máximo 50 caracteres"
+        },
+        placa_veh: {
+          required: "Por favor, ingresa la placa del vehículo",
+        },
+        anio_veh: {
+          required: "Por favor, ingresa el año del vehículo",
+          digits: "Por favor, ingresa solo números",
+          minlength: "El año debe tener 4 dígitos",
+          maxlength: "El año debe tener 4 dígitos",
+        },
+        chasis_veh: {
+          required: "Por favor, ingresa el chasis del vehículo",
+          minlength: "El chasis debe tener  17 caracteres",
+          maxlength:"El chasis debe tener  17 caracteres",
+        },
+        color_veh: {
+          required: "Por favor, ingresa el color del vehículo",
+          minlength: "El color debe tener al menos 3 caracteres",
+          maxlength:"El color debe tener al menos 25 caracteres",
+          lettersonly:"Por favor, ingresa solo letras"
+        },
+        id_cli: {
+          required: "Por favor, selecciona un cliente",
+        },
       },
-      placa_veh: {
-        required: "Por favor, ingresa la placa del vehículo",
-        minlength: "La placa debe tener al menos 5 caracteres",
+      errorElement: "span",
+      errorPlacement: function (error, element) {
+        error.addClass("invalid-feedback");
+        element.closest(".form-group").append(error);
       },
-      anio_veh: {
-        required: "Por favor, ingresa el año del vehículo",
-        digits: "Por favor, ingresa solo números",
-        minlength: "El año debe tener 4 dígitos",
-        maxlength: "El año debe tener 4 dígitos",
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass("is-invalid").removeClass("is-valid");
       },
-      chasis_veh: {
-        required: "Por favor, ingresa el chasis del vehículo",
-        minlength: "El chasis debe tener al menos 5 caracteres",
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass("is-invalid").addClass("is-valid");
       },
-      color_veh: {
-        required: "Por favor, ingresa el color del vehículo",
-        minlength: "El color debe tener al menos 3 caracteres",
-      },
-      cli_id: {
-        required: "Por favor, selecciona un cliente",
-      },
-    },
-    errorElement: "span",
-    errorPlacement: function (error, element) {
-      error.addClass("invalid-feedback");
-      element.closest(".form-group").append(error);
-    },
-    highlight: function (element, errorClass, validClass) {
-      $(element).addClass("is-invalid");
-    },
-    unhighlight: function (element, errorClass, validClass) {
-      $(element).removeClass("is-invalid");
-    },
+    });
   });
+</script>
+<script>
+        $(document).ready(function () {
+            // Configuración de Select2
+            $("#id_cli").select2({
+                allowClear: true,
+                placeholder: "Seleccione el cliente"
+            });
+        });
 </script>
 {% endblock %}

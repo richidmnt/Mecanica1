@@ -22,6 +22,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js" integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
     <link rel="stylesheet" href="{% static 'lib/adminlte/css/adminlte.min.css' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
       .marker {
         position: absolute;
@@ -86,11 +87,9 @@
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
                 <li class="nav-item d-none d-sm-inline-block">
-                    <a href="{% url 'home' %}" class="nav-link">Home</a>
+                    <a href="{% url 'home2' %}" class="nav-link">Inicio</a>
                 </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link">Contact</a>
-                </li>
+                
             </ul>
 
             <!-- Right navbar links -->
@@ -111,10 +110,10 @@
                 <img
             src="{% static 'lib/adminlte/img/logoMulti.jpeg' %}"
             alt="AdminLTE Logo"
-            class="brand-image img-circle  elevation-3"
+            class="brand-image img-circle img-fluid elevation-3"
             style="opacity: 0.8"
           />
-                <span class="brand-text font-weight-light">MultiAUto</span>
+                <span class="brand-text font-weight-light">MULTIAUTO</span>
             </a>
 
             <!-- Sidebar -->
@@ -192,7 +191,7 @@
                         </li>
                         <li class="nav-item">
                 <a href="{% url 'logout' %}" class="nav-link">
-                  <i class="nav-icon fas fa-circle"></i>
+                  <i class="nav-icon fas fa-sign-out-alt"></i>
                   
                   <p>
                     Salir
@@ -215,14 +214,13 @@
             <section class="content-header">
                 <div class="container-fluid">
                     <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1> Dasboard</h1>
+                        <div class=" col-sm-6">
+                            <h1> <strong><span style="color: red;">MULTI</span></strong><strong><span style="color: blue;">AUTO</span></strong></h1>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="{%  url 'home2' %}">Home</a></li>
-                                <li class="breadcrumb-item"><a href="#">Layout</a></li>
-                                <li class="breadcrumb-item active">Fixed Footer Layout</li>
+                                <li class="breadcrumb-item"><a href="{%  url 'home2' %}">Inicio</a></li>
+                                
                             </ol>
                         </div>
                     </div>
@@ -291,6 +289,34 @@
       </div>
     </div>
   </div>
+  <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- Gráfica Órdenes por Estado -->
+                    <div class="col-lg-6 col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Órdenes por Estado</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="ordenesEstadoChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Gráfica Órdenes Completadas por Mes -->
+                    <div class="col-lg-6 col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Órdenes Completadas por Mes</h3>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="ordenesMesChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 </section>
             
             {% endblock %}
@@ -299,9 +325,9 @@
         <!-- /.content-wrapper -->
 
         <footer class="main-footer">
-            <div class="float-right d-none d-sm-block"><b>Version</b> 3.2.0</div>
-            <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
-            All rights reserved.
+            
+            <strong> <a href="https://adminlte.io">MultiAuto</a>.</strong>
+            
         </footer>
 
         <aside class="control-sidebar control-sidebar-dark">
@@ -329,6 +355,74 @@
     <script src="{% static 'lib/adminlte/plugins/select2/select2.full.min.js'%}"></script>
 
     {% block extra_scripts %}{% endblock %}
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    var ordenesEstadoCtx = document.getElementById('ordenesEstadoChart').getContext('2d');
+    var ordenesEstadoChart = new Chart(ordenesEstadoCtx, {
+        type: 'pie',
+        data: {
+            labels: [
+                {% for orden in ordenes_por_estado %}
+                    '{{ orden.estado_ord }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for orden in ordenes_por_estado %}
+                        {{ orden.total }},
+                    {% endfor %}
+                ],
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF5733']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Órdenes por Estado'
+            }
+        }
+    });
+
+    var ordenesMesCtx = document.getElementById('ordenesMesChart').getContext('2d');
+    var ordenesMesChart = new Chart(ordenesMesCtx, {
+        type: 'line',
+        data: {
+            labels: [
+                {% for orden in ordenes_completadas_por_mes %}
+                    'Mes {{ orden.month }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Órdenes Completadas por Mes',
+                data: [
+                    {% for orden in ordenes_completadas_por_mes %}
+                        {{ orden.total }},
+                    {% endfor %}
+                ],
+                borderColor: '#36A2EB',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Órdenes Completadas por Mes'
+            }
+        }
+    });
+});
+</script>
 
     {% if messages %}
         {% for message in messages %}

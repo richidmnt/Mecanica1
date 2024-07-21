@@ -26,14 +26,9 @@
       rel="stylesheet"
       href="{% static 'lib/adminlte/plugins/datatables-buttons/css/buttons.bootstrap4.min.css' %}"
     />
-    <link
-      rel="stylesheet"
-      href="{%  static 'lib/adminlte/plugins/select2/css/select2.min.css' %}"
-    />
-    <link
-      rel="stylesheet"
-      href="{%  static 'lib/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css' %}"
-    />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2-bootstrap4-theme/1.5.2/select2-bootstrap4.min.css" rel="stylesheet" />
+
 
     <link
       rel="stylesheet"
@@ -55,6 +50,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"
     />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Font Awesome -->
    
     <!-- Theme style -->
@@ -62,7 +58,10 @@
       rel="stylesheet"
       href="{% static 'lib/adminlte/css/adminlte.min.css' %}"
     />
+    <!-- Select 2 -->
+  
     <style>
+     
       .marker {
         position: absolute;
         background-color: transparent;
@@ -134,135 +133,20 @@
             ></a>
           </li>
           <li class="nav-item d-none d-sm-inline-block">
-            <a href="../../index3.html" class="nav-link">Home</a>
+            <a href="{% url 'home' %}" class="nav-link">Inicio</a>
           </li>
-          <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link">Contact</a>
-          </li>
+          
         </ul>
 
         <!-- Right navbar links -->
         <ul class="navbar-nav ml-auto">
           <!-- Navbar Search -->
           <li class="nav-item">
-            <a
-              class="nav-link"
-              data-widget="navbar-search"
-              href="#"
-              role="button"
-            >
-              <i class="fas fa-search"></i>
-            </a>
-            <div class="navbar-search-block">
-              <form class="form-inline">
-                <div class="input-group input-group-sm">
-                  <input
-                    class="form-control form-control-navbar"
-                    type="search"
-                    placeholder="Search"
-                    aria-label="Search"
-                  />
-                  <div class="input-group-append">
-                    <button class="btn btn-navbar" type="submit">
-                      <i class="fas fa-search"></i>
-                    </button>
-                    <button
-                      class="btn btn-navbar"
-                      type="button"
-                      data-widget="navbar-search"
-                    >
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </div>
+            
           </li>
 
           <!-- Messages Dropdown Menu -->
-          <li class="nav-item dropdown">
-            <a class="nav-link" data-toggle="dropdown" href="#">
-              <i class="far fa-comments"></i>
-              <span class="badge badge-danger navbar-badge">3</span>
-            </a>
-            <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-              <a href="#" class="dropdown-item">
-                <!-- Message Start -->
-                <div class="media">
-                  <img
-                    src="../../dist/img/user1-128x128.jpg"
-                    alt="User Avatar"
-                    class="img-size-50 mr-3 img-circle"
-                  />
-                  <div class="media-body">
-                    <h3 class="dropdown-item-title">
-                      Brad Diesel
-                      <span class="float-right text-sm text-danger"
-                        ><i class="fas fa-star"></i
-                      ></span>
-                    </h3>
-                    <p class="text-sm">Call me whenever you can...</p>
-                    <p class="text-sm text-muted">
-                      <i class="far fa-clock mr-1"></i> 4 Hours Ago
-                    </p>
-                  </div>
-                </div>
-                <!-- Message End -->
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href="#" class="dropdown-item">
-                <!-- Message Start -->
-                <div class="media">
-                  <img
-                    src="../../dist/img/user8-128x128.jpg"
-                    alt="User Avatar"
-                    class="img-size-50 img-circle mr-3"
-                  />
-                  <div class="media-body">
-                    <h3 class="dropdown-item-title">
-                      John Pierce
-                      <span class="float-right text-sm text-muted"
-                        ><i class="fas fa-star"></i
-                      ></span>
-                    </h3>
-                    <p class="text-sm">I got your message bro</p>
-                    <p class="text-sm text-muted">
-                      <i class="far fa-clock mr-1"></i> 4 Hours Ago
-                    </p>
-                  </div>
-                </div>
-                <!-- Message End -->
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href="#" class="dropdown-item">
-                <!-- Message Start -->
-                <div class="media">
-                  <img
-                    src="../../dist/img/user3-128x128.jpg"
-                    alt="User Avatar"
-                    class="img-size-50 img-circle mr-3"
-                  />
-                  <div class="media-body">
-                    <h3 class="dropdown-item-title">
-                      Nora Silvester
-                      <span class="float-right text-sm text-warning"
-                        ><i class="fas fa-star"></i
-                      ></span>
-                    </h3>
-                    <p class="text-sm">The subject goes here</p>
-                    <p class="text-sm text-muted">
-                      <i class="far fa-clock mr-1"></i> 4 Hours Ago
-                    </p>
-                  </div>
-                </div>
-                <!-- Message End -->
-              </a>
-              <div class="dropdown-divider"></div>
-              <a href="#" class="dropdown-item dropdown-footer"
-                >See All Messages</a
-              >
-            </div>
-          </li>
+          
           <!-- Notifications Dropdown Menu -->
           <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
@@ -299,17 +183,7 @@
               <i class="fas fa-expand-arrows-alt"></i>
             </a>
           </li>
-          <li class="nav-item">
-            <a
-              class="nav-link"
-              data-widget="control-sidebar"
-              data-slide="true"
-              href="#"
-              role="button"
-            >
-              <i class="fas fa-th-large"></i>
-            </a>
-          </li>
+          
         </ul>
       </nav>
       <!-- /.navbar -->
@@ -359,148 +233,150 @@
 
           <!-- Sidebar Menu -->
           <nav class="mt-2">
-            <ul
-              class="nav nav-pills nav-sidebar flex-column"
-              data-widget="treeview"
-              role="menu"
-              data-accordion="false"
-            >
-              <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
-              <li class="nav-item">
-                <a href="" class="nav-link">
-                  <i class="nav-icon fas fa-user-alt"></i>
-                  <p>
-                    Usuarios
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="{%  url 'index' %}" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Lista Usuarios</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="{%  url 'usuariosEliminados' %}" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Usuarios Eliminados</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link">
-                  <i class="nav-icon fas fa-users"></i>
-                  <p>
-                    Clientes
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="{% url 'listaClientes' %}" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Lista Clientes</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="{% url 'clientesEliminados' %}" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Clientes Eliminados</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link">
-                  <i class="nav-icon fas fa-book"></i>
-                  <p>
-                    Servicios
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="{% url 'listaServicios' %}" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Lista Servicios</p>
-                    </a>
-                  </li>
-                    <li class="nav-item">
-                    <a href="{% url 'serviciosEliminados' %}" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p> Servicios Eliminados</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link">
-                  <i class="nav-icon fas fa-car"></i>
-                  <p>
-                    Vehículos
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="{% url 'listaVehiculos' %}" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Lista Vehículos</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a href="" class="nav-link">
-                  <i class="nav-icon fas fa-list-alt"></i>
-                  <p>
-                    Ordenes de trabajo
-                    <i class="right fas fa-angle-left"></i>
-                  </p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="{% url 'ordenCliente' %}" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Nueva Orden</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="{% url 'listarOrdenes' %}" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Lista de Ordenes</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="{% url 'listarDanios' %}" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Lista Inspecciones</p>
-                    </a>
-                  </li>
-                   <li class="nav-item">
-                    <a href="{%  url 'listaDetalle' %}" class="nav-link">
-                      <i class="far fa-circle nav-icon"></i>
-                      <p>Lista Detalle Orden</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-               <li class="nav-item">
-                <a href="{% url 'logout' %}" class="nav-link">
-                  <i class="nav-icon fas fa-circle"></i>
-                  
-                  <p>
-                    Salir
-                  
-                  </p>
-                </a>
-                
-              </li>
-            </ul>
-          </nav>
+  <ul
+    class="nav nav-pills nav-sidebar flex-column"
+    data-widget="treeview"
+    role="menu"
+    data-accordion="false"
+  >
+    <!-- Add icons to the links using the .nav-icon class
+     with font-awesome or any other icon font library -->
+    <li class="nav-item">
+      <a href="" class="nav-link">
+        <i class="nav-icon fas fa-user-alt"></i>
+        <p>
+          Usuarios
+          <i class="right fas fa-angle-left"></i>
+        </p>
+      </a>
+      <ul class="nav nav-treeview">
+        <li class="nav-item">
+          <a href="{% url 'index' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Lista Usuarios</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'usuariosEliminados' %}" class="nav-link">
+            <i class="far fa-trash-alt nav-icon"></i>
+            <p>Usuarios Eliminados</p>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a href="" class="nav-link">
+        <i class="nav-icon fas fa-users"></i>
+        <p>
+          Clientes
+          <i class="right fas fa-angle-left"></i>
+        </p>
+      </a>
+      <ul class="nav nav-treeview">
+        <li class="nav-item">
+          <a href="{% url 'listaClientes' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Lista Clientes</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'clientesEliminados' %}" class="nav-link">
+            <i class="far fa-trash-alt nav-icon"></i>
+            <p>Clientes Eliminados</p>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a href="" class="nav-link">
+        <i class="nav-icon fas fa-book"></i>
+        <p>
+          Servicios
+          <i class="right fas fa-angle-left"></i>
+        </p>
+      </a>
+      <ul class="nav nav-treeview">
+        <li class="nav-item">
+          <a href="{% url 'listaServicios' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Lista Servicios</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'serviciosEliminados' %}" class="nav-link">
+            <i class="far fa-trash-alt nav-icon"></i>
+            <p>Servicios Eliminados</p>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a href="" class="nav-link">
+        <i class="nav-icon fas fa-car"></i>
+        <p>
+          Vehículos
+          <i class="right fas fa-angle-left"></i>
+        </p>
+      </a>
+      <ul class="nav nav-treeview">
+        <li class="nav-item">
+          <a href="{% url 'listaVehiculos' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Lista Vehículos</p>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a href="" class="nav-link">
+        <i class="nav-icon fas fa-list-alt"></i>
+        <p>
+          Ordenes de trabajo
+          <i class="right fas fa-angle-left"></i>
+        </p>
+      </a>
+      <ul class="nav nav-treeview">
+        <li class="nav-item">
+          <a href="{% url 'ordenCliente' %}" class="nav-link">
+            <i class="far fa-plus-square nav-icon"></i>
+            <p>Nueva Orden</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'listarOrdenes' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Lista de Ordenes</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'ordenesFinalizadas' %}" class="nav-link">
+            <i class="far fa-check-circle nav-icon"></i>
+            <p>Ordenes Finalizadas</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'listarDanios' %}" class="nav-link">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Lista Inspecciones</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'listaDetalle' %}" class="nav-link">
+            <i class="far fa-file-alt nav-icon"></i>
+            <p>Lista Detalle Orden</p>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a href="{% url 'logout' %}" class="nav-link">
+        <i class="nav-icon fas fa-sign-out-alt"></i>
+        <p>Salir</p>
+      </a>
+    </li>
+  </ul>
+</nav>
+
           <!-- /.sidebar-menu -->
         </div>
         <!-- /.sidebar -->
@@ -515,14 +391,14 @@
           <div class="container-fluid">
             <div class="row mb-2">
               <div class="col-sm-6">
-                <h1>Gestion de usuarios {{ user.nombre }} {{ user.apellido }}</h1>
+                <h1> <strong><span style="color: red;">MULTI</span></strong><strong><span style="color: blue;">AUTO</span></strong></h1>
                 
               </div>
               <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                  <li class="breadcrumb-item"><a href="{%  url 'home' %}">Home</a></li>
-                  <li class="breadcrumb-item"><a href="#">Layout</a></li>
-                  <li class="breadcrumb-item active">Fixed Footer Layout</li>
+                  <li class="breadcrumb-item"><a href="{%  url 'home' %}">Inicio</a></li>
+                  <li class="breadcrumb-item"><a href="{% url 'logout' %}">Salir</a></li>
+                  
                 </ol>
               </div>
             </div>
@@ -592,6 +468,70 @@
       </div>
     </div>
   </div>
+        <div class="row">
+          <div class="col-lg-6 col-12">
+            <div class="card">
+              <div class="card-header bg-danger">
+                <h3 class="card-title">Órdenes por Estado</h3>
+                
+              </div>
+              <div class="card-body">
+                <canvas id="ordenesEstadoChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6 col-12">
+            <div class="card">
+              <div class="card-header bg-primary">
+                <h3 class="card-title">Órdenes por Mes</h3>
+              </div>
+              <div class="card-body">
+                <canvas id="ordenesMesChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      
+      <section class="content">
+      <div class="container-fluid">        
+        <!-- Gráfica Top 5 Servicios Usados -->
+        <div class="row">
+          <div class="col-lg-6 col-12">
+            <div class="card">
+              <div class="card-header bg-success">
+                <h3 class="card-title">Top 5 Servicios Más Usados</h3>
+              </div>
+              <div class="card-body">
+                <canvas id="topServiciosUsadosChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <!-- Gráfica Bottom 5 Servicios Menos Usados -->
+          <div class="col-lg-6 col-12">
+            <div class="card">
+              <div class="card-header bg-danger">
+                <h3 class="card-title">Top 5 Servicios Menos Usados</h3>
+              </div>
+              <div class="card-body">
+                <canvas id="bottomServiciosUsadosChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="row">
+          <div class="col-lg-6 col-12">
+            <div class="card">
+              <div class="card-header bg-warning">
+                <h3 class="card-title">Órdenes por Mecánico (No Completadas ni Finalizadas)</h3>
+              </div>
+              <div class="card-body">
+                <canvas id="ordenesMecanicoChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
 </section>
         
         {% endblock %}
@@ -639,12 +579,176 @@
     <script src="{% static 'lib/adminlte/plugins/datatables-buttons/js/buttons.html5.min.js' %}"></script>
     <script src="{% static 'lib/adminlte/plugins/datatables-buttons/js/buttons.print.min.js' %}"></script>
     <script src="{% static 'lib/adminlte/plugins/datatables-buttons/js/buttons.colVis.min.js'%}"></script>
-    <script src="{% static 'lib/adminlte/plugins/select2/select2.full.min.js'%}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <!-- AdminLTE App -->
 
     <!-- Select2 -->
 
-    {% block extra_scripts %}{% endblock %}
+    {% block extra_scripts %}
+    
+    {% endblock %}
+    <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var ordenesEstadoCtx = document.getElementById('ordenesEstadoChart').getContext('2d');
+    var ordenesEstadoChart = new Chart(ordenesEstadoCtx, {
+      type: 'pie',
+      data: {
+        labels: [
+          {% for orden in ordenes_por_estado %}
+            '{{ orden.estado_ord }}',
+          {% endfor %}
+        ],
+        datasets: [{
+          data: [
+            {% for orden in ordenes_por_estado %}
+              {{ orden.total }},
+            {% endfor %}
+          ],
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4CAF50', '#FF9800']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Órdenes por Estado'
+        }
+      }
+    });
+
+    var ordenesMesCtx = document.getElementById('ordenesMesChart').getContext('2d');
+    var ordenesMesChart = new Chart(ordenesMesCtx, {
+      type: 'bar',
+      data: {
+        labels: [
+          {% for orden in ordenes_por_mes %}
+            'Mes {{ orden.month }}',
+          {% endfor %}
+        ],
+        datasets: [{
+          label: 'Órdenes por Mes',
+          data: [
+            {% for orden in ordenes_por_mes %}
+              {{ orden.total }},
+            {% endfor %}
+          ],
+          backgroundColor: '#36A2EB'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Órdenes por Mes'
+        }
+      }
+    });
+     // Gráfica Top 5 Servicios Usados
+    var topServiciosUsadosCtx = document.getElementById('topServiciosUsadosChart').getContext('2d');
+    var topServiciosUsadosChart = new Chart(topServiciosUsadosCtx, {
+      type: 'bar',
+      data: {
+        labels: [
+          {% for servicio in top_servicios_usados %}
+            '{{ servicio.servicio_id__nombre_ser }}',
+          {% endfor %}
+        ],
+        datasets: [{
+          label: 'Top 5 Servicios Más Usados',
+          data: [
+            {% for servicio in top_servicios_usados %}
+              {{ servicio.total }},
+            {% endfor %}
+          ],
+          backgroundColor: '#4CAF50'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Top 5 Servicios Más Usados'
+        }
+      }
+    });
+
+    // Gráfica Bottom 5 Servicios Menos Usados
+    var bottomServiciosUsadosCtx = document.getElementById('bottomServiciosUsadosChart').getContext('2d');
+    var bottomServiciosUsadosChart = new Chart(bottomServiciosUsadosCtx, {
+      type: 'bar',
+      data: {
+        labels: [
+          {% for servicio in bottom_servicios_usados %}
+            '{{ servicio.servicio_id__nombre_ser }}',
+          {% endfor %}
+        ],
+        datasets: [{
+          label: 'Top 5 Servicios Menos Usados',
+          data: [
+            {% for servicio in bottom_servicios_usados %}
+              {{ servicio.total }},
+            {% endfor %}
+          ],
+          backgroundColor: '#FF6384'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Top 5 Servicios Menos Usados'
+        }
+      }
+    });
+    var ordenesMecanicoCtx = document.getElementById('ordenesMecanicoChart').getContext('2d');
+    var ordenesMecanicoChart = new Chart(ordenesMecanicoCtx, {
+      type: 'bar',
+      data: {
+        labels: [
+          {% for orden in ordenes_por_mecanico %}
+            '{{ orden.mecanico }}',
+          {% endfor %}
+        ],
+        datasets: [{
+          label: 'Órdenes por Mecánico',
+          data: [
+            {% for orden in ordenes_por_mecanico %}
+              {{ orden.total }},
+            {% endfor %}
+          ],
+          backgroundColor: '#FFCE56'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+          position: 'top',
+        },
+        title: {
+          display: true,
+          text: 'Órdenes por Mecánico (No Completadas ni Finalizadas)'
+        }
+      }
+    });
+  });
+</script>
 
     <!-- AdminLTE for demo purposes 
     <script src="{% static 'lib/adminlte/js/demo.js' %}"></script>

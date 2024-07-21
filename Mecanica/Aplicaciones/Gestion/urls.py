@@ -66,6 +66,7 @@ urlpatterns = [
     path('clientesEliminados/', views.clientesEliminados,name="clientesEliminados"),
     path('restaurarCliente/<id>/',views.restaurarCliente),
     path('serviciosEliminados/',views.serviciosEliminados,name="serviciosEliminados"),
-    path('restaurarServicio/<id>/',views.restaurarServicio)
+    path('restaurarServicio/<id>/',views.restaurarServicio),
+    path('ordenesFinalizadas/',views.listarOrdenesFinalizadas,name='ordenesFinalizadas')
 ]
 

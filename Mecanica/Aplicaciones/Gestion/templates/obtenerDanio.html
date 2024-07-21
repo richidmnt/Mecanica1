@@ -4,23 +4,24 @@
   <div class="container-fluid">
     <div class="row justify-content-center">
       <div class="col-lg-8 col-md-10">
-        <div class="card card-danger">
+        <div class="card card-secondary">
           <div class="card-header">
-            <h3 class="card-title">Actualizar Daños</h3>
+            <h3 class="card-title">Actualizar Inspección</h3>
           </div>
           <div class="card-body">
             <form id="daniosForm" method="post" action="/actualizarDanios/">
               {% csrf_token %}
               <input type="hidden" name="id_ins" value="{{ inspeccion.id_ins }}">
-              <label for="" class="form-label">Ordenes</label>
-              <select name="orden_id" id="orden">
+              <label for="" class="form-label">Orden:</label>
+              <select name="orden_id" id="orden_id" class="form-control mb-2">
+                <option value="">Seleccione una orden</option>
                 {% for orden in ordenes %}
                 <option value="{{ orden.id_ord }}" {% if orden.id == inspeccion.orden_id.id %}selected{% endif %}> {{ orden.numero_ord }}</option>
                 {% endfor %}
               </select>
               <div class="card card-danger mb-3">
                 <div class="card-header bg-danger text-white">
-                  <h4 class="card-title">Actualizar Inspección</h4>
+                  <h4 class="card-title">Estado Vehículo</h4>
                 </div>
                 <div class="card-body">
                   <div class="form-group">
@@ -188,11 +189,11 @@
                   </div>
                 </div>
               </div>
-              <div class="d-flex justify-content-between mt-3">
+              <div class="d-flex justify-content-start mt-3">
                 <button type="submit" class="btn btn-primary">
-                  Actualizar Daños
+                  Actualizar Inspección
                 </button>
-                <a href="{% url 'listarDanios' %}" class="btn btn-secondary"
+                <a href="{% url 'listarDanios' %}" class="btn btn-danger ml-2"
                   >Cancelar</a
                 >
               </div>
@@ -350,5 +351,14 @@
       position: 'topRight'
     });
   }
+</script>
+<script>
+  $(document).ready(function () {
+            // Configuración de Select2
+            $("#orden_id").select2({
+                allowClear: true,
+                
+            });
+        });
 </script>
 {% endblock %}

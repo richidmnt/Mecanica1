@@ -4,7 +4,7 @@
   <div class="container-fluid">
     <div class="row justify-content-center">
       <div class="col-lg-8 col-md-10">
-        <div class="card card-danger">
+        <div class="card card-secondary">
           <div class="card-header">
             <h3 class="card-title">Actualizar Inspección</h3>
           </div>
@@ -24,7 +24,7 @@
               </div>
               <div class="card card-danger mb-3">
                 <div class="card-header bg-danger text-white">
-                  <h4 class="card-title">Actualizar Inspección</h4>
+                  <h4 class="card-title">Estado Vehículo</h4>
                 </div>
                 <div class="card-body">
                   <div class="form-group">
@@ -192,11 +192,11 @@
                   </div>
                 </div>
               </div>
-              <div class="d-flex justify-content-between mt-3">
+              <div class="d-flex justify-content-start mt-3">
                 <button type="submit" class="btn btn-primary">
                   Actualizar Daños
                 </button>
-                <a href="{% url 'listarInspeccionM' %}" class="btn btn-secondary"
+                <a href="{% url 'listarInspeccionM' %}" class="btn btn-danger ml-2"
                   >Cancelar</a
                 >
               </div>

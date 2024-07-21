@@ -6,7 +6,7 @@
     <div class="row justify-content-center">
       <div class="col-lg-12 col-md-12">
         <div class="card">
-          <div class="card-header bg-primary text-white">
+          <div class="card-header bg-secondary text-white">
             <h3 class="card-title">Registrar Orden</h3>
           </div>
           <div class="card-body">
@@ -15,32 +15,32 @@
               <div class="row">
                 <!-- Cliente -->
                 <div class="col-lg-4 col-md-6">
-                  <div class="card card-info mb-3">
+                  <div class="card card-primary mb-3">
                     <div class="card-header bg-info text-white">
                       <h4 class="card-title">Registrar Vehiculo</h4>
                     </div>
                     <div class="card-body">
                       <div class="form-row">
-                        <label for="vehiculoSelect" class="form-label">Elija un vehiculo</label>
-                        <select class="form-control" name="vehiculo_id" id="vehiculoSelect2" required>
+                        <label for="vehiculoSelect2" class="form-label">Elija un vehiculo</label>
+                        <select class="form-control select2" name="vehiculo_id" id="vehiculoSelect2" required>
                           <option value="">Seleccione un vehículo</option>
                           {% for vehiculo in vehiculos %}
                             <option value="{{ vehiculo.id_veh }}"
                               data-nombre="{{ vehiculo.cli_id.nombre_cli }}"
                               data-apellido="{{ vehiculo.cli_id.apellido_cli }}"
                               data-email="{{ vehiculo.cli_id.email_cli }}"
-                              data-telefono="{{ vehiculo.cli_id.telefono_cli }}" >
+                              data-telefono="{{ vehiculo.cli_id.telefono_cli }}">
                               {{ vehiculo.placa_veh }}
                             </option>
                           {% endfor %}
                         </select>
                         <div class="form-group">
-                          <label for="cliente" class="form-label">Cliente</label>
-                          <p><b>Nombre:</b> <span id="clienteNombre">{{ orden.vehiculo_id.cli_id.nombre_cli }}</span></p>
-                          <p><b>Apellido:</b> <span id="clienteApellido">{{ orden.vehiculo_id.cli_id.apellido_cli }}</span></p>
-                          <p><b>Email:</b> <span id="clienteEmail">{{ orden.vehiculo_id.cli_id.email_cli }}</span></p>
-                          <p><b>Teléfono:</b> <span id="clienteTelefono">{{ orden.vehiculo_id.cli_id.telefono_cli }}</span></p>
-                        </div>
+  <label for="cliente" class="form-label">Cliente</label>
+  <p><b><i class="fas fa-user"></i> Nombre:</b> <span id="clienteNombre">{{ orden.vehiculo_id.cli_id.nombre_cli }}</span></p>
+  <p><b><i class="fas fa-user-tag"></i> Apellido:</b> <span id="clienteApellido">{{ orden.vehiculo_id.cli_id.apellido_cli }}</span></p>
+  <p><b><i class="fas fa-envelope"></i> Email:</b> <span id="clienteEmail">{{ orden.vehiculo_id.cli_id.email_cli }}</span></p>
+  <p><b><i class="fas fa-phone"></i> Teléfono:</b> <span id="clienteTelefono">{{ orden.vehiculo_id.cli_id.telefono_cli }}</span></p>
+</div>
                       </div>
                     </div>
                   </div>
@@ -69,7 +69,7 @@
                   </div>
                   <div class="form-group">
                     <label for="estado_ord" class="form-label">Estado:</label>
-                    <select class="form-control" id="estado_ord" name="estado_ord" required>
+                    <select class="form-control select2" id="estado_ord" name="estado_ord" required>
                       {% for key, value in ESTADOS %}
                         <option value="{{ key }}">{{ value }}</option>
                       {% endfor %}
@@ -77,7 +77,7 @@
                   </div>
                   <div class="form-group">
                     <label for="usuario_id" class="form-label">Usuario:</label>
-                    <select class="form-control" id="usuario_id" name="usuario_id" required>
+                    <select class="form-control select2" id="usuario_id" name="usuario_id" required>
                       <option value="">Seleccione un usuario</option>
                       {% for usuario in usuarios %}
                         <option value="{{ usuario.id_usr }}">{{ usuario.nombre }}</option>
@@ -107,7 +107,7 @@
                       <tbody id="serviciosTableBody">
                         <tr>
                           <td>
-                            <select class="form-control servicio-select" name="servicio_id[]" onchange="updateSubtotal(this)" required>
+                            <select class="form-control select2 servicio-select" name="servicio_id[]" onchange="updateSubtotal(this)" required>
                               <option value="">Seleccione un servicio</option>
                               {% for servicio in servicios %}
                                 <option value="{{ servicio.id_ser }}" data-precio="{{ servicio.precio_ser }}" data-nombre="{{ servicio.nombre_ser }}">{{ servicio.nombre_ser }}</option>
@@ -135,9 +135,9 @@
                 </div>
               </div>
 
-              <div class="d-flex justify-content-between mt-3">
+              <div class="d-flex justify-content-start mt-3">
                 <button type="submit" class="btn btn-primary">Registrar Orden</button>
-                <a href="{% url 'listarOrdenes' %}" class="btn btn-secondary">Cancelar</a>
+                <a href="{% url 'listarOrdenes' %}" class="btn btn-danger ml-2">Cancelar</a>
               </div>
             </form>
           </div>
@@ -150,6 +150,11 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<style>
+  .select2-container {
+    width: 100% !important;
+  }
+</style>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     var fechaOrdInput = document.getElementById("fecha_ord");
@@ -161,6 +166,8 @@
     var minute = String(now.getMinutes()).padStart(2, "0");
     var localDatetime = year + "-" + month + "-" + day + "T" + hour + ":" + minute;
     fechaOrdInput.value = localDatetime;
+
+    initializeSelect2(); // Inicializar Select2 para los campos al cargar la página
   });
 
   function updateSubtotal(selectElement) {
@@ -186,7 +193,7 @@
   function addRow() {
     var newRow = `<tr>
       <td>
-        <select class="form-control servicio-select" name="servicio_id[]" onchange="updateSubtotal(this)" required>
+        <select class="form-control select2 servicio-select" name="servicio_id[]" onchange="updateSubtotal(this)" required>
           <option value="">Seleccione un servicio</option>
           {% for servicio in servicios %}
             <option value="{{ servicio.id_ser }}" data-precio="{{ servicio.precio_ser }}" data-nombre="{{ servicio.nombre_ser }}">{{ servicio.nombre_ser }}</option>
@@ -204,11 +211,19 @@
       </td>
     </tr>`;
     document.getElementById("serviciosTableBody").insertAdjacentHTML("beforeend", newRow);
+    initializeSelect2(); // Inicializar Select2 para el nuevo campo
   }
 
   function removeRow(button) {
     button.closest("tr").remove();
     updateTotal();
+  }
+
+  function initializeSelect2() {
+    $(".select2").select2({
+      allowClear: true,
+      placeholder: "Seleccione una opción"
+    });
   }
 
   document.getElementById('ordenForm').addEventListener('submit', function (e) {
@@ -283,15 +298,13 @@
         element.closest("div").append(error);
       },
       highlight: function (element, errorClass, validClass) {
-        $(element).addClass("is-invalid");
+        $(element).addClass("is-invalid").removeClass("is-valid");
       },
       unhighlight: function (element, errorClass, validClass) {
-        $(element).removeClass("is-invalid");
+        $(element).removeClass("is-invalid").addClass("is-valid");
       }
     });
-  });
 
-  document.addEventListener("DOMContentLoaded", function() {
     $('#vehiculoSelect2').change(function() {
       var selectedOption = $(this).find('option:selected');
       var nombre = selectedOption.data('nombre');

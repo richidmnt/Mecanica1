@@ -1,5 +1,6 @@
 from gettext import translation
 import json
+from django.db.models.functions import Concat
 from django.db import transaction, IntegrityError
 from django.forms import ValidationError
 from django.utils import timezone
@@ -7,6 +8,8 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models.deletion import ProtectedError
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Count,Value
+from django.db.models.functions import ExtractMonth
 
 from .decorators import login_required,admin_required,mecanico_required
 from .models import *
@@ -39,18 +42,41 @@ def logout(request):
 
 @admin_required
 def home(request):
-    total_clientes = Cliente.objects.count()
-    ordenes_pendientes_count = Orden.objects.filter(estado_ord='PENDIENTE').count()
-    ordenes_completadas_count = Orden.objects.filter(estado_ord='COMPLETADA').count()
-    ordenes_finalizadas_count = Orden.objects.filter(estado_ord='FINALIZADA').count()
+    # Obtener el total de clientes
+    total_clientes = Cliente.objects.filter(is_deleted=False).count()
+
+    # Obtener el total de órdenes por estado
+    ordenes_por_estado = Orden.objects.filter(is_deleted=False).values('estado_ord').annotate(total=Count('estado_ord'))
+
+    # Obtener el total de órdenes por mes
+    ordenes_por_mes = Orden.objects.filter(is_deleted=False).annotate(month=ExtractMonth('fecha_ord')).values('month').annotate(total=Count('id_ord')).order_by('month')
+
+    # Contar órdenes por estado específico
+    ordenes_pendientes_count = Orden.objects.filter(estado_ord='PENDIENTE', is_deleted=False).count()
+    ordenes_completadas_count = Orden.objects.filter(estado_ord='COMPLETADA', is_deleted=False).count()
+    ordenes_finalizadas_count = Orden.objects.filter(estado_ord='FINALIZADA', is_deleted=False).count()
+    top_servicios_usados = OrdenServicio.objects.values('servicio_id__nombre_ser').annotate(total=Count('servicio_id')).order_by('-total')[:5]
+
+    # Obtener los 5 servicios menos adquiridos
+    bottom_servicios_usados = OrdenServicio.objects.values('servicio_id__nombre_ser').annotate(total=Count('servicio_id')).order_by('total')[:5]
+    ordenes_por_mecanico = Orden.objects.filter(is_deleted=False).exclude(estado_ord__in=['COMPLETADA', 'FINALIZADA']).annotate(
+        mecanico=Concat('usuario_id__nombre', Value(' '), 'usuario_id__apellido')
+    ).values('mecanico').annotate(total=Count('id_ord'))
 
     context = {
         'total_clientes': total_clientes,
+        'ordenes_por_estado': ordenes_por_estado,
+        'ordenes_por_mes': list(ordenes_por_mes),
         'ordenes_pendientes_count': ordenes_pendientes_count,
         'ordenes_completadas_count': ordenes_completadas_count,
         'ordenes_finalizadas_count': ordenes_finalizadas_count,
+        'top_servicios_usados': list(top_servicios_usados),
+        'bottom_servicios_usados': list(bottom_servicios_usados),
+        'ordenes_por_mecanico': list(ordenes_por_mecanico),
+
     }
-    return render(request, 'index.html',context)
+
+    return render(request, 'index.html', context)
 
 
 @mecanico_required
@@ -61,12 +87,17 @@ def home2(request):
     ordenes_progreso_count = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='EN_PROGRESO').count()
     ordenes_buscando_repuestos_count = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='ESPERANDO_REPUESTOS').count()
     ordenes_completadas_count = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='COMPLETADA').count()
+    ordenes_por_estado = Orden.objects.filter(usuario_id=usuario_actual).values('estado_ord').annotate(total=Count('estado_ord'))
+    ordenes_completadas_por_mes = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='COMPLETADA').annotate(month=ExtractMonth('fecha_ord')).values('month').annotate(total=Count('id_ord')).order_by('month')
 
     context = {
         'ordenes_pendientes_count': ordenes_pendientes_count,
         'ordenes_progreso_count': ordenes_progreso_count,
         'ordenes_buscando_repuestos_count': ordenes_buscando_repuestos_count,
         'ordenes_completadas_count': ordenes_completadas_count,
+        'ordenes_por_estado': list(ordenes_por_estado),
+        'ordenes_completadas_por_mes': list(ordenes_completadas_por_mes),
+
     }
     return render(request,'prueba.html',context)
 
@@ -718,12 +749,18 @@ def registrarOrden2(request):
 
 @admin_required
 def listarOrdenesNoFinalizadas(request):
-    #ordenes_no_finalizadas = Orden.objects.exclude(estado_ord='FINALIZADA')
-    ordenes_no_finalizadas = Orden.objects.all()
+    ordenes_no_finalizadas = Orden.objects.exclude(estado_ord='FINALIZADA')
+    #ordenes_no_finalizadas = Orden.objects.all()
     context = {
         'ordenes': ordenes_no_finalizadas
     }
     return render(request, 'listarOrdenesF.html', context)
+
+def listarOrdenesFinalizadas(request):
+    ordenes = Orden.objects.filter(estado_ord = 'FINALIZADA')
+    return render(request,'ordenes_finalizadas.html',{'ordenes':ordenes})
+
+
 @admin_required
 def obtenerOrden(request,id):
     orden = get_object_or_404(Orden, id_ord=id)
@@ -876,18 +913,15 @@ def obtenerDanios(request, id_ord):
 
 def actualizarDanios(request):
     if request.method == 'POST':
-        
-        # Actualizar inspección
         orden_id = request.POST['orden_id']
         orden = get_object_or_404(Orden, id_ord=orden_id)
         id_ins = request.POST['id_ins']
 
-        # Actualizar inspección
         inspeccion, created = Inspeccion.objects.get_or_create(id_ins=id_ins)
-        inspeccion.orden_id = orden  # Asegúrate de asignar el objeto Orden directamente
+        inspeccion.orden_id = orden
         inspeccion.km = request.POST.get('km')
         inspeccion.nivel_gasolina = request.POST.get('nivel_gasolina')
-        
+
         checkboxes = [
             'plumas', 'antena', 'radio', 'encendedor', 'espejos',
             'gata', 'llave_de_ruedas', 'llanta_emergencia', 'parlantes',
@@ -901,17 +935,18 @@ def actualizarDanios(request):
             setattr(inspeccion, checkbox, checkbox in request.POST)
 
         inspeccion.save()
+
         id_dan_list = request.POST.getlist('id_dan[]')
         x_pos_list = request.POST.getlist('x_pos[]')
         y_pos_list = request.POST.getlist('y_pos[]')
         descripcion_dan_list = request.POST.getlist('descripcion_dan[]')
-        delete_id_dan_list = request.POST.getlist('delete_id_dan[]')
+        delete_id_dan_list = request.POST.getlist('deleted_marker_ids[]')
 
         # Eliminar marcadores
         if delete_id_dan_list:
             Danio.objects.filter(id_dan__in=delete_id_dan_list).delete()
 
-    
+        # Actualizar o crear nuevos marcadores
         for id_dan, x_pos, y_pos, descripcion_dan in zip(id_dan_list, x_pos_list, y_pos_list, descripcion_dan_list):
             if id_dan.startswith('marker-'):  # Nuevo marcador
                 Danio.objects.create(
@@ -920,7 +955,7 @@ def actualizarDanios(request):
                     descripcion_dan=descripcion_dan,
                     inspeccion_id=inspeccion,
                 )
-            else:  
+            else:
                 danio = Danio.objects.get(id_dan=id_dan)
                 danio.x_pos = float(x_pos)
                 danio.y_pos = float(y_pos)
@@ -929,6 +964,8 @@ def actualizarDanios(request):
 
         messages.success(request, 'Daños actualizados correctamente')
         return redirect('listarDanios')
+
+    return redirect('listarDanios')
     
 def custom_404_view(request, exception):
     return render(request, '404.html')
@@ -1190,18 +1227,15 @@ def obtenerDaniosM(request, id_ord):
     
 def actualizarDaniosM(request):
     if request.method == 'POST':
-        
-        # Actualizar inspección
         orden_id = request.POST['orden_id']
         orden = get_object_or_404(Orden, id_ord=orden_id)
         id_ins = request.POST['id_ins']
 
-        # Actualizar inspección
         inspeccion, created = Inspeccion.objects.get_or_create(id_ins=id_ins)
-        inspeccion.orden_id = orden  # Asegúrate de asignar el objeto Orden directamente
+        inspeccion.orden_id = orden
         inspeccion.km = request.POST.get('km')
         inspeccion.nivel_gasolina = request.POST.get('nivel_gasolina')
-        
+
         checkboxes = [
             'plumas', 'antena', 'radio', 'encendedor', 'espejos',
             'gata', 'llave_de_ruedas', 'llanta_emergencia', 'parlantes',
@@ -1215,17 +1249,18 @@ def actualizarDaniosM(request):
             setattr(inspeccion, checkbox, checkbox in request.POST)
 
         inspeccion.save()
+
         id_dan_list = request.POST.getlist('id_dan[]')
         x_pos_list = request.POST.getlist('x_pos[]')
         y_pos_list = request.POST.getlist('y_pos[]')
         descripcion_dan_list = request.POST.getlist('descripcion_dan[]')
-        delete_id_dan_list = request.POST.getlist('delete_id_dan[]')
+        delete_id_dan_list = request.POST.getlist('deleted_marker_ids[]')
 
         # Eliminar marcadores
         if delete_id_dan_list:
             Danio.objects.filter(id_dan__in=delete_id_dan_list).delete()
 
-    
+        # Actualizar o crear nuevos marcadores
         for id_dan, x_pos, y_pos, descripcion_dan in zip(id_dan_list, x_pos_list, y_pos_list, descripcion_dan_list):
             if id_dan.startswith('marker-'):  # Nuevo marcador
                 Danio.objects.create(
@@ -1234,7 +1269,7 @@ def actualizarDaniosM(request):
                     descripcion_dan=descripcion_dan,
                     inspeccion_id=inspeccion,
                 )
-            else:  
+            else:
                 danio = Danio.objects.get(id_dan=id_dan)
                 danio.x_pos = float(x_pos)
                 danio.y_pos = float(y_pos)
@@ -1243,6 +1278,8 @@ def actualizarDaniosM(request):
 
         messages.success(request, 'Daños actualizados correctamente')
         return redirect('listarInspeccionM')
+
+    return redirect('listarInspeccionM')
     
 def eliminarDaniosM(request,id_ins):
     inspeccion = get_object_or_404(Inspeccion, id_ins=id_ins)
