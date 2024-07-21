@@ -10,6 +10,7 @@ from django.db.models.deletion import ProtectedError
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count,Value
 from django.db.models.functions import ExtractMonth
+from django.core.mail import send_mail,BadHeaderError
 
 from .decorators import login_required,admin_required,mecanico_required
 from .models import *
@@ -51,15 +52,19 @@ def home(request):
     # Obtener el total de órdenes por mes
     ordenes_por_mes = Orden.objects.filter(is_deleted=False).annotate(month=ExtractMonth('fecha_ord')).values('month').annotate(total=Count('id_ord')).order_by('month')
 
-    # Contar órdenes por estado específico
+    
     ordenes_pendientes_count = Orden.objects.filter(estado_ord='PENDIENTE', is_deleted=False).count()
     ordenes_completadas_count = Orden.objects.filter(estado_ord='COMPLETADA', is_deleted=False).count()
     ordenes_finalizadas_count = Orden.objects.filter(estado_ord='FINALIZADA', is_deleted=False).count()
-    top_servicios_usados = OrdenServicio.objects.values('servicio_id__nombre_ser').annotate(total=Count('servicio_id')).order_by('-total')[:5]
+    top_servicios_usados = OrdenServicio.objects.filter(
+        servicio_id__is_deleted=False
+    ).values('servicio_id__nombre_ser').annotate(total=Count('servicio_id')).order_by('-total')[:5]
 
     # Obtener los 5 servicios menos adquiridos
-    bottom_servicios_usados = OrdenServicio.objects.values('servicio_id__nombre_ser').annotate(total=Count('servicio_id')).order_by('total')[:5]
-    ordenes_por_mecanico = Orden.objects.filter(is_deleted=False).exclude(estado_ord__in=['COMPLETADA', 'FINALIZADA']).annotate(
+    bottom_servicios_usados = OrdenServicio.objects.filter(
+        servicio_id__is_deleted=False
+    ).values('servicio_id__nombre_ser').annotate(total=Count('servicio_id')).order_by('total')[:5]
+    ordenes_por_mecanico = Orden.objects.filter(is_deleted=False,usuario_id__is_active=True).exclude(estado_ord__in=['COMPLETADA', 'FINALIZADA']).annotate(
         mecanico=Concat('usuario_id__nombre', Value(' '), 'usuario_id__apellido')
     ).values('mecanico').annotate(total=Count('id_ord'))
 
@@ -87,18 +92,22 @@ def home2(request):
     ordenes_progreso_count = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='EN_PROGRESO').count()
     ordenes_buscando_repuestos_count = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='ESPERANDO_REPUESTOS').count()
     ordenes_completadas_count = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='COMPLETADA').count()
+    ordenes_finalizadas_count = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='FINALIZADA').count()
     ordenes_por_estado = Orden.objects.filter(usuario_id=usuario_actual).values('estado_ord').annotate(total=Count('estado_ord'))
-    ordenes_completadas_por_mes = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='COMPLETADA').annotate(month=ExtractMonth('fecha_ord')).values('month').annotate(total=Count('id_ord')).order_by('month')
-
+    ordenes_por_mes = Orden.objects.filter(usuario_id=usuario_actual, estado_ord='FINALIZADA', fecha_fin_ord__isnull=False).annotate(
+        month=ExtractMonth('fecha_fin_ord')
+    ).values('month').annotate(total=Count('id_ord')).order_by('month')
     context = {
         'ordenes_pendientes_count': ordenes_pendientes_count,
         'ordenes_progreso_count': ordenes_progreso_count,
         'ordenes_buscando_repuestos_count': ordenes_buscando_repuestos_count,
         'ordenes_completadas_count': ordenes_completadas_count,
+        'ordenes_finalizadas_count': ordenes_finalizadas_count,
         'ordenes_por_estado': list(ordenes_por_estado),
-        'ordenes_completadas_por_mes': list(ordenes_completadas_por_mes),
+        'ordenes_completadas_por_mes': list(ordenes_por_mes),
 
     }
+    print(list(ordenes_por_mes))
     return render(request,'prueba.html',context)
 
 
@@ -487,8 +496,8 @@ def guardarOrden(request):
     next_numero_ord = 1 if max_numero_ord is None else max_numero_ord + 1
     context = {
             'next_numero_ord': next_numero_ord,
-            'usuarios': Usuario.objects.all(),
-            'servicios': Servicio.objects.all(),
+            'usuarios': Usuario.objects.filter(is_active = True),
+            'servicios': Servicio.objects.filter(is_deleted = False),
             'ESTADOS': Orden.ESTADOS,
         }
     return render(request,'generarorden.html',context)
@@ -765,7 +774,7 @@ def listarOrdenesFinalizadas(request):
 def obtenerOrden(request,id):
     orden = get_object_or_404(Orden, id_ord=id)
     servicios = Servicio.objects.all()
-    usuarios = Usuario.objects.filter(is_active=True)
+    usuarios = Usuario.objects.all()
     orden_servicios = OrdenServicio.objects.filter(orden_id=orden)
     vehiculos=Vehiculo.objects.all()
     ESTADOS = Orden.ESTADOS
@@ -789,7 +798,10 @@ def editarOrden(request):
         orden.fecha_ord = request.POST['fecha_ord']
         orden.numero_ord = request.POST['numero_ord']
         orden.observaciones_ord = request.POST['observaciones_ord']
-        orden.estado_ord = request.POST['estado_ord']
+        estado_ord = request.POST['estado_ord']
+        if estado_ord == 'FINALIZADA':
+            orden.fecha_fin_ord=timezone.now()
+        orden.estado_ord=estado_ord
         orden.usuario_id_id = request.POST['usuario_id']
         
         orden.save()
@@ -1147,6 +1159,22 @@ def cambiar_estado_orden(request, id_ord, nuevo_estado):
         orden.estado_ord = nuevo_estado
         orden.save()
         messages.success(request, f'Orden cambiada a estado {nuevo_estado} exitosamente.')
+
+        if nuevo_estado == 'COMPLETADA':
+            cliente_email = orden.vehiculo_id.cli_id.email_cli
+            try:
+                send_mail(
+                    'Orden Completada',
+                    f'Estimado/a {orden.vehiculo_id.cli_id.nombre_cli} {orden.vehiculo_id.cli_id.apellido_cli},\n\nSu orden #{orden.numero_ord} ha sido completada.\n\nGracias por confiar en nosotros.\n\nSaludos,\nMultiAuto',
+                    'tu_correo@example.com',  # Cambia esto por el correo electrónico del remitente
+                    [cliente_email],
+                    fail_silently=False,
+                )
+                messages.success(request, 'Correo electrónico enviado al cliente exitosamente.')
+            except BadHeaderError:
+                messages.error(request, 'Error al enviar el correo electrónico.')
+            except Exception as e:
+                messages.error(request, f'Error al enviar el correo electrónico: {str(e)}')
     else:
         messages.error(request, 'No tienes permiso para cambiar el estado de esta orden.')
     return redirect('listaProgreso')
@@ -1291,5 +1319,20 @@ def eliminarDaniosM(request,id_ins):
 @mecanico_required
 def listar_ordenes_completadas(request):
     usuario_actual = request.user
-    ordenes_completadas = Orden.objects.filter(estado_ord='COMPLETADA', usuario_id=usuario_actual)
+    ordenes_completadas = Orden.objects.filter(estado_ord__in=['COMPLETADA', 'FINALIZADA'], usuario_id=usuario_actual)
     return render(request, 'lista_ordenes_f.html', {'ordenes': ordenes_completadas})
+
+
+def buscar_vehiculo(request):
+    query = request.GET.get('q')
+    vehiculos = None
+    ordenes = None
+    if query:
+        vehiculos = Vehiculo.objects.filter(placa_veh__icontains=query, is_deleted=False)
+        ordenes = Orden.objects.filter(vehiculo_id__placa_veh__icontains=query).exclude(estado_ord='FINALIZADA')
+    
+    return render(request, 'buscar_vehiculo.html', {
+        'vehiculos': vehiculos,
+        'ordenes': ordenes,
+        'query': query,
+    })

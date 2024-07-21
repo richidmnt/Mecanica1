@@ -21,6 +21,7 @@
                     <tr>
                       <th>Número de Orden</th>
                       <th>Fecha de Inicio</th>
+                      <th>Fecha Fin</th>
                       <th>Cliente</th>
                       <th>Auto</th>
                       <th>Estado</th>
@@ -32,6 +33,7 @@
                     <tr class="align-middle">
                       <td>{{ orden.numero_ord }}</td>
                       <td>{{ orden.fecha_ord|date:"d/m/Y H:i" }}</td>
+                      <td> {{ orden.fecha_fin_ord|date:"d/m/y H:i"}}</td>
                       <td>
                         {{ orden.vehiculo_id.cli_id.nombre_cli }} {{ orden.vehiculo_id.cli_id.apellido_cli }}
                       </td>

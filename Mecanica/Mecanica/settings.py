@@ -123,10 +123,12 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'Mecanica/static')]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
+EMAIL_PORT = 465
 EMAIL_HOST_USER = 'richard.martinez4569@utc.edu.ec'
-EMAIL_HOST_PASSWORD = 'jcxt fulr yzsj hctn'
-EMAIL_USE_TLS = True
+EMAIL_HOST_PASSWORD = 'kfhz cupa uwdg oirb'
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+
 
 
 # Default primary key field type

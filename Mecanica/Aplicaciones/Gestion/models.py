@@ -221,5 +221,3 @@ class OrdenRepuesto(models.Model):
     precio_rep = models.DecimalField(max_digits =10 ,decimal_places = 2)
     cantidad_rep = models.IntegerField()
     subtotal_rep = models.DecimalField(max_digits=10,decimal_places=2)
-
-
