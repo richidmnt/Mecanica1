@@ -110,17 +110,17 @@ def home2(request):
     print(list(ordenes_por_mes))
     return render(request,'prueba.html',context)
 
-@mecanico_required
+@admin_required
 def index(request):
     usuarios = Usuario.objects.filter(is_deleted=False)
     return render(request, 'listaUsuarios.html', {'usuarios': usuarios})
 
-@mecanico_required
+@admin_required
 def listaUsuariosEliminados(request):
     usuarios = Usuario.objects.filter(is_deleted=True)
     return render(request, 'lista_usuarios_eliminados.html', {'usuarios': usuarios})
 
-@mecanico_required
+@admin_required
 def restaurarUsuario(request,id):
     usuario = get_object_or_404(Usuario, id_usr=id)
     usuario.is_active=True
@@ -130,11 +130,11 @@ def restaurarUsuario(request,id):
     messages.success(request,f'Usuario {usuario.username} restaurado correctamente.')
     return redirect('usuariosEliminados')
 
-@mecanico_required
+@admin_required
 def guardarUsuario(request):
     return render(request, 'guardarUsuario.html')
 
-@mecanico_required
+@admin_required
 def registrarUsuario(request):
     if request.method == 'POST':
         username = request.POST.get('username').strip()
@@ -182,7 +182,7 @@ def registrarUsuario(request):
     else:
         return render(request, 'guardarUsuario.html')
 
-@mecanico_required
+@admin_required
 def eliminarUsuario(request, id,permanent= False):
     try:
         
@@ -221,7 +221,7 @@ def clientesEliminados(request):
 def guardarCliente(request):
     return render(request,'guardarCliente.html')
 
-@mecanico_required
+@admin_required
 def registrarCliente(request):
     if request.method == 'POST':
         try:
@@ -272,7 +272,7 @@ def registrarCliente(request):
         return redirect('guardarCliente')
 
 
-@mecanico_required
+@admin_required
 def eliminarCliente(request, id,permanent=False):
     try:
         cliente = get_object_or_404(Cliente, id_cli=id)
@@ -293,7 +293,7 @@ def eliminarCliente(request, id,permanent=False):
     
     return redirect('listaClientes')
 
-@mecanico_required
+@admin_required
 def restaurarCliente(request,id):
     cliente = get_object_or_404(Cliente, id_cli=id)
     cliente.is_deleted = False
@@ -308,7 +308,7 @@ def obtenerClietne(request,id):
     cliente = Cliente.objects.get(id_cli=id)
     return render(request,'obtenerCliente.html',{'cliente':cliente})
 
-@mecanico_required
+@admin_required
 def actualizarCliente(request):
     
     if request.method == 'POST':
@@ -369,8 +369,7 @@ def registrarServicio(request):
             return redirect('guardarServicio')
     else:
         return render(request, 'guardarServicio.html')
-
-@mecanico_required
+@admin_required
 def eliminarServicio(request, id):
     servicio = get_object_or_404(Servicio, id_ser=id)
     try:
@@ -382,7 +381,7 @@ def eliminarServicio(request, id):
         messages.error(request, 'No se puede eliminar el servicio porque está referenciado en órdenes existentes.')
     return redirect('listaServicios')
 
-@mecanico_required
+@admin_required
 def restaurarServicio(request,id):
     servicio = get_object_or_404(Servicio,id_ser=id)
     servicio.is_deleted = False
