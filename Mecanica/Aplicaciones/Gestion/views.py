@@ -43,13 +43,13 @@ def logout(request):
 
 @admin_required
 def home(request):
-    # Obtener el total de clientes
+  
     total_clientes = Cliente.objects.filter(is_deleted=False).count()
 
-    # Obtener el total de órdenes por estado
+   
     ordenes_por_estado = Orden.objects.filter(is_deleted=False).values('estado_ord').annotate(total=Count('estado_ord'))
 
-    # Obtener el total de órdenes por mes
+   
     ordenes_por_mes = Orden.objects.filter(is_deleted=False).annotate(month=ExtractMonth('fecha_ord')).values('month').annotate(total=Count('id_ord')).order_by('month')
 
     
@@ -60,7 +60,7 @@ def home(request):
         servicio_id__is_deleted=False
     ).values('servicio_id__nombre_ser').annotate(total=Count('servicio_id')).order_by('-total')[:5]
 
-    # Obtener los 5 servicios menos adquiridos
+    
     bottom_servicios_usados = OrdenServicio.objects.filter(
         servicio_id__is_deleted=False
     ).values('servicio_id__nombre_ser').annotate(total=Count('servicio_id')).order_by('total')[:5]
@@ -110,15 +110,17 @@ def home2(request):
     print(list(ordenes_por_mes))
     return render(request,'prueba.html',context)
 
-
+@mecanico_required
 def index(request):
     usuarios = Usuario.objects.filter(is_deleted=False)
     return render(request, 'listaUsuarios.html', {'usuarios': usuarios})
 
+@mecanico_required
 def listaUsuariosEliminados(request):
     usuarios = Usuario.objects.filter(is_deleted=True)
     return render(request, 'lista_usuarios_eliminados.html', {'usuarios': usuarios})
 
+@mecanico_required
 def restaurarUsuario(request,id):
     usuario = get_object_or_404(Usuario, id_usr=id)
     usuario.is_active=True
@@ -128,10 +130,11 @@ def restaurarUsuario(request,id):
     messages.success(request,f'Usuario {usuario.username} restaurado correctamente.')
     return redirect('usuariosEliminados')
 
-
+@mecanico_required
 def guardarUsuario(request):
     return render(request, 'guardarUsuario.html')
 
+@mecanico_required
 def registrarUsuario(request):
     if request.method == 'POST':
         username = request.POST.get('username').strip()
@@ -144,7 +147,7 @@ def registrarUsuario(request):
         is_active = 'is_active' in request.POST
 
         try:
-            # Verificar si el username o el email ya existen
+            
             if Usuario.objects.filter(username=username).exists():
                 messages.error(request, 'El nombre de usuario ya existe. Por favor, elige otro.')
                 return redirect('guardarUsuario')
@@ -179,6 +182,7 @@ def registrarUsuario(request):
     else:
         return render(request, 'guardarUsuario.html')
 
+@mecanico_required
 def eliminarUsuario(request, id,permanent= False):
     try:
         
@@ -187,7 +191,7 @@ def eliminarUsuario(request, id,permanent= False):
             messages.success(request, 'Usuario eliminado permanentemente.')
         else:
             usuario.is_deleted = True
-            usuario.is_active = False  # Set is_active to False when soft deleting
+            usuario.is_active = False 
             usuario.deleted_at = timezone.now()
             usuario.save()
             messages.success(request, 'Usuario eliminado correctamente.')
@@ -217,7 +221,7 @@ def clientesEliminados(request):
 def guardarCliente(request):
     return render(request,'guardarCliente.html')
 
-
+@mecanico_required
 def registrarCliente(request):
     if request.method == 'POST':
         try:
@@ -268,7 +272,7 @@ def registrarCliente(request):
         return redirect('guardarCliente')
 
 
-
+@mecanico_required
 def eliminarCliente(request, id,permanent=False):
     try:
         cliente = get_object_or_404(Cliente, id_cli=id)
@@ -289,6 +293,7 @@ def eliminarCliente(request, id,permanent=False):
     
     return redirect('listaClientes')
 
+@mecanico_required
 def restaurarCliente(request,id):
     cliente = get_object_or_404(Cliente, id_cli=id)
     cliente.is_deleted = False
@@ -303,6 +308,7 @@ def obtenerClietne(request,id):
     cliente = Cliente.objects.get(id_cli=id)
     return render(request,'obtenerCliente.html',{'cliente':cliente})
 
+@mecanico_required
 def actualizarCliente(request):
     
     if request.method == 'POST':
@@ -364,7 +370,7 @@ def registrarServicio(request):
     else:
         return render(request, 'guardarServicio.html')
 
-
+@mecanico_required
 def eliminarServicio(request, id):
     servicio = get_object_or_404(Servicio, id_ser=id)
     try:
@@ -376,6 +382,7 @@ def eliminarServicio(request, id):
         messages.error(request, 'No se puede eliminar el servicio porque está referenciado en órdenes existentes.')
     return redirect('listaServicios')
 
+@mecanico_required
 def restaurarServicio(request,id):
     servicio = get_object_or_404(Servicio,id_ser=id)
     servicio.is_deleted = False
@@ -765,6 +772,7 @@ def listarOrdenesNoFinalizadas(request):
     }
     return render(request, 'listarOrdenesF.html', context)
 
+@admin_required
 def listarOrdenesFinalizadas(request):
     ordenes = Orden.objects.filter(estado_ord = 'FINALIZADA')
     return render(request,'ordenes_finalizadas.html',{'ordenes':ordenes})
@@ -844,10 +852,11 @@ def eliminarOrden(request, id):
 
 
 #Registrar Danios
+@admin_required
 def registrarDanios(request):
     ordenes = Orden.objects.all()
     return render(request,'registrarDanios2.html',{'ordenes':ordenes})
-
+@admin_required
 def guardarDanios(request):
     if request.method == 'POST':
         orden_id = request.POST['orden']
@@ -904,13 +913,13 @@ def guardarDanios(request):
 
         messages.success(request, 'Inspección registrados correctamente')
         return redirect('listarDanios')
-
+@admin_required
 def listarDanios(request):
     
     inspecciones = Inspeccion.objects.all()
     return render(request, 'listar_danios.html', {'danios': inspecciones})
 
-
+@admin_required
 def obtenerDanios(request, id_ord):
     inspeccion = get_object_or_404(Inspeccion, id_ins=id_ord)
     danios = Danio.objects.filter(inspeccion_id=inspeccion).values('id_dan', 'x_pos', 'y_pos', 'descripcion_dan')
@@ -922,7 +931,7 @@ def obtenerDanios(request, id_ord):
     }
     return render(request, 'obtenerDanio.html', context)
 
-
+@admin_required
 def actualizarDanios(request):
     if request.method == 'POST':
         orden_id = request.POST['orden_id']
@@ -982,6 +991,7 @@ def actualizarDanios(request):
 def custom_404_view(request, exception):
     return render(request, '404.html')
 
+@admin_required
 def eliminarDanios(request,id_ins):
     inspeccion = get_object_or_404(Inspeccion, id_ins=id_ins)
     Danio.objects.filter(inspeccion_id=inspeccion).delete()
@@ -1185,6 +1195,7 @@ def listar_inspecciones(request):
     inspecciones = Inspeccion.objects.filter(orden_id__usuario_id=usuario_actual)
     return render(request, 'listar_inspecciones_m.html', {'danios': inspecciones})
 
+@mecanico_required
 def guardarDaniosM(request):
     if request.method == 'POST':
         orden_id = request.POST['orden']
@@ -1192,7 +1203,7 @@ def guardarDaniosM(request):
         if Inspeccion.objects.filter(orden_id=orden).exists():
             messages.error(request, 'Ya existe una inspección para esta orden.')
             return redirect('registrarDanios')
-        # Crear inspección
+        
         inspeccion = Inspeccion.objects.create(
                 km=request.POST['km'],
                 orden_id =orden,
@@ -1241,7 +1252,8 @@ def guardarDaniosM(request):
 
         messages.success(request, 'Inspección registrados correctamente')
         return redirect('listarInspeccionM')
-    
+
+@mecanico_required   
 def obtenerDaniosM(request, id_ord):
     inspeccion = get_object_or_404(Inspeccion, id_ins=id_ord)
     danios = Danio.objects.filter(inspeccion_id=inspeccion).values('id_dan', 'x_pos', 'y_pos', 'descripcion_dan')
@@ -1252,7 +1264,8 @@ def obtenerDaniosM(request, id_ord):
         'danios': json.dumps(list(danios)),
     }
     return render(request, 'obtener_danio_m.html', context)
-    
+
+@mecanico_required   
 def actualizarDaniosM(request):
     if request.method == 'POST':
         orden_id = request.POST['orden_id']
@@ -1288,9 +1301,9 @@ def actualizarDaniosM(request):
         if delete_id_dan_list:
             Danio.objects.filter(id_dan__in=delete_id_dan_list).delete()
 
-        # Actualizar o crear nuevos marcadores
+      
         for id_dan, x_pos, y_pos, descripcion_dan in zip(id_dan_list, x_pos_list, y_pos_list, descripcion_dan_list):
-            if id_dan.startswith('marker-'):  # Nuevo marcador
+            if id_dan.startswith('marker-'):  
                 Danio.objects.create(
                     x_pos=float(x_pos),
                     y_pos=float(y_pos),
@@ -1308,7 +1321,8 @@ def actualizarDaniosM(request):
         return redirect('listarInspeccionM')
 
     return redirect('listarInspeccionM')
-    
+
+@mecanico_required   
 def eliminarDaniosM(request,id_ins):
     inspeccion = get_object_or_404(Inspeccion, id_ins=id_ins)
     Danio.objects.filter(inspeccion_id=inspeccion).delete()

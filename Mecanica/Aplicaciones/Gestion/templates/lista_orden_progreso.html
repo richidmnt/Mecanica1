@@ -28,7 +28,7 @@
                         <li><strong><i class="fas fa-car"></i> Placa:</strong> {{ orden.vehiculo_id.placa_veh }}</li>
                         <li><strong><i class="fas fa-industry"></i> Marca:</strong> {{ orden.vehiculo_id.marca_veh }}</li>
                         <li><strong><i class="fas fa-cogs"></i> Modelo:</strong> {{ orden.vehiculo_id.modelo_veh }}</li>
-                        <li><strong><i class="fas fa-tachometer-alt"></i> Kilometraje:</strong> {{ orden.vehiculo_id.km }}</li>
+                        
                       </ul>
                       <p><i class="fas fa-check"></i><strong>Servicios:</strong></p>
                       <ul>
@@ -37,7 +37,6 @@
                         {% endfor %}
                       </ul>
                       <p><i class="fas fa-exclamation-triangle"></i><strong>Observaciones:</strong> {{ orden.observaciones_ord }}</p>
-                      <p><i class="fas fa-calendar"></i><strong>Estado:</strong> {{ orden.get_estado_ord_display }}</p>
                       <p><i class="fas fa-calendar"></i><strong>Fecha de la Orden:</strong> {{ orden.fecha_ord|date:"d/m/Y" }}</p>
                       <div class="btn-group" role="group" aria-label="Cambiar Estado">
                         <button onclick="confirmarCambioEstado({{ orden.id_ord }}, 'EN_PROGRESO')" class="btn btn-warning">En Progreso</button>
