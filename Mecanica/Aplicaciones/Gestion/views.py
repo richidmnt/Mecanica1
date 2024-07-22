@@ -502,7 +502,7 @@ def guardarOrden(request):
     next_numero_ord = 1 if max_numero_ord is None else max_numero_ord + 1
     context = {
             'next_numero_ord': next_numero_ord,
-            'usuarios': Usuario.objects.filter(is_active = True),
+            'usuarios': Usuario.objects.filter(is_active = True, rol = "MECANICO"),
             'servicios': Servicio.objects.filter(is_deleted = False),
             'ESTADOS': Orden.ESTADOS,
         }
@@ -714,8 +714,8 @@ def guardarOrden2(request):
     next_numero_ord = 1 if max_numero_ord is None else max_numero_ord + 1
     context = {
             'next_numero_ord': next_numero_ord,
-            'usuarios': Usuario.objects.all(),
-            'servicios': Servicio.objects.all(),
+            'usuarios': Usuario.objects.filter(rol = "MECANICO" , is_active = True),
+            'servicios': Servicio.objects.filter(is_deleted =False),
             'ESTADOS': Orden.ESTADOS,
             'vehiculos': Vehiculo.objects.all()
         }
