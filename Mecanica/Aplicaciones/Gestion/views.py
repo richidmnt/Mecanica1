@@ -11,6 +11,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Count,Value
 from django.db.models.functions import ExtractMonth
 from django.core.mail import send_mail,BadHeaderError
+from django.urls import reverse
+from django.http import JsonResponse
 
 from .decorators import login_required,admin_required,mecanico_required
 from .models import *
@@ -1201,7 +1203,7 @@ def guardarDaniosM(request):
         orden = Orden.objects.get(id_ord=orden_id)
         if Inspeccion.objects.filter(orden_id=orden).exists():
             messages.error(request, 'Ya existe una inspección para esta orden.')
-            return redirect('registrarDanios')
+            return redirect(reverse('aceptar_orden', args=[orden_id]))
         
         inspeccion = Inspeccion.objects.create(
                 km=request.POST['km'],
@@ -1349,3 +1351,15 @@ def buscar_vehiculo(request):
         'ordenes': ordenes,
         'query': query,
     })
+
+def obtener_nombres_repuestos(request):
+    term = request.GET.get('term', '')
+    repuestos = OrdenRepuesto.objects.filter(nombre_rep__icontains=term).values('nombre_rep', 'precio_rep').distinct()[:10]
+    results = []
+    for repuesto in repuestos:
+        results.append({
+            'label': repuesto['nombre_rep'],
+            'value': repuesto['nombre_rep'],
+            'precio': repuesto['precio_rep'],
+        })
+    return JsonResponse(results, safe=False)

@@ -69,5 +69,6 @@ urlpatterns = [
     path('restaurarServicio/<id>/',views.restaurarServicio),
     path('ordenesFinalizadas/',views.listarOrdenesFinalizadas,name='ordenesFinalizadas'),
     path('buscar_vehiculo/', views.buscar_vehiculo, name='buscar_vehiculo'),
+    path('obtener_nombres_repuestos/', views.obtener_nombres_repuestos, name='obtener_nombres_repuestos'),
 ]
 

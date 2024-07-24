@@ -22,8 +22,8 @@
                     <div class="card-body">
                       <div class="form-group">
                         <label for="orden_id" class="form-label">Elija una orden</label>
-                        <select name="orden_id" id="orden_id" class="form-control">
-                          <option value="">Elija una orden</option>
+                        <select name="orden_id" id="id_ord" class="form-control">
+                          <option value="">Seleccione una orden</option>
                           {% for orden in ordenes %}
                           <option value="{{ orden.id_ord }}">{{ orden.numero_ord }}</option>
                           {% endfor %}
@@ -56,16 +56,16 @@
                       <tbody id="repuestosTableBody">
                         <tr>
                           <td>
-                            <input type="text" class="form-control" name="nombre_rep[]" id="nombre_rep_0" required minlength="5" maxlength="50" />
+                            <input type="text" class="form-control nombre-rep" name="nombre_rep[]" id="nombre_rep_0" autocomplete="off" required minlength="5" maxlength="50" />
                           </td>
                           <td>
-                            <textarea class="form-control" name="descripcion_rep[]" id="descripcion_rep_0" rows="2" required minlength="5" maxlength="100"></textarea>
+                            <textarea class="form-control" name="descripcion_rep[]" id="descripcion_rep_0" autocomplete="off" rows="2" minlength="5" maxlength="100"></textarea>
                           </td>
                           <td>
-                            <input type="number" class="form-control precio" name="precio_rep[]" id="precio_rep_0" step="0.01" required min="2" max="1000" onchange="updateSubtotal(this)" />
+                            <input type="number" class="form-control precio" name="precio_rep[]" id="precio_rep_0" autocomplete="off" step="0.01" required min="2" max="1000" onchange="updateSubtotal(this)" />
                           </td>
                           <td>
-                            <input type="number" class="form-control cantidad" name="cantidad_rep[]" id="cantidad_rep_0" required min="1" max="100" onchange="updateSubtotal(this)" />
+                            <input type="number" class="form-control cantidad" name="cantidad_rep[]" id="cantidad_rep_0" autocomplete="off" required min="1" max="100" onchange="updateSubtotal(this)" />
                           </td>
                           <td>
                             <input type="text" class="form-control subtotal" name="subtotal_rep[]" id="subtotal_rep_0" readonly />
@@ -100,6 +100,26 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<style>
+  .ui-autocomplete {
+    max-height: 100px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .ui-menu-item {
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  .ui-menu-item:hover {
+    background-color: #007bff;
+    color: white;
+  }
+</style>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script>
   let rowIndex = 1;
 
@@ -124,16 +144,16 @@
     var newRow = `
       <tr>
         <td>
-          <input type="text" class="form-control" name="nombre_rep[]" id="nombre_rep_${rowIndex}" required minlength="5" maxlength="50" />
+          <input type="text" class="form-control nombre-rep" name="nombre_rep[]" id="nombre_rep_${rowIndex}" autocomplete="off" required minlength="5" maxlength="50" />
         </td>
         <td>
-          <textarea class="form-control" name="descripcion_rep[]" id="descripcion_rep_${rowIndex}" rows="2" required minlength="5" maxlength="100"></textarea>
+          <textarea class="form-control" name="descripcion_rep[]" id="descripcion_rep_${rowIndex}" autocomplete="off" rows="2"  minlength="5" maxlength="100"></textarea>
         </td>
         <td>
-          <input type="number" class="form-control precio" name="precio_rep[]" id="precio_rep_${rowIndex}" step="0.01" required min="2" max="1000" onchange="updateSubtotal(this)" />
+          <input type="number" class="form-control precio" name="precio_rep[]" id="precio_rep_${rowIndex}" autocomplete="off" step="0.01" required min="2" max="1000" onchange="updateSubtotal(this)" />
         </td>
         <td>
-          <input type="number" class="form-control cantidad" name="cantidad_rep[]" id="cantidad_rep_${rowIndex}" required min="1" max="100" onchange="updateSubtotal(this)" />
+          <input type="number" class="form-control cantidad" name="cantidad_rep[]" id="cantidad_rep_${rowIndex}" autocomplete="off" required min="1" max="100" onchange="updateSubtotal(this)" />
         </td>
         <td>
           <input type="text" class="form-control subtotal" name="subtotal_rep[]" id="subtotal_rep_${rowIndex}" readonly />
@@ -143,6 +163,7 @@
         </td>
       </tr>`;
     document.getElementById('repuestosTableBody').insertAdjacentHTML('beforeend', newRow);
+    initializeAutocomplete(`#nombre_rep_${rowIndex}`);
     rowIndex++;
   }
 
@@ -151,7 +172,61 @@
     updateTotal();
   }
 
+  function validateDuplicateRepuestos() {
+    var nombresRepuestos = [];
+    var isValid = true;
+    document.querySelectorAll('.nombre-rep').forEach(function (input) {
+      var value = input.value.trim().toLowerCase();
+      if (nombresRepuestos.includes(value)) {
+        isValid = false;
+        input.classList.add('is-invalid');
+        iziToast.error({
+          title: 'Error',
+          message: 'El nombre del repuesto "' + input.value + '" está duplicado.',
+          position: 'topRight'
+        });
+      } else {
+        nombresRepuestos.push(value);
+        input.classList.remove('is-invalid');
+      }
+    });
+    return isValid;
+  }
+
+  function initializeAutocomplete(selector) {
+    $(selector).autocomplete({
+      source: function(request, response) {
+        $.ajax({
+          url: "{% url 'obtener_nombres_repuestos' %}",
+          dataType: "json",
+          data: {
+            term: request.term
+          },
+          success: function(data) {
+            response($.map(data, function(item) {
+              return {
+                label: item.label,
+                value: item.value,
+                precio: item.precio
+              };
+            }));
+          }
+        });
+      },
+      minLength: 2,
+      select: function(event, ui) {
+        $(this).val(ui.item.value);
+        var row = $(this).closest('tr');
+        row.find('.precio').val(ui.item.precio);
+        updateSubtotal(row.find('.precio')[0]);
+        return false;
+      }
+    });
+  }
+
   $(document).ready(function() {
+    initializeAutocomplete(".nombre-rep");
+
     $("#repuestosForm").on('submit', function(e) {
       let isValid = true;
 
@@ -165,7 +240,7 @@
         }
       });
 
-      if (!isValid) {
+      if (!validateDuplicateRepuestos() || !isValid) {
         e.preventDefault();
         return false;
       }
@@ -180,9 +255,8 @@
           maxlength: 50
         },
         "descripcion_rep[]": {
-          required: true,
           minlength: 5,
-          maxlength:100
+          maxlength: 100
         },
         "precio_rep[]": {
           required: true,
@@ -201,12 +275,11 @@
         "nombre_rep[]": {
           required: "Por favor, ingrese el nombre del repuesto",
           minlength: "El nombre debe tener al menos 5 caracteres",
-          maxlength: "El nombre no puede tener más de 50caracteres"
+          maxlength: "El nombre no puede tener más de 50 caracteres"
         },
         "descripcion_rep[]": {
-          required: "Por favor, ingrese una descripción del repuesto",
           minlength: "La descripción debe tener al menos 5 caracteres",
-          maxlength:"La descripción debe tener máximo 100 caracteres"
+          maxlength: "La descripción no puede tener más de 100 caracteres"
         },
         "precio_rep[]": {
           required: "Por favor, ingrese el precio del repuesto",
@@ -222,26 +295,27 @@
         }
       },
       errorElement: "span",
-      errorPlacement: function (error, element) {
+      errorPlacement: function(error, element) {
         error.addClass("invalid-feedback");
         element.closest("td").append(error);
       },
-      highlight: function (element, errorClass, validClass) {
-        $(element).addClass("is-invalid");
+      highlight: function(element, errorClass, validClass) {
+        $(element).addClass("is-invalid").removeClass("is-valid");
       },
-      unhighlight: function (element, errorClass, validClass) {
-        $(element).removeClass("is-invalid");
+      unhighlight: function(element, errorClass, validClass) {
+        $(element).removeClass("is-invalid").addClass("is-valid");
       }
     });
   });
 </script>
 <script>
   $(document).ready(function () {
-            // Configuración de Select2
-            $("#orden_id").select2({
-                allowClear: true,
-                
-            });
-        });
+    // Configuración de Select2
+    $("#id_ord").select2({
+      allowClear: true,
+    
+      
+    });
+  });
 </script>
 {% endblock %}

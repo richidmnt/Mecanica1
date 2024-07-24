@@ -190,7 +190,7 @@
                 </div>
               </div>
               <div class="d-flex justify-content-start mt-3">
-                <button type="submit" class="btn btn-primary">
+                <button type="button" onclick="actualizar()"  class="btn btn-primary">
                   Actualizar Inspección
                 </button>
                 <a href="{% url 'listarDanios' %}" class="btn btn-danger ml-2"
@@ -206,6 +206,43 @@
 </section>
 {% endblock %}
 {% block extra_scripts %}
+<script>
+  function actualizar() {
+    iziToast.question({
+      timeout: 15000,
+      close: true,
+      overlay: true,
+      displayMode: "once",
+      id: "question",
+      zindex: 999,
+      title: "Confirmación",
+      message: "¿Está seguro de actualizar la información de la inspección?",
+      position: "center",
+      buttons: [
+        [
+          "<button><b>SI</b></button>",
+          function (instance, toast) {
+            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+            document.getElementById('daniosForm').submit();
+          },
+          true,
+        ],
+        [
+          "<button>NO</button>",
+          function (instance, toast) {
+            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+          },
+        ],
+      ],
+      onClosing: function (instance, toast, closedBy) {
+        console.info("Closing | closedBy: " + closedBy);
+      },
+      onClosed: function (instance, toast, closedBy) {
+        console.info("Closed | closedBy: " + closedBy);
+      },
+    });
+  }
+</script>
 <script>
   let markerCount = 0;
   const carImage = document.getElementById("carImage");

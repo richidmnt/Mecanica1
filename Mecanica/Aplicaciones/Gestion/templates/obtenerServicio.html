@@ -71,7 +71,7 @@
                         </div>
                       </div>
                       <div class="d-flex justify-content-start mt-3">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="button"  onclick="actualizar()" class="btn btn-primary">
                           Actualizar Servicio
                         </button>
                         <a
@@ -93,6 +93,43 @@
   </div>
 </section>
 {% endblock %} {% block extra_scripts %}
+<script>
+  function actualizar() {
+    iziToast.question({
+      timeout: 15000,
+      close: true,
+      overlay: true,
+      displayMode: "once",
+      id: "question",
+      zindex: 999,
+      title: "Confirmación",
+      message: "¿Está seguro de actualizar la información del servicio?",
+      position: "center",
+      buttons: [
+        [
+          "<button><b>SI</b></button>",
+          function (instance, toast) {
+            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+            document.getElementById('servicioFormA').submit();
+          },
+          true,
+        ],
+        [
+          "<button>NO</button>",
+          function (instance, toast) {
+            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+          },
+        ],
+      ],
+      onClosing: function (instance, toast, closedBy) {
+        console.info("Closing | closedBy: " + closedBy);
+      },
+      onClosed: function (instance, toast, closedBy) {
+        console.info("Closed | closedBy: " + closedBy);
+      },
+    });
+  }
+</script>
 <script>
   $.validator.addMethod(
     "lettersonly",
