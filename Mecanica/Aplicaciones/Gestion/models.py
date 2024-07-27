@@ -78,7 +78,6 @@ class Vehiculo(models.Model):
     modelo_veh = models.CharField(max_length=255)
     placa_veh = models.CharField(max_length=20, unique=True)
     anio_veh = models.IntegerField()
-    chasis_veh = models.CharField(max_length=255, unique=True)
     color_veh = models.CharField(max_length=255)
     cli_id = models.ForeignKey(Cliente, on_delete=models.PROTECT)
     is_deleted = models.BooleanField(default=False)
