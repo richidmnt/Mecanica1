@@ -13,7 +13,7 @@
                     <h2 class="card-title text-center">Actualizar Vehículo</h2>
                   </div>
                   <div class="card-body">
-                    <form id="vehiculoForm" method="post" action="/actualizarVehiculo/">
+                    <form id="vehiculoForm" method="post" action="/actualizarVehiculo/{{ vehiculo.id_veh }}/">
                       {% csrf_token %}
                       <input type="hidden" name="id_veh" value="{{vehiculo.id_veh}}">
                       <div class="form-row">

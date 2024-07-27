@@ -185,6 +185,61 @@ def registrarUsuario(request):
         return render(request, 'guardarUsuario.html')
 
 @admin_required
+def actualizarUsuario(request, id_usr):
+    usuario = get_object_or_404(Usuario, id_usr=id_usr)
+
+    if request.method == 'POST':
+        username = request.POST.get('username').strip()
+        nombre = request.POST.get('nombre').upper()
+        apellido = request.POST.get('apellido').upper()
+        telefono = request.POST.get('telefono')
+        email = request.POST.get('email').strip()
+        password = request.POST.get('password').strip()
+        rol = request.POST.get('rol')
+        is_active = 'is_active' in request.POST
+
+        try:
+            # Verificar si el nombre de usuario ya existe y no es el del usuario actual
+            if Usuario.objects.filter(username=username).exclude(id_usr=id_usr).exists():
+                messages.error(request, 'El nombre de usuario ya existe. Por favor, elige otro.')
+                return redirect('actualizarUsuario', id_usr=id_usr)
+
+            # Verificar si el email ya existe y no es el del usuario actual
+            if Usuario.objects.filter(email=email).exclude(id_usr=id_usr).exists():
+                messages.error(request, 'El email ya existe. Por favor, ingresa otro.')
+                return redirect('actualizarUsuario', id_usr=id_usr)
+
+            # Actualizar los campos del usuario
+            usuario.username = username
+            usuario.nombre = nombre
+            usuario.apellido = apellido
+            usuario.telefono = telefono
+            usuario.email = email
+            usuario.rol = rol
+            usuario.is_active = is_active
+
+            if password:
+                usuario.set_password(password)
+
+            usuario.save()
+
+            messages.success(request, 'Usuario actualizado correctamente')
+            return redirect('index')
+
+        except IntegrityError as e:
+            if 'username' in str(e):
+                messages.error(request, 'El nombre de usuario ya existe. Por favor, elige otro.')
+            elif 'email' in str(e):
+                messages.error(request, 'El email ya existe. Por favor, ingresa otro.')
+            else:
+                messages.error(request, 'Ocurrió un error al actualizar el usuario. Por favor, inténtalo de nuevo.')
+            return redirect('actualizarUsuario', id_usr=id_usr)
+    else:
+        return render(request, 'obtener_usuario.html', {'usuario': usuario})
+
+
+
+@admin_required
 def eliminarUsuario(request, id,permanent= False):
     try:
         
@@ -275,16 +330,11 @@ def registrarCliente(request):
 
 
 @admin_required
-def eliminarCliente(request, id,permanent=False):
+def eliminarCliente(request, id):
     try:
         cliente = get_object_or_404(Cliente, id_cli=id)
-        if permanent:
-            messages.success(request, 'Cliente eliminado permanentemente.')
-        else:
-            cliente.is_deleted = True 
-            cliente.deleted_at = timezone.now()
-            cliente.save()
-            messages.success(request, 'Cliente eliminado correctamente.')
+        cliente.delete()
+        messages.succes(request, 'El cliente ha sido eliminado correctamente')
     
     except Cliente.DoesNotExist:
         messages.error(request, 'El cliente no existe')
@@ -304,32 +354,46 @@ def restaurarCliente(request,id):
     messages.success(request, f'Cliente {cliente.nombre_cli} {cliente.apellido_cli} restaurado correctamente.')
     return redirect("clientesEliminados")
 
-
 @admin_required
-def obtenerClietne(request,id):
-    cliente = Cliente.objects.get(id_cli=id)
-    return render(request,'obtenerCliente.html',{'cliente':cliente})
-
-@admin_required
-def actualizarCliente(request):
-    
+def actualizarCliente(request,id_cli):
+    cliente = get_object_or_404(Cliente,id_cli=id_cli)
     if request.method == 'POST':
         id_cli = request.POST["id_cli"]
         cliente = Cliente.objects.get(id_cli=id_cli)
+
+        
+        nuevo_ci = request.POST['ci_cli'].strip()
+        nuevo_email = request.POST['email_cli'].strip()
+        
+       
+        if Cliente.objects.filter(ci_cli=nuevo_ci).exclude(id_cli=id_cli).exists():
+            messages.error(request, 'La cédula ya existe. Por favor, ingrese otra.')
+            return redirect('editarCliente', id_cli=id_cli)
+
+        if Cliente.objects.filter(email_cli=nuevo_email).exclude(id_cli=id_cli).exists():
+            messages.error(request, 'El correo electrónico ya existe. Por favor, ingrese otro.')
+            return redirect('editarCliente', id_cli=id_cli)
+
+       
         cliente.dir_id.ciudad_dir = request.POST['ciudad_dir'].strip().upper()
         cliente.dir_id.barrio_dir = request.POST['barrio_dir'].strip().upper()
         cliente.dir_id.calle_dir = request.POST['calle_dir'].strip().upper()
         cliente.dir_id.numero_dir = request.POST['numero_dir']
         cliente.dir_id.save()
-        
+
+       
         cliente.nombre_cli = request.POST['nombre_cli'].strip().upper()
         cliente.apellido_cli = request.POST['apellido_cli'].strip().upper()
-        cliente.ci_cli = request.POST['ci_cli'].strip()
+        cliente.ci_cli = nuevo_ci
         cliente.telefono_cli = request.POST['telefono_cli'].strip()
-        cliente.email_cli = request.POST['email_cli'].strip()
+        cliente.email_cli = nuevo_email
         cliente.save()
+        
         messages.success(request, 'Cliente actualizado correctamente')
-        return redirect('listaClientes') 
+        return redirect('listaClientes')
+    else:
+        return render(request,'obtenerCliente.html',{'cliente':cliente})
+
     
 # Gestion de servicios
 @admin_required
@@ -481,21 +545,39 @@ def obtenerVehiculo(request,id):
     clientes = Cliente.objects.all()
     return render(request,'obtenerVehiculo.html',{'vehiculo':vehiculo,'clientes':clientes})
 @admin_required
-def actualizarVehiculo(request):
+def actualizarVehiculo(request,id_veh):
+    vehiculo = get_object_or_404(Vehiculo,id_veh=id_veh)
+    clientes = Cliente.objects.all()
     if request.method == 'POST':
-        id_veh=request.POST['id_veh']
+        id_veh = request.POST['id_veh']
         vehiculo = Vehiculo.objects.get(id_veh=id_veh)
-        vehiculo.marca_veh = request.POST['marca_veh']
-        vehiculo.modelo_veh = request.POST['modelo_veh']
-        vehiculo.placa_veh = request.POST['placa_veh']
-        vehiculo.anio_veh = request.POST['anio_veh']
-        vehiculo.chasis_veh = request.POST['chasis_veh']
-        vehiculo.color_veh = request.POST['color_veh']
-        cliente_id = request.POST['cli_id']
+        nueva_placa = request.POST['placa_veh'].strip().upper()
+        nuevo_chasis = request.POST['chasis_veh'].strip().upper()
+
+        
+        if Vehiculo.objects.filter(placa_veh=nueva_placa).exclude(id_veh=id_veh).exists():
+            messages.error(request, 'La placa ya existe. Por favor, ingrese otra.')
+            return redirect('editarVehiculo', id_veh=id_veh)
+
+        if Vehiculo.objects.filter(chasis_veh=nuevo_chasis).exclude(id_veh=id_veh).exists():
+            messages.error(request, 'El chasis ya existe. Por favor, ingrese otro.')
+            return redirect('editarVehiculo', id_veh=id_veh)
+
+        vehiculo.marca_veh = request.POST['marca_veh'].strip().upper()
+        vehiculo.modelo_veh = request.POST['modelo_veh'].strip().upper()
+        vehiculo.placa_veh = nueva_placa
+        vehiculo.anio_veh = request.POST['anio_veh'].strip()
+        vehiculo.chasis_veh = nuevo_chasis
+        vehiculo.color_veh = request.POST['color_veh'].strip().upper()
+        cliente_id = request.POST['cli_id'].strip()
         vehiculo.cli_id = Cliente.objects.get(id_cli=cliente_id)
         vehiculo.save()
+
         messages.success(request, 'Vehículo actualizado correctamente')
         return redirect('listaVehiculos')
+    else:
+        return render(request,'obtenerVehiculo.html',{'vehiculo':vehiculo,'clientes':clientes})
+
     
 #Registrar Orden Cliente
 @admin_required
