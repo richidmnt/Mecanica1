@@ -33,7 +33,19 @@
                       <td>{{ orden.numero_ord }}</td>
                       <td>{{ orden.vehiculo_id.placa_veh }}</td>
                       <td>{{ orden.fecha_ord }}</td>
-                      <td>{{ orden.estado_ord }}</td>
+                      <td>
+                        {% if orden.estado_ord == 'PENDIENTE' %}
+                          <span class="badge bg-danger">Pendiente</span>
+                        {% elif orden.estado_ord == 'EN_PROGRESO' %}
+                          <span class="badge bg-warning text-dark">En Progreso</span>
+                        {% elif orden.estado_ord == 'ESPERANDO_REPUESTOS' %}
+                          <span class="badge bg-info text-dark">Esperando Repuestos</span>
+                        {% elif orden.estado_ord == 'COMPLETADA' %}
+                          <span class="badge bg-success">Completada</span>
+                        {% elif orden.estado_ord == 'FINALIZADA' %}
+                          <span class="badge bg-secondary">Finalizada</span>
+                        {% endif %}
+                      </td>
 
                       <td>
                         <a
