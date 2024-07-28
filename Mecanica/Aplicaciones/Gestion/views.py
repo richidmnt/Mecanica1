@@ -334,7 +334,7 @@ def eliminarCliente(request, id):
     try:
         cliente = get_object_or_404(Cliente, id_cli=id)
         cliente.delete()
-        messages.succes(request, 'El cliente ha sido eliminado correctamente')
+        messages.success(request, 'El cliente ha sido eliminado correctamente')
     
     except Cliente.DoesNotExist:
         messages.error(request, 'El cliente no existe')
@@ -503,7 +503,6 @@ def registrarVehiculo(request):
             modelo = request.POST['modelo_veh'].strip().upper()
             placa = request.POST['placa_veh'].strip().upper()
             anio = request.POST['anio_veh']
-            chasis = request.POST['chasis_veh']
             color = request.POST['color_veh'].strip().upper()
             cliente_id = request.POST['id_cli']
             cliente = Cliente.objects.get(id_cli=cliente_id)
@@ -513,7 +512,6 @@ def registrarVehiculo(request):
                 modelo_veh=modelo,
                 placa_veh=placa,
                 anio_veh=anio,
-                chasis_veh=chasis,
                 color_veh=color,
                 cli_id=cliente
             )
@@ -524,7 +522,7 @@ def registrarVehiculo(request):
         except Cliente.DoesNotExist:
             messages.error(request, 'El cliente no existe. Por favor, seleccione un cliente válido.')
         except IntegrityError:
-            messages.error(request, 'La placa o el chasis ya están registrados. Por favor, ingrese datos únicos.')
+            messages.error(request, 'La placa  ya están registrados. Por favor, ingrese datos únicos.')
         except Exception as e:
             messages.error(request, f'Error inesperado: {e}')
         return redirect('guardarVehiculo')
@@ -552,22 +550,20 @@ def actualizarVehiculo(request,id_veh):
         id_veh = request.POST['id_veh']
         vehiculo = Vehiculo.objects.get(id_veh=id_veh)
         nueva_placa = request.POST['placa_veh'].strip().upper()
-        nuevo_chasis = request.POST['chasis_veh'].strip().upper()
+        
 
         
         if Vehiculo.objects.filter(placa_veh=nueva_placa).exclude(id_veh=id_veh).exists():
             messages.error(request, 'La placa ya existe. Por favor, ingrese otra.')
             return redirect('editarVehiculo', id_veh=id_veh)
 
-        if Vehiculo.objects.filter(chasis_veh=nuevo_chasis).exclude(id_veh=id_veh).exists():
-            messages.error(request, 'El chasis ya existe. Por favor, ingrese otro.')
-            return redirect('editarVehiculo', id_veh=id_veh)
+        
 
         vehiculo.marca_veh = request.POST['marca_veh'].strip().upper()
         vehiculo.modelo_veh = request.POST['modelo_veh'].strip().upper()
         vehiculo.placa_veh = nueva_placa
         vehiculo.anio_veh = request.POST['anio_veh'].strip()
-        vehiculo.chasis_veh = nuevo_chasis
+        
         vehiculo.color_veh = request.POST['color_veh'].strip().upper()
         cliente_id = request.POST['cli_id'].strip()
         vehiculo.cli_id = Cliente.objects.get(id_cli=cliente_id)
@@ -721,17 +717,12 @@ def registrarOrden(request):
                 if Vehiculo.objects.filter(placa_veh=request.POST['placa_veh']).exists():
                     raise IntegrityError('placa_veh')
 
-            
-                if Vehiculo.objects.filter(chasis_veh=request.POST['chasis_veh']).exists():
-                    raise IntegrityError('chasis_veh')
-
                 
                 vehiculo = Vehiculo.objects.create(
                     marca_veh=request.POST['marca_veh'].strip().upper(),
                     modelo_veh=request.POST['modelo_veh'].strip().upper(),
                     placa_veh=request.POST['placa_veh'].strip().upper(),
                     anio_veh=request.POST['anio_veh'],
-                    chasis_veh=request.POST['chasis_veh'],
                     color_veh=request.POST['color_veh'].strip().upper(),
                     cli_id=cliente
                 )
@@ -849,7 +840,7 @@ def registrarOrden2(request):
 @admin_required
 def listarOrdenesNoFinalizadas(request):
     ordenes_no_finalizadas = Orden.objects.exclude(estado_ord='FINALIZADA')
-    #ordenes_no_finalizadas = Orden.objects.all()
+    
     context = {
         'ordenes': ordenes_no_finalizadas
     }
