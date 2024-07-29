@@ -65,7 +65,7 @@
                             class="form-control"
                             id="precio_ser"
                             name="precio_ser"
-                            value="{{ servicio.precio_ser }}"
+                            value="{{ servicio.precio_ser|stringformat:'0.2f' }}"
                             required
                           />
                         </div>

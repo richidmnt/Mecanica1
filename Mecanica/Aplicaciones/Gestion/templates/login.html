@@ -14,58 +14,52 @@
   <link rel="stylesheet" href="{% static 'lib/adminlte/plugins/icheck-bootstrap/icheck-bootstrap.min.css' %}">
   <!-- Theme style -->
   <link rel="stylesheet" href="{% static 'lib/adminlte/dist/css/adminlte.min.css' %}">
-     <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.css"
-      integrity="sha512-DIW4FkYTOxjCqRt7oS9BFO+nVOwDL4bzukDyDtMO7crjUZhwpyrWBFroq+IqRe6VnJkTpRAS6nhDvf0w+wHmxg=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.css" integrity="sha512-DIW4FkYTOxjCqRt7oS9BFO+nVOwDL4bzukDyDtMO7crjUZhwpyrWBFroq+IqRe6VnJkTpRAS6nhDvf0w+wHmxg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js"
-      integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    ></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js" integrity="sha512-Zq9o+E00xhhR/7vJ49mxFNJ0KQw1E1TMWkPTxrWcnpfEFDEXgUiwJHIKit93EW/XxE31HSI5GEOW06G6BF1AtA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  
   <style>
     .login-box {
-      width: 500px;
+      width: 100%;
+      max-width: 400px;
+      margin: 7% auto;
     }
     .login-card-body {
-      font-size: 1.2rem;
+      font-size: 1rem;
     }
-    .login-logo a {
-      font-size: 2.5rem;
-      font-weight: bold;
-      color: #007bff;
-    }
-    .login-logo a b {
-      color: #28a745;
+    .login-logo img {
+      width: 80%;
+      max-width: 300px;
     }
     .input-group-text {
-      font-size: 1.5rem;
+      font-size: 1rem;
     }
     .btn-primary {
       background-color: #007bff;
       border-color: #007bff;
+    }
+    @media (min-width: 768px) {
+      .login-box {
+        width: 500px;
+      }
+      .login-card-body {
+        font-size: 1.2rem;
+      }
+      .input-group-text {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </head>
 <body class="hold-transition login-page">
 <div class="login-box">
   <div class="login-logo">
-    <img
-            src="{% static 'lib/adminlte/img/Logo_Multiauto.png' %}"
-            width="300px"
-            alt="AdminLTE Logo"
-            
-          />
+    <img src="{% static 'lib/adminlte/img/Logo_Multiauto.png' %}" alt="AdminLTE Logo"/>
   </div>
   <!-- /.login-logo -->
   <div class="card">
     <div class="card-body login-card-body ">
-    <p class="login-box-msg"> Inicar Sesión </p>
+      <p class="login-box-msg"> Iniciar Sesión </p>
 
       <form action="/login/" method="post">
         {% csrf_token %}
@@ -103,7 +97,7 @@
       </form>
 
       <p class="mb-1">
-        <a href="#">❓ Si olvidaste tu contraseña acercate a administración</a>
+        <a href="#">❓ Si olvidaste tu contraseña acércate a administración</a>
       </p>
      
     </div>
@@ -111,7 +105,8 @@
   </div>
 </div>
 <!-- /.login-box -->
-    {% if messages %} {% for message in messages %}
+{% if messages %}
+  {% for message in messages %}
     <script type="text/javascript">
       iziToast.{{ message.tags }}({
           title: '{{ message.tags|title }}: ',
@@ -119,7 +114,8 @@
           position: 'topRight'
       });
     </script>
-    {% endfor %} {% endif %}
+  {% endfor %}
+{% endif %}
 <!-- jQuery -->
 <script src="{% static 'lib/adminlte/plugins/jquery/jquery.min.js' %}"></script>
 <!-- Bootstrap 4 -->

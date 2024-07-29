@@ -75,7 +75,8 @@
                 <div class="card-body">
                   <div class="form-group">
                     <label for="servicios" class="form-label">Servicios:</label>
-                    <table class="table table-bordered">
+                    <div class="table-responsive">
+                      <table class="table table-bordered">
                       <thead>
                         <tr>
                           <th>Servicio</th>
@@ -108,6 +109,7 @@
                         {% endfor %}
                       </tbody>
                     </table>
+                    </div>
                     <button type="button" class="btn btn-success mt-2" onclick="addRow()">Agregar Servicio</button>
                   </div>
                   <div class="form-group">
