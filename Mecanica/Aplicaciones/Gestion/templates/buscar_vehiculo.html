@@ -7,7 +7,7 @@
     <title>Buscar Vehículo</title>
     <link rel="stylesheet" href="{% static 'lib/adminlte/dist/css/adminlte.min.css' %}">
     <style>
-        .pendiente { background-color: yellow; }
+        .pendiente { background-color: red; }
         .en-progreso { background-color: orange; }
         .esperando-repuestos { background-color: lightblue; }
         .completada { background-color: green; }
@@ -18,7 +18,7 @@
         <h1>Buscar Vehículo</h1>
         <form method="GET" action="{% url 'buscar_vehiculo' %}">
             <div class="input-group mb-3">
-                <input type="text" name="q" class="form-control" placeholder="Buscar por placa" value="{{ query }}">
+                <input type="text" name="q" class="form-control" placeholder="Buscar por cédula o placa" value="{{ query }}">
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="submit">Buscar</button>
                 </div>
@@ -33,7 +33,7 @@
                 {% endfor %}
             </ul>
         {% elif query %}
-            <p>No se encontraron vehículos con esa placa.</p>
+            <p>No se encontraron vehículos .</p>
         {% endif %}
 
         {% if ordenes %}

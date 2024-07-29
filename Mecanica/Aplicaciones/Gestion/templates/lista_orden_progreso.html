@@ -49,9 +49,9 @@
                 {% endfor %}
               </div>
             {% else %}
-                           <div class="alert alert-warning" role="alert">
- <i class="fas fa-exclamation"></i> No existen ordenes en progreso .
-</div>
+              <div class="alert alert-warning" role="alert">
+                <i class="fas fa-exclamation"></i> No existen ordenes en progreso.
+              </div>
             {% endif %}
           </div>
           <!-- /.card-body -->
@@ -90,7 +90,7 @@
   function cambiarEstadoOrden(id_ord, nuevo_estado) {
     var form = document.createElement('form');
     form.method = 'POST';
-    form.action = '{% url "cambiar_estado_orden" id_ord=0 nuevo_estado=0 %}'.replace('0', id_ord).replace('0', nuevo_estado);
+    form.action = '/cambiar_estado_orden/' + id_ord + '/' + nuevo_estado + '/';
     var csrfToken = document.createElement('input');
     csrfToken.type = 'hidden';
     csrfToken.name = 'csrfmiddlewaretoken';

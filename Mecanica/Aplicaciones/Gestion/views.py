@@ -55,9 +55,9 @@ def home(request):
     ordenes_por_mes = Orden.objects.filter(is_deleted=False).annotate(month=ExtractMonth('fecha_ord')).values('month').annotate(total=Count('id_ord')).order_by('month')
 
     
-    ordenes_pendientes_count = Orden.objects.filter(estado_ord='PENDIENTE', is_deleted=False).count()
-    ordenes_completadas_count = Orden.objects.filter(estado_ord='COMPLETADA', is_deleted=False).count()
-    ordenes_finalizadas_count = Orden.objects.filter(estado_ord='FINALIZADA', is_deleted=False).count()
+    ordenes_pendientes_count = Orden.objects.filter(estado_ord='PENDIENTE', ).count()
+    ordenes_completadas_count = Orden.objects.filter(estado_ord='COMPLETADA', ).count()
+    ordenes_finalizadas_count = Orden.objects.filter(estado_ord='FINALIZADA',).count()
     top_servicios_usados = OrdenServicio.objects.filter(
         servicio_id__is_deleted=False
     ).values('servicio_id__nombre_ser').annotate(total=Count('servicio_id')).order_by('-total')[:5]
@@ -113,7 +113,7 @@ def home2(request):
     return render(request,'prueba.html',context)
 
 @admin_required
-def index(request):
+def index1(request):
     usuarios = Usuario.objects.filter(is_deleted=False)
     return render(request, 'listaUsuarios.html', {'usuarios': usuarios})
 
@@ -171,7 +171,7 @@ def registrarUsuario(request):
             usuario.save()
             
             messages.success(request, 'Usuario guardado correctamente')
-            return redirect('index')
+            return redirect('index1')
 
         except IntegrityError as e:
             if 'username' in str(e):
@@ -224,7 +224,7 @@ def actualizarUsuario(request, id_usr):
             usuario.save()
 
             messages.success(request, 'Usuario actualizado correctamente')
-            return redirect('index')
+            return redirect('index1')
 
         except IntegrityError as e:
             if 'username' in str(e):
@@ -261,7 +261,7 @@ def eliminarUsuario(request, id,permanent= False):
     except Exception as e:
         messages.error(request, f'Ocurrió un error al eliminar el usuario: {str(e)}')
     
-    return redirect('index')
+    return redirect('index1')
 
 
 # Gestion de Clientes
@@ -415,7 +415,7 @@ def registrarServicio(request):
     if request.method == 'POST':
         nombre = request.POST['nombre_ser'].strip().upper()
         descripcion = request.POST['descripcion_ser'].upper()
-        precio = request.POST['precio_ser']
+        precio = request.POST.get('precio_ser').replace(',', '.')
 
         try:
             if Servicio.objects.filter(nombre_ser=nombre).exists():
@@ -470,7 +470,7 @@ def actualizarServicio(request):
             servicio = Servicio.objects.get(id_ser=servicio_id)
             servicio.nombre_ser = request.POST['nombre_ser'].strip().upper()
             servicio.descripcion_ser = request.POST['descripcion_ser'].upper()
-            servicio.precio_ser = request.POST['precio_ser']
+            servicio.precio_ser = request.POST['precio_ser'].replace(',','.')
             servicio.save()
             messages.success(request, 'Servicio actualizado correctamente')
         except IntegrityError:
@@ -1411,15 +1411,21 @@ def listar_ordenes_completadas(request):
     return render(request, 'lista_ordenes_f.html', {'ordenes': ordenes_completadas})
 
 
+
 def buscar_vehiculo(request):
     query = request.GET.get('q')
-    vehiculos = None
-    ordenes = None
+    vehiculos = []
+    ordenes = []
     if query:
-        vehiculos = Vehiculo.objects.filter(placa_veh__icontains=query, is_deleted=False)
-        ordenes = Orden.objects.filter(vehiculo_id__placa_veh__icontains=query).exclude(estado_ord='FINALIZADA')
+        clientes = Cliente.objects.filter(ci_cli__icontains=query)
+        if clientes.exists():
+            vehiculos = Vehiculo.objects.filter(cli_id__in=clientes)
+            ordenes = Orden.objects.filter(vehiculo_id__in=vehiculos).exclude(estado_ord='FINALIZADA')
+        else:
+            vehiculos = Vehiculo.objects.filter(placa_veh__icontains=query)
+            ordenes = Orden.objects.filter(vehiculo_id__placa_veh__icontains=query).exclude(estado_ord='FINALIZADA')
     
-    return render(request, 'buscar_vehiculo.html', {
+    return render(request, 'principal.html', {
         'vehiculos': vehiculos,
         'ordenes': ordenes,
         'query': query,
@@ -1436,3 +1442,7 @@ def obtener_nombres_repuestos(request):
             'precio': repuesto['precio_rep'],
         })
     return JsonResponse(results, safe=False)
+
+
+def index(request):
+    return render(request,'principal.html')

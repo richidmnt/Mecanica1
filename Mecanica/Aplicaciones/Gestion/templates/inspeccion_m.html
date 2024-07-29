@@ -12,7 +12,7 @@
             <form id="daniosForm" method="post" action="/guardarDaniosM/">
               {% csrf_token %}
               <div class="form-group">
-                <input type="text" name="orden" value="{{orden.id_ord}}">
+                <input type="hidden" name="orden" value="{{orden.id_ord}}">
                 <h3 class=""><i class="fas fa-file-alt"></i> ORDEN: {{ orden.numero_ord }}</h3>
                       <p><strong><i class="fas fa-car-side"></i>Datos del Vehículo:</strong></p>
                       <ul>
@@ -193,9 +193,6 @@
                 <button type="submit" class="btn btn-primary">
                   Guardar Daños
                 </button>
-                <a href="{% url 'ordenesM' %}" class="btn btn-danger ml-2"
-                  >Cancelar</a
-                >
               </div>
             </form>
           </div>
