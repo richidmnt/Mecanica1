@@ -100,39 +100,47 @@
 
 <script>
   function actualizar() {
-    iziToast.question({
-      timeout: 15000,
-      close: true,
-      overlay: true,
-      displayMode: "once",
-      id: "question",
-      zindex: 999,
-      title: "Confirmación",
-      message: "¿Está seguro de actualizar la información del usuario?",
-      position: "center",
-      buttons: [
-        [
-          "<button><b>SI</b></button>",
-          function (instance, toast) {
-            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
-            document.getElementById('usuarioForm').submit();
-          },
-          true,
+    if ($("#usuarioForm").valid()) {
+      iziToast.question({
+        timeout: 15000,
+        close: true,
+        overlay: true,
+        displayMode: "once",
+        id: "question",
+        zindex: 999,
+        title: "Confirmación",
+        message: "¿Está seguro de actualizar la información de la inspección?",
+        position: "center",
+        buttons: [
+          [
+            "<button><b>SI</b></button>",
+            function (instance, toast) {
+              instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+              document.getElementById('usuarioForm').submit();
+            },
+            true,
+          ],
+          [
+            "<button>NO</button>",
+            function (instance, toast) {
+              instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+            },
+          ],
         ],
-        [
-          "<button>NO</button>",
-          function (instance, toast) {
-            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
-          },
-        ],
-      ],
-      onClosing: function (instance, toast, closedBy) {
-        console.info("Closing | closedBy: " + closedBy);
-      },
-      onClosed: function (instance, toast, closedBy) {
-        console.info("Closed | closedBy: " + closedBy);
-      },
-    });
+        onClosing: function (instance, toast, closedBy) {
+          console.info("Closing | closedBy: " + closedBy);
+        },
+        onClosed: function (instance, toast, closedBy) {
+          console.info("Closed | closedBy: " + closedBy);
+        },
+      });
+    } else {
+      iziToast.error({
+        title: 'Error',
+        message: 'Por favor, corrija los errores en el formulario.',
+        position: 'topRight'
+      });
+    }
   }
 </script>
 <script>

@@ -1,4 +1,5 @@
-{% extends "./index.html" %} {% block body %}
+{% extends "./index.html" %}
+{% block body %}
 <section class="content">
   <div class="container-fluid">
     <div class="row justify-content-center">
@@ -12,109 +13,46 @@
                     <h2 class="card-title text-center">Registrar Vehículo</h2>
                   </div>
                   <div class="card-body">
-                    <form
-                      id="vehiculoForm"
-                      method="post"
-                      action="/registrarVehiculo/"
-                    >
+                    <form id="vehiculoForm" method="post" action="/registrarVehiculo/">
                       {% csrf_token %}
                       <div class="form-row">
                         <div class="form-group col-md-6">
-                          <label for="marca_veh" class="form-label"
-                            >Marca:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="marca_veh"
-                            name="marca_veh"
-                            required
-                          />
+                          <label for="marca_veh" class="form-label">Marca:</label>
+                          <input type="text" class="form-control" id="marca_veh" name="marca_veh" required />
                         </div>
                         <div class="form-group col-md-6">
-                          <label for="modelo_veh" class="form-label"
-                            >Modelo:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="modelo_veh"
-                            name="modelo_veh"
-                            required
-                          />
+                          <label for="modelo_veh" class="form-label">Modelo:</label>
+                          <input type="text" class="form-control" id="modelo_veh" name="modelo_veh" required />
                         </div>
                       </div>
                       <div class="form-row">
                         <div class="form-group col-md-6">
-                          <label for="placa_veh" class="form-label"
-                            >Placa:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="placa_veh"
-                            name="placa_veh"
-                            required
-                          />
+                          <label for="placa_veh" class="form-label">Placa:</label>
+                          <input type="text" class="form-control" id="placa_veh" name="placa_veh" required />
                         </div>
                         <div class="form-group col-md-6">
                           <label for="anio_veh" class="form-label">Año:</label>
-                          <input
-                            type="number"
-                            class="form-control"
-                            id="anio_veh"
-                            name="anio_veh"
-                            required
-                          />
+                          <input type="number" class="form-control" id="anio_veh" name="anio_veh" required />
                         </div>
                       </div>
                       <div class="form-row">
-                      
                         <div class="form-group col-md-6">
-                          <label for="color_veh" class="form-label"
-                            >Color:</label
-                          >
-                          <input
-                            type="text"
-                            class="form-control"
-                            id="color_veh"
-                            name="color_veh"
-                            required
-                          />
+                          <label for="color_veh" class="form-label">Color:</label>
+                          <input type="text" class="form-control" id="color_veh" name="color_veh" required />
                         </div>
-                         <div class="form-group col-md-6">
-                           <label for="cli_id" class="form-label"
-                            >Cliente:</label
-                          >
-                          <select
-                            class="form-control"
-                            id="id_cli"
-                            name="id_cli"
-                            required
-                          >
+                        <div class="form-group col-md-6">
+                          <label for="cli_id" class="form-label">Cliente:</label>
+                          <select class="form-control" id="id_cli" name="id_cli" required>
                             <option value="">Seleccione un cliente</option>
                             {% for cliente in clientes %}
-                            <option value="{{ cliente.id_cli }}">
-                              {{ cliente.ci_cli }}
-                            </option>
+                            <option value="{{ cliente.id_cli }}">{{ cliente.ci_cli }}</option>
                             {% endfor %}
                           </select>
                         </div>
                       </div>
-                      <div class="form-row">
-                        <div class="form-group col-md-12">
-                          
-                        </div>
-                      </div>
                       <div class="d-flex justify-content-start mt-3">
-                        <button type="submit" class="btn btn-primary">
-                          Registrar Vehículo
-                        </button>
-                        <a
-                          href="{% url 'listaVehiculos' %}"
-                          class="btn btn-danger ml-2"
-                          >Cancelar</a
-                        >
+                        <button type="submit" class="btn btn-primary">Registrar Vehículo</button>
+                        <a href="{% url 'listaVehiculos' %}" class="btn btn-danger ml-2">Cancelar</a>
                       </div>
                     </form>
                   </div>
@@ -128,30 +66,56 @@
     </div>
   </div>
 </section>
-
-{% endblock %} {% block extra_scripts %}
+{% endblock %}
+{% block extra_scripts %}
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script>
   $(document).ready(function () {
+    const currentYear = new Date().getFullYear();
+    const maxYear = currentYear + 1;
+
+    function setupAutocomplete(selector, url) {
+      $(selector).autocomplete({
+        source: function(request, response) {
+          $.ajax({
+            url: url,
+            dataType: "json",
+            data: {
+              term: request.term
+            },
+            success: function(data) {
+              response(data);
+            }
+          });
+        },
+        minLength: 2,
+      });
+    }
+
+    setupAutocomplete("#marca_veh", "{% url 'obtener_marcas' %}");
+    setupAutocomplete("#modelo_veh", "{% url 'obtener_modelos' %}");
+    setupAutocomplete("#color_veh", "{% url 'obtener_colores' %}");
+
     $.validator.addMethod(
-    "lettersonly",
-    function (value, element) {
-      return this.optional(element) || /^[a-zA-Z\s]+$/i.test(value);
-    },
-    "Por favor, ingresa solo letras"
-  );
-    // Añadir método de validación para la placa ecuatoriana
+      "lettersonly",
+      function (value, element) {
+        return this.optional(element) || /^[a-zA-Z\s]+$/i.test(value);
+      },
+      "Por favor, ingresa solo letras"
+    );
+
     $.validator.addMethod("placaEcuador", function (value, element) {
       return this.optional(element) || /^[A-Z]{3}-\d{3,4}$|^[A-Z]{1}\d{3}-[A-Z]{2}$/.test(value);
     }, "Por favor ingrese una placa válida (ej. ABC-1234 o P123-AB)");
 
-    // Validación del formulario utilizando jQuery Validation
     $("#vehiculoForm").validate({
       rules: {
         marca_veh: {
           required: true,
           minlength: 3,
-          maxlength:30,
-          lettersonly:true
+          maxlength: 30,
+          lettersonly: true
         },
         modelo_veh: {
           required: true,
@@ -165,19 +129,14 @@
         anio_veh: {
           required: true,
           digits: true,
-          minlength: 4,
-          maxlength: 4,
-        },
-        chasis_veh: {
-          required: true,
-          minlength: 17,
-          maxlength:17
+          min: 1900,
+          max: maxYear,
         },
         color_veh: {
           required: true,
           minlength: 4,
           maxlength: 25,
-          lettersonly:true
+          lettersonly: true
         },
         id_cli: {
           required: true,
@@ -187,8 +146,8 @@
         marca_veh: {
           required: "Por favor, ingresa la marca del vehículo",
           minlength: "La marca debe tener al menos 3 caracteres",
-          maxlength:"La marca debe tener máximo 30 caracteres",
-          lettersonly:"Por favor, ingresa solo letras"
+          maxlength: "La marca debe tener máximo 30 caracteres",
+          lettersonly: "Por favor, ingresa solo letras"
         },
         modelo_veh: {
           required: "Por favor, ingresa el modelo del vehículo",
@@ -201,19 +160,14 @@
         anio_veh: {
           required: "Por favor, ingresa el año del vehículo",
           digits: "Por favor, ingresa solo números",
-          minlength: "El año debe tener 4 dígitos",
-          maxlength: "El año debe tener 4 dígitos",
-        },
-        chasis_veh: {
-          required: "Por favor, ingresa el chasis del vehículo",
-          minlength: "El chasis debe tener  17 caracteres",
-          maxlength:"El chasis debe tener  17 caracteres",
+          min: "El año debe ser 1900 o posterior",
+          max: `El año debe ser ${maxYear} o anterior`,
         },
         color_veh: {
           required: "Por favor, ingresa el color del vehículo",
           minlength: "El color debe tener al menos 3 caracteres",
-          maxlength:"El color debe tener al menos 25 caracteres",
-          lettersonly:"Por favor, ingresa solo letras"
+          maxlength: "El color debe tener al menos 25 caracteres",
+          lettersonly: "Por favor, ingresa solo letras"
         },
         id_cli: {
           required: "Por favor, selecciona un cliente",
@@ -231,15 +185,11 @@
         $(element).removeClass("is-invalid").addClass("is-valid");
       },
     });
+
+    $("#id_cli").select2({
+      allowClear: true,
+      placeholder: "Seleccione el cliente"
+    });
   });
-</script>
-<script>
-        $(document).ready(function () {
-            // Configuración de Select2
-            $("#id_cli").select2({
-                allowClear: true,
-                placeholder: "Seleccione el cliente"
-            });
-        });
 </script>
 {% endblock %}

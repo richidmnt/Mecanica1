@@ -50,15 +50,13 @@
                             {% endfor %}
                           </select>
                         </div>
-                        
                       </div>
                       <div class="form-row">
                         <div class="form-group col-md-12">
-                          
+                          <script>
+                            document.getElementById("id_cli").value="{{vehiculo.cli_id.id_cli}}";
+                          </script>
                         </div>
-                        <script>
-                          document.getElementById("id_cli").value="{{vehiculo.cli_id.id_cli}}";
-                        </script>
                       </div>
                       <div class="d-flex justify-content-start mt-3">
                         <button type="button"  onclick="actualizar()"  class="btn btn-primary">Actualizar Vehículo</button>
@@ -78,65 +76,99 @@
 </section>
 {% endblock %}
 {% block extra_scripts %}
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script>
   function actualizar() {
-    iziToast.question({
-      timeout: 15000,
-      close: true,
-      overlay: true,
-      displayMode: "once",
-      id: "question",
-      zindex: 999,
-      title: "Confirmación",
-      message: "¿Está seguro de actualizar la información del vehículo?",
-      position: "center",
-      buttons: [
-        [
-          "<button><b>SI</b></button>",
-          function (instance, toast) {
-            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
-            document.getElementById('vehiculoForm').submit();
-          },
-          true,
+    if ($("#vehiculoForm").valid()) {
+      iziToast.question({
+        timeout: 15000,
+        close: true,
+        overlay: true,
+        displayMode: "once",
+        id: "question",
+        zindex: 999,
+        title: "Confirmación",
+        message: "¿Está seguro de actualizar la información de la inspección?",
+        position: "center",
+        buttons: [
+          [
+            "<button><b>SI</b></button>",
+            function (instance, toast) {
+              instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+              document.getElementById('vehiculoForm').submit();
+            },
+            true,
+          ],
+          [
+            "<button>NO</button>",
+            function (instance, toast) {
+              instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+            },
+          ],
         ],
-        [
-          "<button>NO</button>",
-          function (instance, toast) {
-            instance.hide({ transitionOut: "fadeOut" }, toast, "button");
-          },
-        ],
-      ],
-      onClosing: function (instance, toast, closedBy) {
-        console.info("Closing | closedBy: " + closedBy);
-      },
-      onClosed: function (instance, toast, closedBy) {
-        console.info("Closed | closedBy: " + closedBy);
-      },
-    });
+        onClosing: function (instance, toast, closedBy) {
+          console.info("Closing | closedBy: " + closedBy);
+        },
+        onClosed: function (instance, toast, closedBy) {
+          console.info("Closed | closedBy: " + closedBy);
+        },
+      });
+    } else {
+      iziToast.error({
+        title: 'Error',
+        message: 'Por favor, corrija los errores en el formulario.',
+        position: 'topRight'
+      });
+    }
   }
-</script>
-<script>
+
+
   $(document).ready(function () {
+    const currentYear = new Date().getFullYear();
+    const maxYear = currentYear + 1;
+
+    function setupAutocomplete(selector, url) {
+      $(selector).autocomplete({
+        source: function(request, response) {
+          $.ajax({
+            url: url,
+            dataType: "json",
+            data: {
+              term: request.term
+            },
+            success: function(data) {
+              response(data);
+            }
+          });
+        },
+        minLength: 2,
+      });
+    }
+
+    setupAutocomplete("#marca_veh", "{% url 'obtener_marcas' %}");
+    setupAutocomplete("#modelo_veh", "{% url 'obtener_modelos' %}");
+    setupAutocomplete("#color_veh", "{% url 'obtener_colores' %}");
+
     $.validator.addMethod(
-    "lettersonly",
-    function (value, element) {
-      return this.optional(element) || /^[a-zA-Z\s]+$/i.test(value);
-    },
-    "Por favor, ingresa solo letras"
-  );
-    // Añadir método de validación para la placa ecuatoriana
+      "lettersonly",
+      function (value, element) {
+        return this.optional(element) || /^[a-zA-Z\s]+$/i.test(value);
+      },
+      "Por favor, ingresa solo letras"
+    );
+
     $.validator.addMethod("placaEcuador", function (value, element) {
       return this.optional(element) || /^[A-Z]{3}-\d{3,4}$|^[A-Z]{1}\d{3}-[A-Z]{2}$/.test(value);
     }, "Por favor ingrese una placa válida (ej. ABC-1234 o P123-AB)");
 
-    // Validación del formulario utilizando jQuery Validation
     $("#vehiculoForm").validate({
       rules: {
         marca_veh: {
           required: true,
           minlength: 3,
-          maxlength:30,
-          lettersonly:true
+          maxlength: 30,
+          lettersonly: true
         },
         modelo_veh: {
           required: true,
@@ -150,21 +182,16 @@
         anio_veh: {
           required: true,
           digits: true,
-          minlength: 4,
-          maxlength: 4,
-        },
-        chasis_veh: {
-          required: true,
-          minlength: 17,
-          maxlength:17
+          min: 1900,
+          max: maxYear,
         },
         color_veh: {
           required: true,
           minlength: 4,
           maxlength: 25,
-          lettersonly:true
+          lettersonly: true
         },
-        id_cli: {
+        cli_id: {
           required: true,
         },
       },
@@ -172,8 +199,8 @@
         marca_veh: {
           required: "Por favor, ingresa la marca del vehículo",
           minlength: "La marca debe tener al menos 3 caracteres",
-          maxlength:"La marca debe tener máximo 30 caracteres",
-          lettersonly:"Por favor, ingresa solo letras"
+          maxlength: "La marca debe tener máximo 30 caracteres",
+          lettersonly: "Por favor, ingresa solo letras"
         },
         modelo_veh: {
           required: "Por favor, ingresa el modelo del vehículo",
@@ -186,21 +213,16 @@
         anio_veh: {
           required: "Por favor, ingresa el año del vehículo",
           digits: "Por favor, ingresa solo números",
-          minlength: "El año debe tener 4 dígitos",
-          maxlength: "El año debe tener 4 dígitos",
-        },
-        chasis_veh: {
-          required: "Por favor, ingresa el chasis del vehículo",
-          minlength: "El chasis debe tener  17 caracteres",
-          maxlength:"El chasis debe tener  17 caracteres",
+          min: "El año debe ser 1900 o posterior",
+          max: `El año debe ser ${maxYear} o anterior`,
         },
         color_veh: {
           required: "Por favor, ingresa el color del vehículo",
           minlength: "El color debe tener al menos 3 caracteres",
-          maxlength:"El color debe tener al menos 25 caracteres",
-          lettersonly:"Por favor, ingresa solo letras"
+          maxlength: "El color debe tener al menos 25 caracteres",
+          lettersonly: "Por favor, ingresa solo letras"
         },
-        id_cli: {
+        cli_id: {
           required: "Por favor, selecciona un cliente",
         },
       },
@@ -216,15 +238,11 @@
         $(element).removeClass("is-invalid").addClass("is-valid");
       },
     });
+
+    $("#id_cli").select2({
+      allowClear: true,
+      placeholder: "Seleccione el cliente"
+    });
   });
-</script>
-<script>
-        $(document).ready(function () {
-            // Configuración de Select2
-            $("#id_cli").select2({
-                allowClear: true,
-                placeholder: "Seleccione el cliente"
-            });
-        });
 </script>
 {% endblock %}

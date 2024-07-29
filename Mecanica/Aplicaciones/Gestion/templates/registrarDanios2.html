@@ -13,7 +13,7 @@
               {% csrf_token %}
               <div class="form-group">
                 <label for="" class="form-label">Elija una orden</label>
-                <select name="orden" id="orden_id" class="form-control">
+                <select name="orden" id="orden_id" class="form-control" required>
                   <option value="">Seleccione una orden</option>
                   {% for orden in ordenes %}
                   <option value="{{ orden.id_ord }}">
@@ -347,5 +347,50 @@
                 
             });
         });
+</script>
+<script>
+  $(document).ready(function () {
+    // Configuración de Select2
+    $("#orden_id").select2({
+      allowClear: true,
+    });
+
+    // Configuración de la validación del formulario
+    $("#daniosForm").validate({
+      rules: {
+        orden: {
+          required:true,
+        },
+        km: {
+          required: true,
+          digits: true,
+          min: 1,
+          max: 300000,
+        },
+      },
+      messages: {
+        orden: {
+          required:"Por favor, seleccione una orden",
+        },
+        km: {
+          required: "Por favor, ingresa el kilometraje del vehículo",
+          digits: "Por favor, ingresa solo números",
+          min: "El kilometraje debe ser al menos 1",
+          max: "El kilometraje no debe ser más de 300,000",
+        },
+      },
+      errorElement: "span",
+      errorPlacement: function (error, element) {
+        error.addClass("invalid-feedback");
+        element.closest(".form-group").append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass("is-invalid").removeClass("is-valid");
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass("is-invalid").addClass("is-valid");
+      },
+    });
+  });
 </script>
 {% endblock %}

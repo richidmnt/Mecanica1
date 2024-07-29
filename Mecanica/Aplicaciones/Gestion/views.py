@@ -1440,6 +1440,24 @@ def obtener_nombres_repuestos(request):
         })
     return JsonResponse(results, safe=False)
 
+def obtener_marcas(request):
+    term = request.GET.get('term', '')
+    marcas = Vehiculo.objects.filter(marca_veh__icontains=term).values('marca_veh').distinct()[:10]
+    results = [marca['marca_veh'] for marca in marcas]
+    return JsonResponse(results, safe=False)
+
+def obtener_modelos(request):
+    term = request.GET.get('term', '')
+    modelos = Vehiculo.objects.filter(modelo_veh__icontains=term).values('modelo_veh').distinct()[:10]
+    results = [modelo['modelo_veh'] for modelo in modelos]
+    return JsonResponse(results, safe=False)
+
+def obtener_colores(request):
+    term = request.GET.get('term', '')
+    colores = Vehiculo.objects.filter(color_veh__icontains=term).values('color_veh').distinct()[:10]
+    results = [color['color_veh'] for color in colores]
+    return JsonResponse(results, safe=False)
+
 
 def index(request):
     return render(request,'principal.html')
