@@ -15,72 +15,62 @@
     <link rel="stylesheet" href="{% static 'lib/principal/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'lib/principal/css/swiper.min.css' %}">
     <style>
-    .section-title h5 {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 15px;
-    color: #333;
-}
-
-.section-title h2 {
-    font-size: 36px;
-    font-weight: 700;
-    margin-bottom: 30px;
-    color: #333;
-}
-
-.resultados h2 {
-    font-size: 24px;
-    font-weight: 600;
-    margin-top: 30px;
-    margin-bottom: 20px;
-    color: #333;
-}
-
-.card-header {
-    font-weight: bold;
-}
-
-.card-body p {
-    margin: 0;
-}
-
-.card-footer .badge {
-    font-size: 16px;
-    padding: 10px;
-    width: 100%;
-    text-align: center;
-    border-radius: 0;
-}
-
-.badge-warning {
-    background-color: #ffc107;
-}
-
-.badge-primary {
-    background-color: #007bff;
-}
-
-.badge-danger {
-    background-color: #dc3545;
-}
-
-.badge-success {
-    background-color: #28a745;
-}
-
-</style>
+        .section-title h5 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .section-title h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        .resultados h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .card-header {
+            font-weight: bold;
+        }
+        .card-body p {
+            margin: 0;
+        }
+        .card-footer .badge {
+            font-size: 16px;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            border-radius: 0;
+        }
+        .badge-warning {
+            background-color: #ffc107;
+        }
+        .badge-primary {
+            background-color: #007bff;
+        }
+        .badge-danger {
+            background-color: #dc3545;
+        }
+        .badge-success {
+            background-color: #28a745;
+        }
+    </style>
 </head>
 <body>
     <div class="preloader" id="zr-theme-preloader" style="display: none;">
-		<div class="preloader-wapper">
-			<div>
-				<div class="spinner-loader">
+        <div class="preloader-wapper">
+            <div>
+                <div class="spinner-loader">
                     <div></div>
                 </div>
-			</div>
-		</div>
-	</div>
+            </div>
+        </div>
+    </div>
     <header id="zr-theme-menu" class="zr-theme-menu-header-navber-area">
         <div class="nav-top-bar">
             <div class="container">
@@ -97,19 +87,20 @@
         <nav class="navbar navbar-b navbar-expand-lg navbar-reduce" id="mainNav">
             <div class="container">
                 <a class="navbar-brand js-scroll" href="">
-				<img src="{% static 'lib/principal/images/logo2.png' %}" class="white-logo" alt="logo">
-				<img src="{% static 'lib/principal/images/logo2.png' %}" class="black-logo" alt="logo">
-			</a>
-            <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarDefault" aria-controls="navbarDefault" aria-expanded="false" aria-label="Toggle navigation"> <span></span>  <span></span>  <span></span> 
-			</button>
+                    <img src="{% static 'lib/principal/images/logo2.png' %}" class="white-logo" alt="logo">
+                    <img src="{% static 'lib/principal/images/logo2.png' %}" class="black-logo" alt="logo">
+                </a>
+                <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#navbarDefault" aria-controls="navbarDefault" aria-expanded="false" aria-label="Toggle navigation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
                 <div class="navbar-collapse collapse justify-content-end" id="navbarDefault">
                     <ul class="navbar-nav">
                         <li class="nav-item"><a class="nav-link js-scroll active" href="#slider-home">Inicio</a></li>
-                        <!-- <li class="nav-item"><a class="nav-link js-scroll" href="#about">About</a></li> -->
                         <li class="nav-item"><a class="nav-link js-scroll" href="#services">Servicios</a></li>
                         <li class="nav-item"><a class="nav-link js-scroll" href="#buscar-vehiculo">Consultas</a></li>
                         <li class="nav-item"><a class="nav-link js-scroll" href="#gallery">Galeria</a></li>
-                        <!-- <li class="nav-item"><a class="nav-link js-scroll" href="#review">Testimonials</a></li> -->
                         <li class="nav-item"><a class="nav-link js-scroll" href="#blog">Nosotros</a></li>
                         <li class="nav-item"><a class="nav-link js-scroll" href="#contact">Contacto</a></li>
                         <li class="nav-item book-now"><a class="nav-link js-scroll" href="{% url 'login' %}">Ingresar</a></li>
@@ -248,69 +239,62 @@
             </div>
         </div>
     </section>
-<section id="buscar-vehiculo" class="section-padding bg-grey">
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-lg-12 col-md-12">
-                <div class="section-title">
-                    <h5>Consulta el estado de la orden de tu vehículo</h5>
-                    <h2>Consultas</h2>
-                </div>
-            </div>
-        </div>
-        <h1>Estado de la orden</h1>
-        <form method="GET" action="{% url 'buscar_vehiculo' %}#buscar-vehiculo">
-            <div class="input-group mb-3">
-                <input type="text" name="q" class="form-control" placeholder="Ingrese su número de Cédula" value="{{ query }}">
-                <div class="input-group-append">
-                    <button class="btn btn-primary" type="submit">Buscar</button>
-                </div>
-            </div>
-        </form>
-
-        {% if vehiculos %}
-            <div class="resultados">
-                <h2>Resultados de búsqueda</h2>
-               
-            </div>
-        {% elif query %}
-            <p class="alert alert-warning">No se encontraron vehículos.</p>
-        {% endif %}
-
-        {% if ordenes %}
-
+    <section id="buscar-vehiculo" class="section-padding bg-grey">
+        <div class="container mt-5">
             <div class="row">
-                {% for orden in ordenes %}
-                    <div class="col-md-4">
-                        <div class="card mb-3 {% if orden.estado_ord == 'PENDIENTE' %}border-danger{% elif orden.estado_ord == 'EN_PROGRESO' %}border-warning{% elif orden.estado_ord == 'ESPERANDO_REPUESTOS' %}border-primary{% elif orden.estado_ord == 'COMPLETADA' %}border-success{% endif %}">
-                            <div class="card-header {% if orden.estado_ord == 'PENDIENTE' %}bg-danger{% elif orden.estado_ord == 'EN_PROGRESO' %}bg-warning{% elif orden.estado_ord == 'ESPERANDO_REPUESTOS' %}bg-primary{% elif orden.estado_ord == 'COMPLETADA' %}bg-success{% endif %} text-white">
-                                <i class="fa fa-clipboard"></i> ORDEN: {{ orden.numero_ord }}
-                            </div>
-                            <div class="card-body">
-                                <p><strong><i class="fa fa-user"></i> Datos del Cliente:</strong></p>
-                                <p>Nombre: {{ orden.vehiculo_id.cli_id.nombre_cli }}</p>
-                                <p>Apellido: {{ orden.vehiculo_id.cli_id.apellido_cli }}</p>
-                                <p>Cédula: {{ orden.vehiculo_id.cli_id.ci_cli }}</p>
-                                <p><strong><i class="fa fa-car"></i> Datos del Vehículo:</strong></p>
-                                <p>Placa: {{ orden.vehiculo_id.placa_veh }}</p>
-                                <p>Marca: {{ orden.vehiculo_id.marca_veh }}</p>
-                                <p>Modelo: {{ orden.vehiculo_id.modelo_veh }}</p>
-                               
-                                <p><strong><i class="fa fa-calendar"></i> Fecha de la Orden:</strong></p>
-                                <p>{{ orden.fecha_ord }}</p>
-                            </div>
-                            <div class="card-footer text-center">
-                                <span class="badge {% if orden.estado_ord == 'PENDIENTE' %}badge-danger{% elif orden.estado_ord == 'EN_PROGRESO' %}badge-warning{% elif orden.estado_ord == 'ESPERANDO_REPUESTOS' %}badge-primary{% elif orden.estado_ord == 'COMPLETADA' %}badge-success{% endif %}">
-                                    {{ orden.get_estado_ord_display }}
-                                </span>
-                            </div>
-                        </div>
+                <div class="col-lg-12 col-md-12">
+                    <div class="section-title">
+                        <h5>Consulta el estado de la orden de tu vehículo</h5>
+                        <h2>Consultas</h2>
                     </div>
-                {% endfor %}
+                </div>
             </div>
-        {% endif %}
+            <h1>Estado de la orden</h1>
+            <form method="GET" action="{% url 'buscar_vehiculo' %}#buscar-vehiculo">
+                <div class="input-group mb-3">
+                    <input type="text" name="q" class="form-control" placeholder="Ingrese su número de Cédula" value="{{ query }}">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">Buscar</button>
+                    </div>
+                </div>
+            </form>
+            {% if vehiculos %}
+    <div class="resultados">
+        <h2>Resultados de búsqueda</h2>
     </div>
-</section>
+    <div class="row">
+        {% for orden in ordenes %}
+            <div class="col-md-4">
+                <div class="card mb-3 {% if orden.estado_ord == 'PENDIENTE' %}border-danger{% elif orden.estado_ord == 'EN_PROGRESO' %}border-warning{% elif orden.estado_ord == 'ESPERANDO_REPUESTOS' %}border-primary{% elif orden.estado_ord == 'COMPLETADA' %}border-success{% endif %}">
+                    <div class="card-header {% if orden.estado_ord == 'PENDIENTE' %}bg-danger{% elif orden.estado_ord == 'EN_PROGRESO' %}bg-warning{% elif orden.estado_ord == 'ESPERANDO_REPUESTOS' %}bg-primary{% elif orden.estado_ord == 'COMPLETADA' %}bg-success{% endif %} text-white">
+                        <i class="fa fa-clipboard"></i> ORDEN: {{ orden.numero_ord }}
+                    </div>
+                    <div class="card-body">
+                        <p><strong><i class="fa fa-user"></i> Datos del Cliente:</strong></p>
+                        <p>Nombre: {{ orden.vehiculo_id.cli_id.nombre_cli }}</p>
+                        <p>Apellido: {{ orden.vehiculo_id.cli_id.apellido_cli }}</p>
+                        <p>Cédula: {{ orden.vehiculo_id.cli_id.ci_cli }}</p>
+                        <p><strong><i class="fa fa-car"></i> Datos del Vehículo:</strong></p>
+                        <p>Placa: {{ orden.vehiculo_id.placa_veh }}</p>
+                        <p>Marca: {{ orden.vehiculo_id.marca_veh }}</p>
+                        <p>Modelo: {{ orden.vehiculo_id.modelo_veh }}</p>
+                        <p><strong><i class="fa fa-calendar"></i> Fecha de la Orden:</strong></p>
+                        <p>{{ orden.fecha_ord }}</p>
+                    </div>
+                    <div class="card-footer text-center">
+                        <span class="badge {% if orden.estado_ord == 'PENDIENTE' %}badge-danger{% elif orden.estado_ord == 'EN_PROGRESO' %}badge-warning{% elif orden.estado_ord == 'ESPERANDO_REPUESTOS' %}badge-primary{% elif orden.estado_ord == 'COMPLETADA' %}badge-success{% endif %}">
+                            {{ orden.get_estado_ord_display }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% elif query %}
+    <p class="alert alert-warning">No se encontraron vehículos.</p>
+{% endif %}
+        </div>
+    </section>
 
 
 
@@ -790,6 +774,16 @@
     <script src="{%  static 'lib/principal/js/main.js' %}"></script>
     <script src="{%  static 'lib/principal/js/validator.min.js' %}"></script>
     <script src="{%  static 'lib/principal/js/wow.min.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.hash) {
+                var element = document.querySelector(window.location.hash);
+                if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+    </script>
 
 </body>
 </html>

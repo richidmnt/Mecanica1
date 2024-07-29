@@ -1413,22 +1413,19 @@ def listar_ordenes_completadas(request):
 
 
 def buscar_vehiculo(request):
-    query = request.GET.get('q')
+    query = request.GET.get('q', '')
     vehiculos = []
     ordenes = []
+
     if query:
-        clientes = Cliente.objects.filter(ci_cli__icontains=query)
-        if clientes.exists():
-            vehiculos = Vehiculo.objects.filter(cli_id__in=clientes)
-            ordenes = Orden.objects.filter(vehiculo_id__in=vehiculos).exclude(estado_ord='FINALIZADA')
-        else:
-            vehiculos = Vehiculo.objects.filter(placa_veh__icontains=query)
-            ordenes = Orden.objects.filter(vehiculo_id__placa_veh__icontains=query).exclude(estado_ord='FINALIZADA')
-    
+        vehiculos = Vehiculo.objects.filter(cli_id__ci_cli__exact=query)
+        # Excluyendo las órdenes finalizadas
+        ordenes = Orden.objects.filter(vehiculo_id__in=vehiculos).exclude(estado_ord='FINALIZADA')
+
     return render(request, 'principal.html', {
-        'vehiculos': vehiculos,
-        'ordenes': ordenes,
         'query': query,
+        'vehiculos': vehiculos,
+        'ordenes': ordenes
     })
 
 def obtener_nombres_repuestos(request):
