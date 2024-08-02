@@ -1419,14 +1419,20 @@ def buscar_vehiculo(request):
 
     if query:
         vehiculos = Vehiculo.objects.filter(cli_id__ci_cli__exact=query)
-        # Excluyendo las órdenes finalizadas
         ordenes = Orden.objects.filter(vehiculo_id__in=vehiculos).exclude(estado_ord='FINALIZADA')
 
-    return render(request, 'principal.html', {
+    context = {
         'query': query,
         'vehiculos': vehiculos,
         'ordenes': ordenes
-    })
+    }
+
+   
+    if not query:
+        context['query'] = ''
+
+    return render(request, 'principal.html', context)
+
 
 def obtener_nombres_repuestos(request):
     term = request.GET.get('term', '')

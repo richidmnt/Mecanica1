@@ -1,4 +1,5 @@
 {% extends "./index.html" %}
+{% load static %}
 {% block body %}
 <section class="content">
   <div class="container-fluid">
@@ -36,7 +37,8 @@
                     <label for="nivel_gasolina" class="form-label">Nivel de Gasolina:</label>
                     <div class="d-flex justify-content-between align-items-center">
                       <span>E</span>
-                      <input type="range" class="form-control-range" id="nivel_gasolina" name="nivel_gasolina" min="0" max="100" step="25" oninput="updateGasolinaLabel(this.value)" required />
+                      <input type="range" class="form-control-range" id="nivel_gasolina" name="nivel_gasolina" min="0"
+                        max="100" step="25" oninput="updateGasolinaLabel(this.value)" required />
                       <span>F</span>
                     </div>
                     <div class="d-flex justify-content-between mt-2">
@@ -63,7 +65,8 @@
                         <label class="form-check-label" for="radio">Radio</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="encendedor" id="encendedor" name="encendedor" />
+                        <input class="form-check-input" type="checkbox" value="encendedor" id="encendedor"
+                          name="encendedor" />
                         <label class="form-check-label" for="encendedor">Encendedor</label>
                       </div>
                       <div class="form-check">
@@ -78,49 +81,59 @@
                         <label class="form-check-label" for="gata">Gata</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="llave_de_ruedas" id="llave_de_ruedas" name="llave_de_ruedas" />
+                        <input class="form-check-input" type="checkbox" value="llave_de_ruedas" id="llave_de_ruedas"
+                          name="llave_de_ruedas" />
                         <label class="form-check-label" for="llave_de_ruedas">Llave de Ruedas</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="llanta_emergencia" id="llanta_emergencia" name="llanta_emergencia" />
+                        <input class="form-check-input" type="checkbox" value="llanta_emergencia" id="llanta_emergencia"
+                          name="llanta_emergencia" />
                         <label class="form-check-label" for="llanta_emergencia">Llanta de Emergencia</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="parlantes" id="parlantes" name="parlantes" />
+                        <input class="form-check-input" type="checkbox" value="parlantes" id="parlantes"
+                          name="parlantes" />
                         <label class="form-check-label" for="parlantes">Parlantes</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="direccionales" id="direccionales" name="direccionales" />
+                        <input class="form-check-input" type="checkbox" value="direccionales" id="direccionales"
+                          name="direccionales" />
                         <label class="form-check-label" for="direccionales">Direccionales</label>
                       </div>
                     </div>
                     <!-- Tercera columna de inspección -->
                     <div class="col-md-4">
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="manubrios" id="manubrios" name="manubrios" />
+                        <input class="form-check-input" type="checkbox" value="manubrios" id="manubrios"
+                          name="manubrios" />
                         <label class="form-check-label" for="manubrios">Manubrios</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="parabrisas" id="parabrisas" name="parabrisas" />
+                        <input class="form-check-input" type="checkbox" value="parabrisas" id="parabrisas"
+                          name="parabrisas" />
                         <label class="form-check-label" for="parabrisas">Parabrisas</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="t_seguridad" id="t_seguridad" name="t_seguridad" />
+                        <input class="form-check-input" type="checkbox" value="t_seguridad" id="t_seguridad"
+                          name="t_seguridad" />
                         <label class="form-check-label" for="t_seguridad">Triángulo de Seguridad</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="tapa_radiador" id="tapa_radiador" name="tapa_radiador" />
+                        <input class="form-check-input" type="checkbox" value="tapa_radiador" id="tapa_radiador"
+                          name="tapa_radiador" />
                         <label class="form-check-label" for="tapa_radiador">Tapa del Radiador</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="mandos_funcionales" id="mandos_funcionales" name="mandos_funcionales" />
+                        <input class="form-check-input" type="checkbox" value="mandos_funcionales"
+                          id="mandos_funcionales" name="mandos_funcionales" />
                         <label class="form-check-label" for="mandos_funcionales">Mandos Funcionales</label>
                       </div>
                     </div>
                     <!-- Cuarta columna de inspección -->
                     <div class="col-md-4">
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="cenicero" id="cenicero" name="cenicero" />
+                        <input class="form-check-input" type="checkbox" value="cenicero" id="cenicero"
+                          name="cenicero" />
                         <label class="form-check-label" for="cenicero">Cenicero</label>
                       </div>
                       <div class="form-check">
@@ -128,15 +141,18 @@
                         <label class="form-check-label" for="palanca">Palanca</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="herramientas" id="herramientas" name="herramientas" />
+                        <input class="form-check-input" type="checkbox" value="herramientas" id="herramientas"
+                          name="herramientas" />
                         <label class="form-check-label" for="herramientas">Herramientas</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="botiquin" id="botiquin" name="botiquin" />
+                        <input class="form-check-input" type="checkbox" value="botiquin" id="botiquin"
+                          name="botiquin" />
                         <label class="form-check-label" for="botiquin">Botiquín</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="tapa_gasolina" id="tapa_gasolina" name="tapa_gasolina" />
+                        <input class="form-check-input" type="checkbox" value="tapa_gasolina" id="tapa_gasolina"
+                          name="tapa_gasolina" />
                         <label class="form-check-label" for="tapa_gasolina">Tapa de Gasolina</label>
                       </div>
                     </div>
@@ -151,19 +167,23 @@
                         <label class="form-check-label" for="faros">Faros</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="extintor" id="extintor" name="extintor" />
+                        <input class="form-check-input" type="checkbox" value="extintor" id="extintor"
+                          name="extintor" />
                         <label class="form-check-label" for="extintor">Extintor</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="tapa_cubas" id="tapa_cubas" name="tapa_cubas" />
+                        <input class="form-check-input" type="checkbox" value="tapa_cubas" id="tapa_cubas"
+                          name="tapa_cubas" />
                         <label class="form-check-label" for="tapa_cubas">Tapa de Cubas</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="triangulos" id="triangulos" name="triangulos" />
+                        <input class="form-check-input" type="checkbox" value="triangulos" id="triangulos"
+                          name="triangulos" />
                         <label class="form-check-label" for="triangulos">Triángulos</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="emblemas" id="emblemas" name="emblemas" />
+                        <input class="form-check-input" type="checkbox" value="emblemas" id="emblemas"
+                          name="emblemas" />
                         <label class="form-check-label" for="emblemas">Emblemas</label>
                       </div>
                       <div class="form-check">
@@ -171,7 +191,8 @@
                         <label class="form-check-label" for="placas">Placas</label>
                       </div>
                       <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="moquetas" id="moquetas" name="moquetas" />
+                        <input class="form-check-input" type="checkbox" value="moquetas" id="moquetas"
+                          name="moquetas" />
                         <label class="form-check-label" for="moquetas">Moquetas</label>
                       </div>
                     </div>
@@ -183,20 +204,20 @@
                 <div class="card-header bg-danger text-white">
                   <h4 class="card-title">Registrar Daños</h4>
                 </div>
-                <div class="card-body">
+                <div class="card-body d-flex justify-content-center align-items-center">
                   <div id="carImageContainer">
-                    <img id="carImage" src="https://previews.123rf.com/images/galimovma79/galimovma791510/galimovma79151000015/47423409-veh%C3%ADculo-condici%C3%B3n-informe-coche-lista-de-verificaci%C3%B3n-el-da%C3%B1o-de-auto-vector-inspecci%C3%B3n.jpg" alt="Diagrama del Vehículo" />
+                    <img id="carImage" src="{% static 'lib/adminlte/img/reporte.webp' %}" alt="Diagrama del Vehículo"
+                      class="img-fluid" />
                     <div id="markerContainer"></div>
                   </div>
                 </div>
               </div>
+
               <div class="d-flex justify-content-start mt-3">
                 <button type="submit" class="btn btn-primary">
                   Guardar Daños
                 </button>
-                <a href="{% url 'listarDanios' %}" class="btn btn-danger ml-2"
-                  >Cancelar</a
-                >
+                <a href="{% url 'listarDanios' %}" class="btn btn-danger ml-2">Cancelar</a>
               </div>
             </form>
           </div>
@@ -341,12 +362,12 @@
 </script>
 <script>
   $(document).ready(function () {
-            // Configuración de Select2
-            $("#orden_id").select2({
-                allowClear: true,
-                
-            });
-        });
+    // Configuración de Select2
+    $("#orden_id").select2({
+      allowClear: true,
+
+    });
+  });
 </script>
 <script>
   $(document).ready(function () {
@@ -359,7 +380,7 @@
     $("#daniosForm").validate({
       rules: {
         orden: {
-          required:true,
+          required: true,
         },
         km: {
           required: true,
@@ -370,7 +391,7 @@
       },
       messages: {
         orden: {
-          required:"Por favor, seleccione una orden",
+          required: "Por favor, seleccione una orden",
         },
         km: {
           required: "Por favor, ingresa el kilometraje del vehículo",
