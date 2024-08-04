@@ -22,6 +22,7 @@
                       <th>Cliente</th>
                       <th>Auto</th>
                       <th>Estado</th>
+                      <th>Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -47,6 +48,21 @@
                           <span class="badge bg-success">Completada</span>
                         {% elif orden.estado_ord == 'FINALIZADA' %}
                           <span class="badge bg-secondary">Finalizada</span>
+                        {% endif %}
+                      </td>
+                      <td>
+                        {% if orden.estado_ord == 'COMPLETADA' %}
+                        <a href="/agregar_detalle_m/{{orden.id_ord}}" title="Agregar Detalle" class="btn btn-primary">
+                          <i class="fas fa-plus-square"></i> 
+                        </a>
+                        {% endif %}
+                        
+                        <!-- Mostrar botón de editar si la orden existe en ordenrepuestos -->
+                        {% if orden.id_ord in orden_repuestos_ids and orden.estado_ord == 'COMPLETADA' %}
+                        <a href="/obtener_detalle_m/{{orden.id_ord}}" title="Editar Detalle" class="btn btn-warning">
+                          <i class="fas fa-edit"></i> 
+                        </a>
+                        <a href="#" title="Eliminar" onclick="eliminar('/eliminar_detalle_m/{{ orden.id_ord }}/')" class="btn btn-danger"><i class="fas fa-trash"></i>
                         {% endif %}
                       </td>
                     </tr>
@@ -77,7 +93,7 @@
       id: "question",
       zindex: 999,
       title: "Confirmación",
-      message: "¿Está seguro de eliminar la orden seleccionada?",
+      message: "¿Está seguro de eliminar el detalle de orden seleccionada?",
       position: "center",
       buttons: [
         [

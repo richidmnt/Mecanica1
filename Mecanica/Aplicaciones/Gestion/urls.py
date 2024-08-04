@@ -46,6 +46,7 @@ urlpatterns = [
     path('obtener_repuestos/<int:id>/',views.obtenerRepuestos),
     path('editar_repuestos/',views.editarRepuestos),
     path('eliminar_repuestos/<int:id>/',views.eliminarRepuestos),
+     path('eliminar_detalle_m/<int:id>/',views.eliminarRepuestosM),
     path('detalle_orden/<int:id>/',views.detalleOrden),
     path('detalleInspeccion/<int:id>/',views.reporte_inspeccion),
     path('login/',views.login_view,name="login"),
@@ -71,6 +72,10 @@ urlpatterns = [
     path('obtener_marcas/', views.obtener_marcas, name='obtener_marcas'),
     path('obtener_modelos/', views.obtener_modelos, name='obtener_modelos'),
     path('obtener_colores/', views.obtener_colores, name='obtener_colores'),
-    path('finalizar_orden/<int:id>/',views.finalizarOrden)
+    path('finalizar_orden/<int:id>/',views.finalizarOrden),
+    path('agregar_detalle_m/<int:id>/', views.agregarDetalleM, name='agregar_detalle_m'),
+    path('registrar_repuestos_m/', views.guardarRepuestosM, name='registrar_repuestos_m'),
+    path('obtener_detalle_m/<int:id>/', views.obtenerRepuestosM, name='obtener_detalle_m'),
+    path('editar_detalle_m/',views.editarRepuestosM,name="editar_repuestos_m"),
 ]
 

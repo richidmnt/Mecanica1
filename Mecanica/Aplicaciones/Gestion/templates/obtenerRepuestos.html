@@ -134,7 +134,7 @@
         id: "question",
         zindex: 999,
         title: "Confirmación",
-        message: "¿Está seguro de actualizar la información de la inspección?",
+        message: "¿Está seguro de actualizar la información del detalle?",
         position: "center",
         buttons: [
           [
@@ -310,14 +310,14 @@
         "precio_rep[]": {
           required: true,
           number: true,
-          min: 2,
+          min: 1,
           max: 1000
         },
         "cantidad_rep[]": {
           required: true,
           number: true,
           min: 1,
-          max: 100
+          max: 50
         }
       },
       messages: {
@@ -333,14 +333,14 @@
         "precio_rep[]": {
           required: "Por favor, ingrese el precio del repuesto",
           number: "Por favor, ingrese un número válido",
-          min: "El precio debe ser al menos 2",
+          min: "El precio debe ser al menos 1",
           max: "El precio no puede ser más de 1000"
         },
         "cantidad_rep[]": {
           required: "Por favor, ingrese la cantidad de repuestos",
           number: "Por favor, ingrese un número válido",
           min: "La cantidad debe ser al menos 1",
-          max: "La cantidad no puede ser más de 100"
+          max: "La cantidad no puede ser más de 50"
         }
       },
       errorElement: "span",

@@ -993,6 +993,7 @@ def listarDetalleOrden(request):
 def guardarDetalle(request):
     ordenes = Orden.objects.filter(estado_ord ="COMPLETADA")
     return render(request,'detallesOrden.html',{'ordenes':ordenes})
+
 @admin_required
 def guardarRepuestos(request):
     if request.method == 'POST':
@@ -1319,7 +1320,8 @@ def eliminarDaniosM(request,id_ins):
 def listar_ordenes_completadas(request):
     usuario_actual = request.user
     ordenes_completadas = Orden.objects.filter(estado_ord__in=['COMPLETADA', 'FINALIZADA'], usuario_id=usuario_actual)
-    return render(request, 'lista_ordenes_f.html', {'ordenes': ordenes_completadas})
+    orden_repuestos_ids = OrdenRepuesto.objects.values_list('orden_id', flat=True)
+    return render(request, 'lista_ordenes_f.html', {'ordenes': ordenes_completadas,'orden_repuestos_ids':orden_repuestos_ids})
 
 
 
@@ -1378,3 +1380,96 @@ def obtener_colores(request):
 
 def index(request):
     return render(request,'principal.html')
+
+def agregarDetalleM(request,id):
+    orden = get_object_or_404(Orden,id_ord=id)
+    return render(request,'agregar_detalle_m.html',{'orden':orden})
+
+
+
+@mecanico_required
+def guardarRepuestosM(request):
+    if request.method == 'POST':
+        orden_id = request.POST.get('orden')
+        orden = Orden.objects.get(id_ord=orden_id)
+
+        if OrdenRepuesto.objects.filter(orden_id=orden).exists():
+            messages.error(request, 'Ya existen repuestos registrados para esta orden.')
+            return redirect('registrarDetalle')
+
+        nombres_rep = [nombre.upper() for nombre in request.POST.getlist('nombre_rep[]')]
+        descripciones_rep = [descripcion.upper() for descripcion in request.POST.getlist('descripcion_rep[]')]
+        precios_rep = request.POST.getlist('precio_rep[]')
+        cantidades_rep = request.POST.getlist('cantidad_rep[]')
+        subtotales_rep = request.POST.getlist('subtotal_rep[]')
+
+        try:
+            with transaction.atomic():
+                for nombre, descripcion, precio, cantidad, subtotal in zip(nombres_rep, descripciones_rep, precios_rep, cantidades_rep, subtotales_rep):
+                    OrdenRepuesto.objects.create(
+                        orden_id=orden,
+                        nombre_rep=nombre,
+                        descripcion_rep=descripcion,
+                        precio_rep=precio,
+                        cantidad_rep=cantidad,
+                        subtotal_rep=subtotal
+                    )
+            
+            messages.success(request, 'Repuesto(s) guardado(s) correctamente')
+            return redirect('ordenesCompletas')
+
+        except Exception as e:
+            messages.error(request, f'Error al guardar repuestos: {e}')
+            return redirect('agregar_detalle_m')
+
+@mecanico_required  
+def obtenerRepuestosM(request, id):
+    orden = get_object_or_404(Orden, id_ord=id)
+    try:
+        repuestos = OrdenRepuesto.objects.filter(orden_id=orden)
+    except ObjectDoesNotExist:
+        repuestos = []
+    
+    context = {
+        'orden': orden,
+        'repuestos': repuestos,
+    }
+    return render(request, 'obtener_detalle_m.html', context)
+
+
+@mecanico_required
+def editarRepuestosM(request):
+    if request.method == 'POST':
+        
+        orden_id = request.POST['orden']
+        orden = Orden.objects.get(id_ord=orden_id)
+        OrdenRepuesto.objects.filter(orden_id=orden).delete()
+        nombre_rep_list = [nombre.upper() for nombre in request.POST.getlist('nombre_rep[]')]
+        descripcion_rep_list= [descripcion.upper() for descripcion in request.POST.getlist('descripcion_rep[]')]
+        precio_rep_list = request.POST.getlist('precio_rep[]')
+        cantidad_rep_list = request.POST.getlist('cantidad_rep[]')
+        subtotal_rep_list = request.POST.getlist('subtotal_rep[]')
+        
+        for nombre_rep, descripcion_rep, precio_rep, cantidad_rep, subtotal_rep in zip(nombre_rep_list, descripcion_rep_list, precio_rep_list, cantidad_rep_list, subtotal_rep_list):
+            subtotal_rep = subtotal_rep.replace(',', '.')
+            OrdenRepuesto.objects.create(
+                orden_id=orden,
+                nombre_rep=nombre_rep,
+                descripcion_rep=descripcion_rep,
+                precio_rep=precio_rep,
+                cantidad_rep=cantidad_rep,
+                subtotal_rep=subtotal_rep
+            )
+
+        messages.success(request, 'Detalle actualizado correctamente.')
+        return redirect('ordenesCompletas')
+
+@mecanico_required  
+def eliminarRepuestosM(request,id):
+    orden = get_object_or_404(Orden, id_ord=id)
+    try:
+        OrdenRepuesto.objects.filter(orden_id=orden).delete()
+        messages.success(request, 'Todos los repuestos asociados a la orden han sido eliminados correctamente.')
+    except Exception as e:
+        messages.error(request, f'Error al eliminar repuestos: {str(e)}')
+    return redirect('ordenesCompletas')
