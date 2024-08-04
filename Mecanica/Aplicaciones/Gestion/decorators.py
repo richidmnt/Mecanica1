@@ -22,7 +22,7 @@ def admin_required(view_func):
             try:
                 request.user = Usuario.objects.get(id_usr=request.session['id_usr'])
                 if request.user.rol != Usuario.ADMINISTRADOR:
-                    return render(request, 'permission_denied.html')  # Renderiza la plantilla de permiso denegado
+                    return render(request, 'permission_denied.html')  #
             except Usuario.DoesNotExist:
                 return redirect('login')
         return view_func(request, *args, **kwargs)
@@ -36,7 +36,7 @@ def mecanico_required(view_func):
             try:
                 request.user = Usuario.objects.get(id_usr=request.session['id_usr'])
                 if request.user.rol != Usuario.MECANICO:
-                    return render(request, 'permission_denied.html')  # Renderiza la plantilla de permiso denegado
+                    return render(request, 'permission_denied.html') 
             except Usuario.DoesNotExist:
                 return redirect('login')
         return view_func(request, *args, **kwargs)

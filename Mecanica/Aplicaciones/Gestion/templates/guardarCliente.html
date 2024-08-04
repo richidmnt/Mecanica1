@@ -16,7 +16,7 @@
                     <form
                       id="clienteForm"
                       method="post"
-                      action="/registrarCliente/"
+                      action="/registrar_cliente/"
                     >
                       {% csrf_token %}
                       <div class="row">
@@ -208,6 +208,8 @@
             // Verificamos si el dígito verificador ingresado es igual al calculado
             return digitoVerificadorEsperado === digitoVerificadorCalculado;
         }, "Ingrese una cédula ecuatoriana válida");
+
+
   $.validator.addMethod("validarInicioTelefono", function(value, element) {
             return value.startsWith("09");
         }, "El número de teléfono debe comenzar con '09'.");
@@ -227,9 +229,10 @@
         lettersonly:true
       },
       ci_cli: {
+        required:true,
         digits:true,
-        minlength: 10,
-        maxlength:  10,
+        minlength:10,
+        maxlength:10,
         validarCedulaEcuatoriana:true
       },
       telefono_cli: {

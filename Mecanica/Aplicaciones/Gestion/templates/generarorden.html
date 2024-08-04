@@ -10,7 +10,7 @@
             <h3 class="card-title">Registrar Orden</h3>
           </div>
           <div class="card-body">
-            <form id="ordenForm" method="post" action="/registrarOrden/">
+            <form id="ordenForm" method="post" action="/registrar_orden/">
               {% csrf_token %}
               <div class="row">
                 <!-- Cliente -->
@@ -63,7 +63,7 @@
                         </div>
                         <div class="form-group col-md-12">
                           <label for="calle_dir" class="form-label">Calle:</label>
-                          <input type="text" class="form-control" id="calle_dir" name="calle_dir" required />
+                          <input type="text" class="form-control" id="calle_dir" name="calle_dir"  />
                         </div>
                         <div class="form-group col-md-12">
                           <label for="numero_dir" class="form-label">Número:</label>
@@ -358,7 +358,7 @@
         lettersonly:true
       },
       calle_dir: {
-        required:true,
+     
         minlength: 3,
         maxlength:50,
       },
@@ -455,7 +455,7 @@
         lettersonly:"Por favor, ingresa solo letras."
       },
       calle_dir: {
-        required:"Por favor, ingresa la calle",
+       
         minlength: "La calle debe tener al menos 3 letras",
         maxlength: "La calle  no puede tener más dee 50 letras",
         

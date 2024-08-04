@@ -19,12 +19,11 @@
                 >
                   <thead>
                     <tr>
-                      <th>ID</th>
+                      <th>#</th>
                       <th>Marca</th>
                       <th>Modelo</th>
                       <th>Placa</th>
                       <th>Año</th>
-                     
                       <th>Color</th>
                       <th>Cliente</th>
                       <th>Acciones</th>
@@ -33,7 +32,7 @@
                   <tbody>
                     {% for vehiculo in vehiculos %}
                     <tr class="align-middle">
-                      <td>{{ vehiculo.id_veh }}</td>
+                      <td>{{ forloop.counter }}</td>
                       <td>{{ vehiculo.marca_veh }}</td>
                       <td>{{ vehiculo.modelo_veh }}</td>
                       <td>{{ vehiculo.placa_veh }}</td>
@@ -46,7 +45,7 @@
                       </td>
                       <td>
                         <a
-                          href="/actualizarVehiculo/{{ vehiculo.id_veh }}/"
+                          href="/actualizar_vehiculo/{{ vehiculo.id_veh }}/"
                           title="Editar"
                           class="btn btn-warning"
                           ><i class="fas fa-pen"></i></a
@@ -54,7 +53,7 @@
                         <a
                           href="#"
                           title="Eliminar"
-                          onclick="eliminar('/eliminarVehiculo/{{ vehiculo.id_veh }}/')"
+                          onclick="eliminar('/eliminar_vehiculo/{{ vehiculo.id_veh }}/')"
                           class="btn btn-danger"
                           ><i class="fas fa-trash"></i></a
                         >
@@ -148,18 +147,33 @@
         buttons: [
           {
             extend: "pdfHtml5",
-            messageTop: "PDF creado por PDFMake con botones para DataTables.",
-            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+            messageTop: "Reporte de Vehículos.",
+            className: "btn btn-warning",
+             exportOptions: {
+              columns: [0,1, 2, 3,4,5]
+            } 
           },
           {
             extend: "print",
-            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+            className: "btn btn-warning",
+             exportOptions: {
+              columns: [0,1, 2, 3,4, 5]
+            }  
           },
           {
-            extend: "csv",
-            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+            extend: "excelHtml5",
+            className: "btn btn-warning", 
+             exportOptions: {
+              columns: [0,1, 2, 3,4, 5]
+            } 
           },
         ],
+         rowCallback: function (row, data, index) {
+          var api = this.api();
+          var pageInfo = api.page.info();
+          var rowIndex = pageInfo.start + index + 1;
+          $('td:eq(0)', row).html(rowIndex); // Actualiza la columna de numeración
+        }
       }).buttons().container().appendTo("#tbl_vehiculos_wrapper .col-md-6:eq(0)");
     }
   });

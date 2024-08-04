@@ -10,7 +10,7 @@
             <h3 class="card-title">Editar Orden</h3>
           </div>
           <div class="card-body">
-            <form id="ordenForm" method="post" action="/editarOrden/">
+            <form id="ordenForm" method="post" action="/editar_orden/">
               {% csrf_token %}
               <!-- Campos de la Orden -->
               <input type="hidden" name="id_ord" value="{{orden.id_ord}}">

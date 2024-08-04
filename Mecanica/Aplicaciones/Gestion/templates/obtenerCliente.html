@@ -18,7 +18,7 @@
                     <form
                       id="clienteFormA"
                       method="post"
-                      action="/actualizarCliente/{{cliente.id_cli}}/"
+                      action="/actualizar_cliente/{{cliente.id_cli}}/"
                     >
                       {% csrf_token %}
                       <input
@@ -124,7 +124,7 @@
                               id="calle_dir"
                               name="calle_dir"
                               value="{{ cliente.dir_id.calle_dir }}"
-                              required
+                             
                             />
                           </div>
                           <div class="form-group">
@@ -135,7 +135,7 @@
                               id="numero_dir"
                               name="numero_dir"
                               value="{{ cliente.dir_id.numero_dir }}"
-                              required
+                              
                             />
                           </div>
                         </div>
@@ -290,7 +290,7 @@
         lettersonly: true
       },
       calle_dir: {
-        required: true,
+        
         minlength: 3,
         maxlength: 50,
       },
@@ -340,7 +340,7 @@
         lettersonly: "Por favor, ingresa solo letras."
       },
       calle_dir: {
-        required: "Por favor, ingresa la calle",
+       
         minlength: "La calle debe tener al menos 3 letras",
         maxlength: "La calle no puede tener más de 50 letras",
       },

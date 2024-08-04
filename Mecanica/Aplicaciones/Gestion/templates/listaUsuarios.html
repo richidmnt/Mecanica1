@@ -19,7 +19,7 @@
                 >
                   <thead>
                     <tr>
-                      <th>ID</th>
+                      <th>#</th>
                       <th>Usuario</th>
                       <th>Nombre</th>
                       <th>Apellido</th>
@@ -33,7 +33,7 @@
                   <tbody>
                     {% for usuario in usuarios %}
                     <tr class="align-middle">
-                      <td>{{usuario.id_usr}}</td>
+                      <td>{{forloop.counter}}</td>
                       <td>{{usuario.username}}</td>
                       <td>{{usuario.nombre}}</td>
                       <th>{{usuario.apellido}}</th>
@@ -50,7 +50,7 @@
 
                       <td>
                         <a
-                          href="/actualizarUsuario/{{usuario.id_usr}}/"
+                          href="/actualizar_usuario/{{usuario.id_usr}}/"
                           class="btn btn-warning"
                           title="Editar"
                           ><i class="fas fa-pen"></i></a
@@ -58,7 +58,7 @@
                         <a
                           href="#"
                           title="Eliminar"
-                          onclick="eliminar('/eliminarUsuario/{{ usuario.id_usr}}')"
+                          onclick="eliminar('/eliminar_usuario/{{ usuario.id_usr}}')"
                           class="btn btn-danger"
                           ><i class="fas fa-trash"></i></a
                         >
@@ -160,21 +160,37 @@
             sSortDescending: ": Activar para ordenar la columna de manera descendente",
           },
         },
+       
         buttons: [
           {
             extend: "pdfHtml5",
-            messageTop: "PDF creado por PDFMake con botones para DataTables.",
-            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+            messageTop: "Reporte de Usuarios.",
+            className: "btn btn-warning",
+             exportOptions: {
+              columns: [ 0,1, 2,3,4,5,6], // Indica las columnas a exportar (ID, Usuario, Nombre, Email)
+            } // Agregar clase de estilo de Bootstrap
           },
           {
             extend: "print",
-            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+            className: "btn btn-warning",
+             exportOptions: {
+              columns: [0,1, 2, 3, 4, 5, 6], // Indica las columnas a exportar (ID, Usuario, Nombre, Email)
+            } // Agregar clase de estilo de Bootstrap
           },
           {
-            extend: "csv",
-            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+            extend: "excelHtml5",
+            className: "btn btn-warning",
+             exportOptions: {
+              columns: [0,1, 2, 3, 4, 5, 6], // Indica las columnas a exportar (ID, Usuario, Nombre, Email)
+            } // Agregar clase de estilo de Bootstrap
           },
         ],
+         rowCallback: function (row, data, index) {
+          var api = this.api();
+          var pageInfo = api.page.info();
+          var rowIndex = pageInfo.start + index + 1;
+          $('td:eq(0)', row).html(rowIndex); // Actualiza la columna de numeración
+        }
       }).buttons().container().appendTo("#tbl_usuarios_wrapper .col-md-6:eq(0)");
     }
   });

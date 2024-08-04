@@ -17,7 +17,7 @@
                 <table id="tbl_usuarios" class="table table-head-fixed text-nowrap">
                   <thead>
                     <tr>
-                      <th>ID</th>
+                      <th>#</th>
                       <th>Usuario</th>
                       <th>Nombre</th>
                       <th>Apellido</th>
@@ -31,7 +31,7 @@
                   <tbody>
                     {% for usuario in usuarios %}
                     <tr class="align-middle">
-                      <td>{{usuario.id_usr}}</td>
+                      <td>{{forloop.counter}}</td>
                       <td>{{usuario.username}}</td>
                       <td>{{usuario.nombre}}</td>
                       <td>{{usuario.apellido}}</td>
@@ -78,7 +78,7 @@
           "<button><b>SI</b></button>",
           function (instance, toast) {
             instance.hide({ transitionOut: "fadeOut" }, toast, "button");
-            window.location.href = `/restaurarUsuario/${id}/`;
+            window.location.href = `/restaurar_usuario/${id}/`;
           },
           true,
         ],
@@ -136,18 +136,33 @@
         buttons: [
           {
             extend: "pdfHtml5",
-            messageTop: "PDF creado por PDFMake con botones para DataTables.",
+            messageTop: "Reporte MultiAuto.",
             className: "btn btn-warning",
+            exportOptions: {
+              columns: [0,1, 2, 3, 4, 5, 6], // Indica las columnas a exportar (ID, Usuario, Nombre, Email)
+            } 
           },
           {
             extend: "print",
             className: "btn btn-warning",
+            exportOptions: {
+              columns: [0,1, 2, 3, 4, 5, 6], // Indica las columnas a exportar (ID, Usuario, Nombre, Email)
+            } 
           },
           {
-            extend: "csv",
+            extend: "excelHtml5",
             className: "btn btn-warning",
+            exportOptions: {
+              columns: [0,1, 2, 3, 4, 5, 6], // Indica las columnas a exportar (ID, Usuario, Nombre, Email)
+            } 
           },
         ],
+         rowCallback: function (row, data, index) {
+          var api = this.api();
+          var pageInfo = api.page.info();
+          var rowIndex = pageInfo.start + index + 1;
+          $('td:eq(0)', row).html(rowIndex); // Actualiza la columna de numeración
+        }
       }).buttons().container().appendTo("#tbl_usuarios_wrapper .col-md-6:eq(0)");
     }
   });

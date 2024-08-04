@@ -16,6 +16,7 @@
                 <table id="tbl_1" class="table table-head-fixed text-nowrap">
                   <thead>
                     <tr>
+                      <th>#</th>
                       <th>Número de Orden</th>
                       <th>Fecha de Inicio</th>
                       <th>Cliente</th>
@@ -26,6 +27,7 @@
                   <tbody>
                     {% for orden in ordenes %}
                     <tr class="align-middle">
+                      <td> {{forloop.counter}} </td>
                       <td>{{ orden.numero_ord }}</td>
                       <td>{{ orden.fecha_ord|date:"d/m/Y H:i" }}</td>
                       <td>
@@ -108,7 +110,7 @@
   $(document).ready(function () {
     if (!$.fn.dataTable.isDataTable("#tbl_1")) {
       $("#tbl_1").DataTable({
-        dom: "Bfrtip",
+        dom: "frtip",
         responsive: true,
         lengthChange: false,
         autoWidth: false,
@@ -151,6 +153,12 @@
             className: "btn btn-warning",
           },
         ],
+         rowCallback: function (row, data, index) {
+          var api = this.api();
+          var pageInfo = api.page.info();
+          var rowIndex = pageInfo.start + index + 1;
+          $('td:eq(0)', row).html(rowIndex); // Actualiza la columna de numeración
+        }
       }).buttons().container().appendTo("#tbl_1_wrapper .col-md-6:eq(0)");
     }
   });

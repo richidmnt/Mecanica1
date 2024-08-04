@@ -18,6 +18,7 @@
                 >
                   <thead>
                     <tr>
+                      <td>#</td>
                       <th>Número de Orden</th>
                       <th>Placa del Vehículo</th>
                       <th>Fecha de Orden</th>
@@ -28,13 +29,14 @@
                   <tbody>
                     {% for danio in danios %}
                     <tr class="align-middle">
+                      <td> {{forloop.counter}} </td>
                       <td>{{ danio.orden_id.numero_ord }}</td>
                       <td>{{ danio.orden_id.vehiculo_id.placa_veh }}</td>
                       <td>{{ danio.orden_id.fecha_ord }}</td>
 
                       <td>
                         <a
-                          href="/editarDanioM/{{ danio.id_ins}}/"
+                          href="/editar_inspeccion_m/{{ danio.id_ins}}/"
                           title="Editar"
                           class="btn btn-warning"
                           ><i class="fas fa-pen"></i></a
@@ -43,7 +45,7 @@
                         <a
                           href="#"
                           title="Eliminar"
-                          onclick="eliminar('/eliminarDanioM/{{ danio.id_ins}}/')"
+                          onclick="eliminar('/eliminar_inspeccion_m/{{ danio.id_ins}}/')"
                           class="btn btn-danger"
                           ><i class="fas fa-trash"></i></a
                         >
@@ -118,7 +120,7 @@
   $(document).ready(function () {
     if (!$.fn.dataTable.isDataTable("#tbl_danios")) {
       $("#tbl_danios").DataTable({
-        dom: "Bfrtip",
+        dom: "frtip",
         responsive: true,
         lengthChange: false,
         autoWidth: false,
@@ -162,6 +164,12 @@
             className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
           },
         ],
+         rowCallback: function (row, data, index) {
+          var api = this.api();
+          var pageInfo = api.page.info();
+          var rowIndex = pageInfo.start + index + 1;
+          $('td:eq(0)', row).html(rowIndex); // Actualiza la columna de numeración
+        }
       }).buttons().container().appendTo("#tbl_danios_wrapper .col-md-6:eq(0)");
     }
   });

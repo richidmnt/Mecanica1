@@ -19,7 +19,7 @@
                 >
                   <thead>
                     <tr>
-                      <th>ID</th>
+                      <th>#</th>
                       <th>Nombre</th>
                       <th>Descripción</th>
                       <th>Precio</th>
@@ -29,13 +29,13 @@
                   <tbody>
                     {% for servicio in servicios %}
                     <tr class="align-middle">
-                      <td>{{ servicio.id_ser }}</td>
+                      <td>{{ forloop.counter }}</td>
                       <td>{{ servicio.nombre_ser }}</td>
                       <td>{{ servicio.descripcion_ser }}</td>
                       <td>{{ servicio.precio_ser }}</td>
                       <td>
                         <a
-                          href="/obtenerServicio/{{ servicio.id_ser }}/"
+                          href="/obtener_servicio/{{ servicio.id_ser }}/"
                           class="btn btn-warning"
                           title="Editar"
                           ><i class="fas fa-pen"></i></a
@@ -44,7 +44,7 @@
                         <a
                           href="#"
                           title="Eliminar"
-                          onclick="eliminar('/eliminarServicio/{{ servicio.id_ser }}/')"
+                          onclick="eliminar('/eliminar_servicio/{{ servicio.id_ser }}/')"
                           class="btn btn-danger"
                           ><i class="fas fa-trash"></i></a
                         >
@@ -138,18 +138,34 @@
         buttons: [
           {
             extend: "pdfHtml5",
-            messageTop: "PDF creado por PDFMake con botones para DataTables.",
-            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+            messageTop: "Reporte de Servicios.",
+            className: "btn btn-warning",
+            exportOptions: {
+              columns: [0,1, 2, 3], 
+            },
+            
           },
           {
             extend: "print",
-            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+            className: "btn btn-warning", 
+            exportOptions: {
+              columns: [0,1, 2, 3]
+            }
           },
           {
-            extend: "csv",
-            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
+            extend: "excelHtml5",
+            className: "btn btn-warning", 
+            exportOptions: {
+              columns: [0,1, 2, 3], 
+            }
           },
         ],
+         rowCallback: function (row, data, index) {
+          var api = this.api();
+          var pageInfo = api.page.info();
+          var rowIndex = pageInfo.start + index + 1;
+          $('td:eq(0)', row).html(rowIndex); // Actualiza la columna de numeración
+        }
       }).buttons().container().appendTo("#tbl_servicios_wrapper .col-md-6:eq(0)");
     }
   });

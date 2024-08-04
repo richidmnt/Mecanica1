@@ -20,6 +20,7 @@
                 >
                   <thead>
                     <tr>
+                      <th>#</th>
                       <th>Número de Orden</th>
                       <th>Placa del Vehículo</th>
                       <th>Fecha de Orden</th>
@@ -30,6 +31,7 @@
                   <tbody>
                     {% for orden in ordenes %}
                     <tr class="align-middle">
+                      <td>{{ forloop.counter }}</td>
                       <td>{{ orden.numero_ord }}</td>
                       <td>{{ orden.vehiculo_id.placa_veh }}</td>
                       <td>{{ orden.fecha_ord }}</td>
@@ -49,7 +51,7 @@
 
                       <td>
                         <a
-                          href="/obtenerRepuestos/{{ orden.id_ord}}/"
+                          href="/obtener_repuestos/{{ orden.id_ord}}/"
                           title="Editar"
                           class="btn btn-warning"
                           ><i class="fas fa-pen"></i></a
@@ -57,7 +59,7 @@
                         <a
                           href="#"
                           title="Eliminar"
-                          onclick="eliminar('/eliminarDetalle/{{ orden.id_ord}}/')"
+                          onclick="eliminar('/eliminar_repuestos/{{ orden.id_ord}}/')"
                           class="btn btn-danger"
                           ><i class="fas fa-trash"></i></a
                         >
@@ -132,7 +134,7 @@
   $(document).ready(function () {
     if (!$.fn.dataTable.isDataTable("#tbl_detalle")) {
       $("#tbl_detalle").DataTable({
-        dom: "Bfrtip",
+        dom: "frtip",
         responsive: true,
         lengthChange: false,
         autoWidth: false,
@@ -161,22 +163,14 @@
             sSortDescending: ": Activar para ordenar la columna de manera descendente",
           },
         },
-        buttons: [
-          {
-            extend: "pdfHtml5",
-            messageTop: "PDF creado por PDFMake con botones para DataTables.",
-            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
-          },
-          {
-            extend: "print",
-            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
-          },
-          {
-            extend: "csv",
-            className: "btn btn-warning", // Agregar clase de estilo de Bootstrap
-          },
-        ],
-      }).buttons().container().appendTo("#tbl_detalle_wrapper .col-md-6:eq(0)");
+        rowCallback: function (row, data, index) {
+          var api = this.api();
+          var pageInfo = api.page.info();
+          var rowIndex = pageInfo.start + index + 1;
+          $('td:eq(0)', row).html(rowIndex); // Actualiza la columna de numeración
+        }
+        
+      }).container().appendTo("#tbl_detalle_wrapper .col-md-6:eq(0)");
     }
   });
 </script>

@@ -10,7 +10,7 @@
             <h3 class="card-title">Inspección</h3>
           </div>
           <div class="card-body">
-            <form id="daniosForm" method="post" action="/guardarDaniosM/">
+            <form id="daniosForm" method="post" action="/guardar_inspeccion_m/">
               {% csrf_token %}
               <div class="form-group">
                 <input type="hidden" name="orden" value="{{orden.id_ord}}">

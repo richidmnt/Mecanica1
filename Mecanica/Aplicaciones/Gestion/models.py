@@ -182,8 +182,8 @@ class Orden(models.Model):
         return f"Orden: {self.numero_ord} - Estado: {self.get_estado_ord_display()}"
 
     def calcular_total(self):
-        total_servicios = sum(item.subtotal for item in self.servicios.all())
-        total_repuestos = sum(item.subtotal_rep for item in self.repuestos.all())
+        total_servicios = sum(item.subtotal for item in self.ordenservicio_set.all())
+        total_repuestos = sum(item.subtotal_rep for item in self.ordenrepuesto_set.all())
         return total_servicios + total_repuestos
 
     def save(self, *args, **kwargs):
