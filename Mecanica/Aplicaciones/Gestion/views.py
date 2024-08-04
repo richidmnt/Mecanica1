@@ -286,10 +286,10 @@ def registrarCliente(request):
                 ciudad = request.POST['ciudad_dir'].strip().upper()
                 barrio = request.POST['barrio_dir'].strip().upper()
                 calle = request.POST['calle_dir'].strip().upper()
-                numero = request.POST['numero_dir']
+               
 
                 # Crear la instancia de la dirección pero no guardarla aún
-                direccion = Direccion(ciudad_dir=ciudad, barrio_dir=barrio, calle_dir=calle, numero_dir=numero)
+                direccion = Direccion(ciudad_dir=ciudad, barrio_dir=barrio, calle_dir=calle)
 
                 nombre = request.POST['nombre_cli'].strip().upper()
                 apellido = request.POST['apellido_cli'].strip().upper()
@@ -378,7 +378,6 @@ def actualizarCliente(request,id_cli):
         cliente.dir_id.ciudad_dir = request.POST['ciudad_dir'].strip().upper()
         cliente.dir_id.barrio_dir = request.POST['barrio_dir'].strip().upper()
         cliente.dir_id.calle_dir = request.POST['calle_dir'].strip().upper()
-        cliente.dir_id.numero_dir = request.POST['numero_dir']
         cliente.dir_id.save()
 
        
@@ -598,7 +597,7 @@ def registrarOrden(request):
                     ciudad_dir=request.POST['ciudad_dir'].strip().upper(),
                     barrio_dir=request.POST['barrio_dir'].strip().upper(),
                     calle_dir=request.POST['calle_dir'].strip().upper(),
-                    numero_dir=request.POST['numero_dir']
+                    
                 )
 
                 
