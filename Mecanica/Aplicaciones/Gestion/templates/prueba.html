@@ -69,6 +69,9 @@
       .marker:hover .comment-box {
         display: block;
       }
+        .custom-font {
+  font-family: 'Merriweather', sans-serif;
+}
     </style>
     {% block extra_styles %}{% endblock %}
 </head>
@@ -115,8 +118,9 @@
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="{% url 'home2' %}" class="brand-link">
-                <img src="{% static 'lib/adminlte/img/logoMulti.jpeg' %}" alt="AdminLTE Logo" class="brand-image img-circle img-fluid elevation-3" style="opacity: 0.8" />
-                <span class="brand-text font-weight-light">MULTIAUTO</span>
+                <a href="{% url 'home' %}" class="brand-link text-center font-size-5 custom-font">
+                    <b class="">MultiAuto</b>
+                </a>
             </a>
 
             <!-- Sidebar -->
@@ -271,18 +275,7 @@
                         </div>
 
                         <!-- Órdenes Completadas -->
-                        <div class="col-lg-3 col-6">
-                            <div class="small-box bg-success">
-                                <div class="inner">
-                                    <h3>{{ ordenes_completadas_count }}</h3>
-                                    <p>Órdenes Completadas</p>
-                                </div>
-                                <div class="icon">
-                                    <i class="fas fa-check-circle"></i> <!-- Icono de check circle para completadas -->
-                                </div>
-                                <a href="{% url 'ordenesCompletas' %}" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
-                            </div>
-                        </div>
+                        
                         <div class="col-lg-3 col-6">
         <div class="small-box bg-secondary">
           <div class="inner">
@@ -292,7 +285,7 @@
           <div class="icon">
             <i class="fas fa-flag-checkered"></i> <!-- Icono de bandera para finalizadas -->
           </div>
-          <a href="" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
+          <a href="{% url 'ordenesCompletas' %}" class="small-box-footer">Más info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
       </div>
                     </div>

@@ -113,7 +113,9 @@
   .marker:hover .comment-box {
     display: block;
   }
-  
+  .custom-font {
+  font-family: 'Merriweather', sans-serif;
+}
       
     </style>
     {% block extra_styles %}{% endblock %}
@@ -165,14 +167,8 @@
       <!-- Main Sidebar Container -->
       <aside class="main-sidebar sidebar-dark-primary elevation-4">
         <!-- Brand Logo -->
-        <a href="../../index3.html" class="brand-link">
-          <img
-            src="{% static 'lib/adminlte/img/logoMulti.jpeg' %}"
-            alt="AdminLTE Logo"
-            class="brand-image img-circle  elevation-3"
-            style="opacity: 0.8"
-          />
-          <span class="brand-text font-weight-light">MultiAuto</span>
+        <a href="{% url 'home' %}" class="brand-link text-center font-size-5 custom-font">
+          <b class="">MultiAuto</b>
         </a>
 
         <!-- Sidebar -->

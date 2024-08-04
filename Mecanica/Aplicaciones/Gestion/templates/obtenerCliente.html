@@ -127,17 +127,7 @@
                              
                             />
                           </div>
-                          <div class="form-group">
-                            <label for="numero_dir" class="form-label">Número:</label>
-                            <input
-                              type="text"
-                              class="form-control"
-                              id="numero_dir"
-                              name="numero_dir"
-                              value="{{ cliente.dir_id.numero_dir }}"
-                              
-                            />
-                          </div>
+                         
                         </div>
                       </div>
                       <button type="button" onclick="actualizar()" class="btn btn-primary">
@@ -290,7 +280,7 @@
         lettersonly: true
       },
       calle_dir: {
-        
+        required:true,
         minlength: 3,
         maxlength: 50,
       },
@@ -340,7 +330,7 @@
         lettersonly: "Por favor, ingresa solo letras."
       },
       calle_dir: {
-       
+        required:'Por favor, ingrese la calle.',
         minlength: "La calle debe tener al menos 3 letras",
         maxlength: "La calle no puede tener más de 50 letras",
       },

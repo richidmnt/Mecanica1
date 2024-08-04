@@ -683,8 +683,14 @@ def registrarOrden(request):
         
       
         return redirect('ordenCliente')
-
     
+@admin_required
+def finalizarOrden(request,id):
+    orden = get_object_or_404(Orden,id_ord=id)
+    orden.estado_ord='FINALIZADA'
+    orden.save()
+    messages.success(request,'Orden finalizada correctamente')
+    return  redirect('listarOrdenes') 
 
     
 

@@ -71,5 +71,6 @@ urlpatterns = [
     path('obtener_marcas/', views.obtener_marcas, name='obtener_marcas'),
     path('obtener_modelos/', views.obtener_modelos, name='obtener_modelos'),
     path('obtener_colores/', views.obtener_colores, name='obtener_colores'),
+    path('finalizar_orden/<int:id>/',views.finalizarOrden)
 ]
 

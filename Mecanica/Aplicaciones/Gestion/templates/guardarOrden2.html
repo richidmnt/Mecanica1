@@ -80,7 +80,7 @@
                     <select class="form-control select2" id="usuario_id" name="usuario_id" required>
                       <option value="">Seleccione un usuario</option>
                       {% for usuario in usuarios %}
-                        <option value="{{ usuario.id_usr }}">{{ usuario.nombre }}</option>
+                        <option value="{{ usuario.id_usr }}">{{ usuario.nombre }} {{ usuario.apellido }}</option>
                       {% endfor %}
                     </select>
                   </div>

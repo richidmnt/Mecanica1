@@ -59,6 +59,11 @@
                         <a href="#"  title="Eliminar"  onclick="eliminar('/eliminar_orden/{{ orden.id_ord }}/')" class="btn btn-danger">
                           <i class="fas fa-trash"></i> 
                         </a>
+                        {% if orden.estado_ord == 'COMPLETADA' %}
+                        <a href="#"  onclick="finalizar('/finalizar_orden/{{ orden.id_ord }}/')" title="Finalizar Orden" class="btn btn-success">
+                          <i class="fas fa-check"></i> 
+                        </a>
+                        {% endif %}
                       </td>
                     </tr>
                     {% endfor %}
@@ -114,6 +119,41 @@
       },
     });
   }
+  function finalizar(url) {
+      iziToast.question({
+        timeout: 15000,
+        close: true,
+        overlay: true,
+        displayMode: "once",
+        id: "question",
+        zindex: 999,
+        title: "Confirmación",
+        message: "¿Está seguro de Finalizar la orden seleccionada?",
+        position: "center",
+        buttons: [
+          [
+            "<button><b>SI</b></button>",
+            function (instance, toast) {
+              instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+              window.location.href = url;
+            },
+            true,
+          ],
+          [
+            "<button>NO</button>",
+            function (instance, toast) {
+              instance.hide({ transitionOut: "fadeOut" }, toast, "button");
+            },
+          ],
+        ],
+        onClosing: function (instance, toast, closedBy) {
+          console.info("Closing | closedBy: " + closedBy);
+        },
+        onClosed: function (instance, toast, closedBy) {
+          console.info("Closed | closedBy: " + closedBy);
+        },
+      });
+    }
 </script>
 
 

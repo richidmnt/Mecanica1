@@ -62,11 +62,11 @@
                 <select class="form-control select2" id="usuario_id" name="usuario_id">
                   <option value="">Seleccione un usuario</option>
                   {% for usuario in usuarios %}
-                    <option value="{{ usuario.id_usr }}" {% if orden.usuario_id.id_usr == usuario.id_usr %}selected{% endif %}>{{ usuario.nombre }}</option>
+                    <option value="{{ usuario.id_usr }}" {% if orden.usuario_id.id_usr == usuario.id_usr %}selected{% endif %}>{{ usuario.nombre }} {{ usuario.apellido }}</option>
                   {% endfor %}
                 </select>
               </div>
-              
+            
               <!-- Servicios -->
               <div class="card card-primary mb-3">
                 <div class="card-header bg-primary text-white">
