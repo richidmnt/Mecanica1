@@ -77,5 +77,7 @@ urlpatterns = [
     path('registrar_repuestos_m/', views.guardarRepuestosM, name='registrar_repuestos_m'),
     path('obtener_detalle_m/<int:id>/', views.obtenerRepuestosM, name='obtener_detalle_m'),
     path('editar_detalle_m/',views.editarRepuestosM,name="editar_repuestos_m"),
+    path('recuperar-contraseña/', views.password_reset_request, name='password_reset_request'),
+    path('reset-password/<uuid:token>/', views.reset_password, name='reset_password'),
 ]
 

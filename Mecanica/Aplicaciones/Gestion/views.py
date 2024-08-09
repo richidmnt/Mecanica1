@@ -13,6 +13,7 @@ from django.db.models.functions import ExtractMonth
 from django.core.mail import send_mail,BadHeaderError
 from django.urls import reverse
 from django.http import JsonResponse
+from django.conf import settings
 
 from .decorators import login_required,admin_required,mecanico_required
 from .models import *
@@ -1237,7 +1238,7 @@ def guardarDaniosM(request):
             )
 
         messages.success(request, 'Inspección registrados correctamente')
-        return redirect('listarInspeccionM')
+        return redirect('listaProgreso')
 
 @mecanico_required   
 def obtenerDaniosM(request, id_ord):
@@ -1381,6 +1382,7 @@ def obtener_colores(request):
 def index(request):
     return render(request,'principal.html')
 
+@mecanico_required
 def agregarDetalleM(request,id):
     orden = get_object_or_404(Orden,id_ord=id)
     return render(request,'agregar_detalle_m.html',{'orden':orden})
@@ -1473,3 +1475,50 @@ def eliminarRepuestosM(request,id):
     except Exception as e:
         messages.error(request, f'Error al eliminar repuestos: {str(e)}')
     return redirect('ordenesCompletas')
+
+def password_reset_request(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = Usuario.objects.get(email=email)
+            token = PasswordResetToken.objects.create(user=user)
+            
+            reset_link = request.build_absolute_uri(f'/reset-password/{token.token}/')
+            send_mail(
+                'Recuperar Contraseña',
+                f'Haz clic en el siguiente enlace para restablecer tu contraseña: {reset_link}',
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False,
+            )
+            messages.success(request, 'Te hemos enviado un enlace para restablecer tu contraseña.')
+        except Usuario.DoesNotExist:
+            messages.error(request, 'No encontramos ningún usuario con ese correo electrónico.')
+
+    return render(request, 'password_reset_request.html')
+
+def reset_password(request, token):
+    try:
+        reset_token = PasswordResetToken.objects.get(token=token)
+        if reset_token.is_expired():
+            messages.error(request, 'El token ha expirado.')
+            return redirect('password_reset_request')
+        if reset_token.is_used:
+            messages.error(request, 'El token ya ha sido utilizado.')
+            return redirect('password_reset_request')
+
+        if request.method == 'POST':
+            new_password = request.POST.get('password')
+            user = reset_token.user
+            user.set_password(new_password)
+            user.save()
+            reset_token.is_used = True
+            reset_token.save()
+            messages.success(request, 'Tu contraseña ha sido actualizada.')
+            return redirect('login')
+
+    except PasswordResetToken.DoesNotExist:
+        messages.error(request, 'Token inválido.')
+        return redirect('password_reset_request')
+
+    return render(request, 'reset_password.html', {'token': token})

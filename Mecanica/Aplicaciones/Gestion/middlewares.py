@@ -1,5 +1,8 @@
 # middlewares.py
 from .models import Usuario
+from django.utils import timezone
+from django.http import HttpResponseForbidden
+from datetime import time
 
 class CustomUserMiddleware:
     def __init__(self, get_response):
@@ -15,3 +18,4 @@ class CustomUserMiddleware:
             request.user = None
         response = self.get_response(request)
         return response
+

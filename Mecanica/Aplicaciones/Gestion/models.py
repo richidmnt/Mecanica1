@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
+import uuid
+from django.conf import settings
 class Taller(models.Model):
     nombre_tall = models.CharField(max_length=255)
     descripcion_tall = models.TextField()
@@ -8,7 +10,6 @@ class Taller(models.Model):
     direccion_tall = models.CharField(max_length=100)
     email_tall = models.EmailField()
     telefono_tall = models.CharField(max_length=11)
-
 
 
 
@@ -46,6 +47,20 @@ class Usuario(models.Model):
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.username})"
+    
+    
+class PasswordResetToken(models.Model):
+    user = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255, unique=True, default=uuid.uuid4)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_used = models.BooleanField(default=False)
+
+    def is_expired(self):
+        expiration_time = timezone.now() - timezone.timedelta(minutes=10) 
+        return self.created_at < expiration_time
+
+    def __str__(self):
+        return f"Token for {self.user.username} - Used: {self.is_used}"
 
 class Direccion(models.Model):
     id_dir = models.AutoField(primary_key=True)

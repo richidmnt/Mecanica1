@@ -337,4 +337,53 @@
     });
   }
 </script>
+<script>
+  function validateAndSubmit() {
+    if ($("#daniosForm").valid()) {
+      document.getElementById('daniosForm').submit();
+    } else {
+      iziToast.error({
+        title: 'Error',
+        message: 'Por favor, corrija los errores en el formulario.',
+        position: 'topRight'
+      });
+    }
+  }
+
+  $(document).ready(function () {
+    // Configuración de la validación del formulario
+    $("#daniosForm").validate({
+      rules: {
+        km: {
+          required: true,
+          digits: true,
+          min: 1,
+          max: 600000,
+        },
+      },
+      messages: {
+
+        km: {
+          required: "Por favor, ingrese el kilometraje del vehículo",
+          digits: "Por favor, ingrese solo números",
+          min: "El kilometraje debe ser al menos 1",
+          max: "El kilometraje no debe ser más de 600,000",
+        },
+      },
+      errorElement: "span",
+      errorPlacement: function (error, element) {
+        error.addClass("invalid-feedback");
+        element.closest(".form-group").append(error);
+      },
+      highlight: function (element, errorClass, validClass) {
+        $(element).addClass("is-invalid").removeClass("is-valid");
+      },
+      unhighlight: function (element, errorClass, validClass) {
+        $(element).removeClass("is-invalid").addClass("is-valid");
+      },
+    });
+
+
+  });
+</script>
 {% endblock %}

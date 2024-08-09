@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'Aplicaciones.Gestion.middlewares.CustomUserMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'Mecanica.urls'
@@ -71,6 +72,10 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Mecanica.wsgi.application'
+SESSION_COOKIE_SECURE = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 10    # 600 segundos = 10 minutos
+
 
 
 # Database
@@ -78,10 +83,15 @@ WSGI_APPLICATION = 'Mecanica.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'multiauto',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '127.0.0.1',  # o la dirección de tu servidor MySQL
+        'PORT': '3306',       # puerto por defecto de MySQL
     }
 }
+
 
 
 # Password validation
