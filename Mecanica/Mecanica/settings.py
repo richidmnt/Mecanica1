@@ -74,7 +74,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Mecanica.wsgi.application'
 SESSION_COOKIE_SECURE = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_AGE = 10    # 600 segundos = 10 minutos
+    # 600 segundos = 10 minutos
 
 
 

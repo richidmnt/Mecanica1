@@ -127,8 +127,9 @@ footer {
         <header>
             <div class="header-left">
                 <img src="{% static 'lib/adminlte/img/logoMulti.jpeg' %}" alt=""  width="250px" class="img-size-25 img-circle mr-3">
-                <p>Dirección: Calle Falsa 123</p>
-                <p>Tel: (123) 456-7890</p>
+            <p><strong>Dirección</strong>: BELLAVISTA Calle: SABANILLA Numero: N61-77
+            Interseccion: CUARTA TRANSVERSA</p>
+                <p><strong>Tel:</strong>+593 96 405 5665</p>
             </div>
             <div class="header-right">
                 <h2>ORDEN DE RECEPCIÓN Y REPARACIÓN</h2>
@@ -204,8 +205,8 @@ footer {
             <h2 class="total">Total: {{ total }}</h2>
         </section>
         <section class="responsable">
-            <h3>RESPONSABLE</h3>
-            <p> <span style="color: #000;">Nombre:</span> {{orden.usuario_id.nombre}} {{orden.usuario_id.apellido}} </p>
+            <h3>RESPONSABLE :</h3>
+             {{orden.usuario_id.nombre}} {{orden.usuario_id.apellido}} </p>
         </section>
        
        

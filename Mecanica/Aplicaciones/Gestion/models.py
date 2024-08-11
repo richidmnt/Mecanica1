@@ -3,15 +3,6 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
 import uuid
 from django.conf import settings
-class Taller(models.Model):
-    nombre_tall = models.CharField(max_length=255)
-    descripcion_tall = models.TextField()
-    logo_tall = models.FileField(upload_to="Taller",null=True,blank=True)
-    direccion_tall = models.CharField(max_length=100)
-    email_tall = models.EmailField()
-    telefono_tall = models.CharField(max_length=11)
-
-
 
 
 class Usuario(models.Model):

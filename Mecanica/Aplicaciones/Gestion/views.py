@@ -688,7 +688,11 @@ def registrarOrden(request):
 def finalizarOrden(request,id):
     orden = get_object_or_404(Orden,id_ord=id)
     orden.estado_ord='FINALIZADA'
+    orden.fecha_fin_ord=timezone.now()
+    
+        
     orden.save()
+   
     messages.success(request,'Orden finalizada correctamente')
     return  redirect('listarOrdenes') 
 
